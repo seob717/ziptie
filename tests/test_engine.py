@@ -81,3 +81,11 @@ def test_engine_never_raises_on_garbage_input():
     d = make_project()
     assert decide({}, d) == {}
     assert decide({"tool_name": "Bash"}, d) == {}
+
+def test_broken_regex_rule_does_not_disable_others():
+    broken = "---\nname: broken-re\ntrigger:\n  tool: Bash\n  pattern: (unbalanced\n---\nb"
+    d = make_project()
+    with open(os.path.join(d, ".claude", "rules", "aa-broken.md"), "w") as f:
+        f.write(broken)  # 정렬상 pr.md보다 먼저 로드되도록 aa- 접두
+    out = decide(hook_input(session="s8"), d)
+    assert out["hookSpecificOutput"]["permissionDecision"] == "deny"  # pr-rules는 여전히 발동

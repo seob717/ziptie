@@ -29,7 +29,7 @@ def _content(rule: Rule, project_dir: str) -> str:
     if rule.source:
         try:
             with open(os.path.join(project_dir, rule.source), encoding="utf-8") as f:
-                return f.read()  # 배달 시점에 원본을 읽는다 — 복붕 아님
+                return f.read()  # 배달 시점에 원본을 읽는다 — 복붙 아님
         except OSError:
             pass
     return rule.body
@@ -68,7 +68,14 @@ def decide(input_data: dict, project_dir: str) -> dict:
         session = input_data.get("session_id", "nosession")
         for rule in load_rules(project_dir):
             field = _match_field(rule, tool_name, tool_input)
-            if field is None or not re.search(rule.pattern, field):
+            if field is None:
+                continue
+            try:
+                matched = re.search(rule.pattern, field)
+            except re.error as e:
+                print(f"ziptie: rule {rule.name} match error: {e}", file=sys.stderr)
+                continue
+            if not matched:
                 continue
             if rule.strength == "require-read":
                 state_dir = os.path.join(project_dir, ".claude", "ziptie", "state")
