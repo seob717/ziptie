@@ -3,4 +3,3 @@ pilot/runs/
 !pilot/template/*.local.md
 .state/
 /docs/
-.superpowers/
