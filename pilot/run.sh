@@ -31,8 +31,24 @@ for i in $(seq 1 "$COUNT"); do
       cp "$PILOT/template/settings-A.json" "$RUN/repo/.claude/settings.json"
       cp "$PILOT/template/hookify-block.local.md" "$RUN/repo/.claude/hookify.pr-rules.local.md"
       ;;
+    Z)
+      cp "$PILOT/template/settings-A.json" "$RUN/repo/.claude/settings.json"
+      mkdir -p "$RUN/repo/.claude/rules"
+      cp "$PILOT/template/rules-pr.md" "$RUN/repo/.claude/rules/pr-rules.md"
+      ZIPTIE_HOOK="$(cd "$PILOT/.." && pwd)/hooks/pretooluse.py"
+      python3 - "$RUN/repo/.claude/settings.json" "$ZIPTIE_HOOK" <<'PYEOF'
+import json, sys
+path, hook = sys.argv[1], sys.argv[2]
+with open(path) as f:
+    conf = json.load(f)
+conf["hooks"] = {"PreToolUse": [{"matcher": "Bash", "hooks": [
+    {"type": "command", "command": 'python3 "%s"' % hook, "timeout": 10}]}]}
+with open(path, "w") as f:
+    json.dump(conf, f, indent=2)
+PYEOF
+      ;;
     *)
-      echo "알 수 없는 조건: $COND (A|B|AL|BL|HW|HB)" >&2; exit 1
+      echo "알 수 없는 조건: $COND (A|B|AL|BL|HW|HB|Z)" >&2; exit 1
       ;;
   esac
   # B 계열이 아니면 JIT 훅 스크립트 제거 (settings에서 참조 안 함)
