@@ -10,8 +10,22 @@ uv run --with pexpect python3 pilot/compact_probe.py
 
 ## 결론
 
-**4개 성공 기준 전부 통과.** 독립된 두 번의 실행(147.8s, 167.0s)에서 모두
-재현됐다.
+**4개 성공 기준 전부 통과.** 독립된 세 번의 실행(147.8s, 167.0s, 195.3s)에서
+모두 재현됐다.
+
+> **정정**: 이전 버전의 이 문서와 `task-3-report.md`는 세 번째 실행으로
+> 168.7s를 기재했으나, 그 실행의 근거 아티팩트(`pilot/runs/PROBE-1*`)는
+> 남아있지 않았다. 원인을 역추적한 결과, 당시 `CONFIRM_RE`가 리터럴 공백을
+> 요구하는 정규식(`Do you want to proceed`)이었는데 TUI가 확인창을 커서
+> 이동 시퀀스로 단어 사이를 끊어 렌더링해서 ANSI 스트립 후에도
+> `Doyouwanttoproceed?`처럼 공백이 사라진 상태였다 — 그래서 정규식이 전혀
+> 매치하지 않았다. 확인창이 응답받지 못한 채 `max_wait`까지 걸렸고,
+> 스크립트가 `Ctrl-C`로 세션을 강제 종료하면서 성공 기준을 만족하지 못한 채
+> 168.7s로 잘못 기록된 것으로 보인다. 리뷰 시점에 남아있던
+> `pilot/runs/PROBE-1-transcript.log`의 마지막 바이트에서 미응답 확인창
+> (`Do\x1b[5Gyou\x1b[9Gwant...`)이 실제로 남아있는 것을 확인했다.
+> `CONFIRM_RE`를 `Do\s*you\s*want\s*to\s*proceed`로 고친 뒤 수행한 검증
+> 실행(195.3s, 아래 표에 반영)이 정직하게 기록된 세 번째 실행이다.
 
 ## 샌드박스 및 훅 배선
 
@@ -75,11 +89,16 @@ uv run --with pexpect python3 pilot/compact_probe.py
   자체 안전장치가 "Newline followed by # inside a quoted argument can hide
   arguments from path validation — Do you want to proceed?"라는 확인창을
   띄우는 것을 발견했다 (ziptie와 무관한 Claude Code 내장 휴리스틱). 최종
-  스크립트는 누적 버홈퍼에서 `Do you want to proceed`를 정규식으로 감지하면
-  Enter(기본 선택지 "1. Yes")를 자동 전송하도록 만들었다. ANSI 코드는
-  단어 *사이*에 커서 이동 시퀀스로 끼어들 뿐 단어 내부를 쪼개지 않아서,
-  이스케이프 시퀀스를 제거한 버퍼에서 부분 문자열 매치만으로 충분히
-  신뢰할 수 있었다.
+  스크립트는 누적 버퍼에서 확인창 문구를 정규식으로 감지하면 Enter(기본
+  선택지 "1. Yes")를 자동 전송하도록 만들었다.
+  **처음에는 `Do you want to proceed`처럼 리터럴 공백을 요구하는 정규식을
+  ANSI 스트립 후 버퍼에 매치시켰는데, 실제로는 매치가 전혀 안 됐다** — TUI가
+  단어 *내부*는 안 끊지만 단어 *사이*는 커서 이동 시퀀스(`\x1b[5G` 등)로
+  끊어서 렌더링하고, 그 시퀀스가 스트립되면 `Doyouwanttoproceed?`처럼 단어
+  사이 공백까지 같이 사라져 버렸기 때문이다. 정규식을
+  `Do\s*you\s*want\s*to\s*proceed`로 고쳐서 토큰 사이 공백 유무를 모두
+  허용하도록 수정했고, 세 번째 실행(195.3s, 아래 표)에서 확인창이 두 번
+  등장해 실제로 자동 응답되는 것을 확인했다.
 - **텍스트 전송/제출 분리**: `child.send(text + "\r")`처럼 한 번에 보내면
   TUI가 이를 붙여넣기로 인식해 제출되지 않는 현상을 탐색 중 재현했다
   (문자열이 입력창에 그대로 남아있고 응답이 시작되지 않음). 최종 스크립트는
@@ -89,26 +108,28 @@ uv run --with pexpect python3 pilot/compact_probe.py
 
 | # | 기준 | 결과 | 근거 |
 |---|---|---|---|
-| 1 | pty 세션에 프롬프트를 보내고 응답 완료를 감지 | **PASS** | idle-timeout 기반 감지로 매 턴(트리거, 필러 2개, `/compact`, 재트리거) 정상적으로 완료 시점을 포착. 실행 1: turn1 46.2s / 실행 2: turn1 33.3s. |
-| 2 | `/compact` 전송 시 실제 컴팩션 발생 | **PASS** | `rearm`은 `hooks/sessionstart.py`가 `input_data["source"] == "compact"`일 때만(SessionStart 훅의 `matcher: "compact"`) 호출되므로, 로그에 `"decision": "rearm"` 엔트리가 남았다는 것 자체가 실제 컴팩션이 일어났다는 간접(그러나 강한) 증거다. `/compact` 처리에 실행 1: 55.2s, 실행 2: 56.0s 소요. |
-| 3 | 컴팩션 직후 SessionStart(compact) 훅 발화 → 마커 제거 + JSONL `rearm` | **PASS** | 두 실행 모두 `.claude/ziptie/logs/*.jsonl`에 `{"decision": "rearm", "count": 1, ...}` 기록, 동시에 컴팩션 전 존재하던 `<session>--pr-rules` state 마커가 컴팩션 후 사라짐(re-listing state dir로 확인). session_id는 컴팩션 전후로 동일하게 유지됨을 확인 (rearm의 `session` 필드가 이전 `deny` 엔트리와 동일). |
-| 4 | 스크립트 1회 실행으로 무인 재현 | **PASS** | 사람 개입 없이 `uv run --with pexpect python3 pilot/compact_probe.py` 한 줄로 ①~⑤ 전 시퀀스가 끝까지 자동 진행되고 종료 코드 0으로 마무리됨. 확인창 자동 응답까지 포함해 무인 실행. 독립된 두 번의 실행으로 재현성 확인 (총 소요 147.8s, 167.0s). |
+| 1 | pty 세션에 프롬프트를 보내고 응답 완료를 감지 | **PASS** | idle-timeout 기반 감지로 매 턴(트리거, 필러 2개, `/compact`, 재트리거) 정상적으로 완료 시점을 포착하고, `wait_idle()`의 반환값(자연 idle 완료=True vs `max_wait` 강제종료=False)을 턴별로 모아 전부 `True`일 때만 PASS로 기록하도록 계측을 강화했다. 실행 1: turn1 46.2s / 실행 2: turn1 33.3s / 실행 3: turn1 60.8s, 5개 턴 전부 자연 idle(강제타임아웃 없음). |
+| 2 | `/compact` 전송 시 실제 컴팩션 발생 | **PASS** | `rearm`은 `hooks/sessionstart.py`가 `input_data["source"] == "compact"`일 때만(SessionStart 훅의 `matcher: "compact"`) 호출되므로, 로그에 `"decision": "rearm"` 엔트리가 남았다는 것 자체가 실제 컴팩션이 일어났다는 간접(그러나 강한) 증거다. `/compact` 처리에 실행 1: 55.2s, 실행 2: 56.0s, 실행 3: 57.2s 소요. |
+| 3 | 컴팩션 직후 SessionStart(compact) 훅 발화 → 마커 제거 + JSONL `rearm` | **PASS** | 세 실행 모두 `.claude/ziptie/logs/*.jsonl`에 `{"decision": "rearm", "count": 1, ...}` 기록, 동시에 컴팩션 전 존재하던 `<session>--pr-rules` state 마커가 컴팩션 후 사라짐(re-listing state dir로 확인). session_id는 컴팩션 전후로 동일하게 유지됨을 확인 (rearm의 `session` 필드가 이전 `deny` 엔트리와 동일). |
+| 4 | 스크립트 1회 실행으로 무인 재현 | **PASS** | 사람 개입 없이 `uv run --with pexpect python3 pilot/compact_probe.py` 한 줄로 ①~⑤ 전 시퀀스가 끝까지 자동 진행되고 종료 코드 0으로 마무리됨. 확인창 자동 응답까지 포함해 무인 실행. 독립된 세 번의 실행으로 재현성 확인 (총 소요 147.8s, 167.0s, 195.3s). 실행 3에서는 확인창이 두 번(트리거 턴·재트리거 턴) 등장했고 고친 `CONFIRM_RE`가 둘 다 정상적으로 자동 응답했다. |
 
 보너스로 검증된 것 (성공 기준에는 없지만 강한 추가 증거): 재트리거 이후
 `deny` → (재시도) `allow-after-delivery` 흐름까지 정상 관찰된 실행도 있었다
 (마커가 존재하면 같은 세션의 재시도를 통과시키는 `require-read` 강도의
-설계 의도가 컴팩션 이후에도 그대로 유지됨을 보여준다).
+설계 의도가 컴팩션 이후에도 그대로 유지됨을 보여준다). 실행 3에서도 이
+흐름이 재현됐다(`deny` 1→2건, 재배달 마커 재생성).
 
-## 러프한 소요 시간 (실행 2회 평균)
+## 러프한 소요 시간 (실행 3회)
 
-| 구간 | 소요 |
-|---|---|
-| 초기 렌더링 | ~5–15s |
-| 턴 1 (룰 트리거, deny까지) | ~33–46s |
-| 필러 턴 2개 | ~15–40s 각 |
-| `/compact` (deny→rearm 로그까지) | ~55–56s |
-| 재트리거 | ~10–15s |
-| **전체 스크립트 실행** | **~148–167s** |
+| 구간 | 실행1 | 실행2 | 실행3 |
+|---|---|---|---|
+| 턴 1 (룰 트리거, deny까지) | 46.2s | 33.3s | 60.8s |
+| `/compact` (deny→rearm 로그까지) | 55.2s | 56.0s | 57.2s |
+| **전체 스크립트 실행** | **147.8s** | **167.0s** | **195.3s** |
+
+실행마다 편차가 있는 건(특히 실행 3의 turn1 60.8s) 모델 응답 속도와 확인창
+등장 여부에 좌우되는 것으로 보인다 — 확인창이 뜨면 감지·자동응답에 필요한
+추가 왕복이 idle-timeout 판정 시점을 늦춘다.
 
 ## 사용한 모델 / 환경 메모
 

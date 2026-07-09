@@ -57,7 +57,10 @@ FILLER_MSGS = [
 ]
 
 ANSI_RE = re.compile(rb"\x1b\[[0-9;?]*[a-zA-Z]|\x1b\].*?\x07")
-CONFIRM_RE = re.compile(rb"Do you want to proceed", re.IGNORECASE)
+# TUI가 커서 이동 시퀀스(\x1b[NG)로 단어 사이를 끊어 렌더링하기 때문에,
+# ANSI_RE로 스트립한 뒤에도 단어 사이 공백이 사라져 "Doyouwanttoproceed?"
+# 형태가 된다. 그래서 \s*로 토큰 사이 공백 유무를 모두 허용한다.
+CONFIRM_RE = re.compile(rb"Do\s*you\s*want\s*to\s*proceed", re.IGNORECASE)
 
 results = {}  # criterion -> (bool, detail str)
 
@@ -235,6 +238,10 @@ def main():
     setup_sandbox()
     sess = Session()
     t_total0 = time.time()
+    # wait_idle()의 반환값(자연 idle=True vs max_wait 강제종료=False)을
+    # 턴별로 모아서 기준 1 판정에 반영한다 (초기 렌더링 대기는 "프롬프트
+    # 전송"이 아니므로 제외).
+    idle_results = []
     try:
         log("초기 렌더링 대기")
         sess.wait_idle(idle=2.0, max_wait=20.0)
@@ -243,17 +250,13 @@ def main():
         log("① 룰 트리거 과제 전송")
         t0 = time.time()
         sess.send_msg(TRIGGER_MSG)
-        sess.wait_idle(idle=4.0, max_wait=120.0)
+        idle_results.append(("turn1_trigger", sess.wait_idle(idle=4.0, max_wait=120.0)))
         elapsed1 = time.time() - t0
         marker_before = [f for f in list_state() if f.endswith("--pr-rules")]
         deny_before = [e for e in read_log_entries() if e.get("decision") == "deny"]
-        c1_ok = bool(marker_before) and bool(deny_before)
-        results["1_prompt_and_completion_detected"] = (
-            True,  # 이 단계 자체가 "프롬프트 전송 + 응답 완료 감지"의 실증
-            f"idle-timeout 감지로 turn 1 완료 판정, 소요 {elapsed1:.1f}s",
-        )
+        marker_ok = bool(marker_before) and bool(deny_before)
         results["3a_pre_compact_marker"] = (
-            c1_ok,
+            marker_ok,
             f"state 마커={marker_before}, deny 로그={len(deny_before)}건",
         )
         log(f"turn1 완료 ({elapsed1:.1f}s) marker_before={marker_before}")
@@ -262,13 +265,15 @@ def main():
         for i, fm in enumerate(FILLER_MSGS, start=2):
             log(f"filler turn {i}")
             sess.send_msg(fm)
-            sess.wait_idle(idle=4.0, max_wait=90.0)
+            idle_results.append(
+                (f"filler_turn{i}", sess.wait_idle(idle=4.0, max_wait=90.0))
+            )
 
         # ② /compact 전송
         log("② /compact 전송")
         t0 = time.time()
         sess.send_msg("/compact")
-        sess.wait_idle(idle=5.0, max_wait=150.0)
+        idle_results.append(("compact", sess.wait_idle(idle=5.0, max_wait=150.0)))
 
         # ③ 컴팩션 완료 + rearm 로그 대기 (idle 감지가 일러도 디스크 상태로 재확인)
         def rearm_seen():
@@ -309,7 +314,7 @@ def main():
             [e for e in entries_after_compact if e.get("decision") == "deny"]
         )
         sess.send_msg(TRIGGER_MSG)
-        sess.wait_idle(idle=4.0, max_wait=120.0)
+        idle_results.append(("retrigger", sess.wait_idle(idle=4.0, max_wait=120.0)))
         entries_final = read_log_entries()
         deny_count_after_retrigger = len(
             [e for e in entries_final if e.get("decision") == "deny"]
@@ -324,6 +329,17 @@ def main():
             f"재배달 마커={marker_redelivered}, deny 로그 {deny_count_before_retrigger}->{deny_count_after_retrigger}",
         )
 
+        # 기준 1 — 모든 턴이 자연 idle(=True)로 완료됐는지 판정. max_wait으로
+        # 강제 종료된 턴이 하나라도 있으면 FAIL로 기록한다 (idle-timeout이
+        # "응답 완료"를 제대로 감지하지 못했다는 신호이므로).
+        forced = [label for label, ok in idle_results if not ok]
+        c1_ok = len(idle_results) > 0 and not forced
+        results["1_prompt_and_completion_detected"] = (
+            c1_ok,
+            f"turn1 소요 {elapsed1:.1f}s, 턴별 idle 판정={idle_results}, "
+            f"강제타임아웃 턴={forced if forced else '없음'}",
+        )
+
         # ⑤ 종료
         log("⑤ 세션 종료")
     finally:
@@ -336,6 +352,7 @@ def main():
     all_core_pass = True
     for key in [
         "1_prompt_and_completion_detected",
+        "3a_pre_compact_marker",
         "2_compaction_occurred",
         "3_sessionstart_compact_rearm",
         "4_redelivery_after_rearm",
