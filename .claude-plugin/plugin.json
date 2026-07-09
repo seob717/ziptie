@@ -1,7 +1,10 @@
 {
   "name": "ziptie",
   "description": "Zip-tie your rules to the moment they matter. Compiles CLAUDE.md rules into trigger-bound hooks and delivers them right before the action.",
-  "version": "0.1.0",
-  "author": { "name": "yuseobshim", "email": "seob717@jirocorp.io" },
+  "version": "0.2.0",
+  "author": {
+    "name": "yuseobshim",
+    "email": "seob717@jirocorp.io"
+  },
   "license": "MIT"
 }
