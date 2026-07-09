@@ -179,6 +179,8 @@ def rearm(input_data, project_dir: str) -> None:
         input_data = input_data or {}
         session = _sanitize_session(input_data.get("session_id", "nosession"))
         state_dir = os.path.join(project_dir, ".claude", "ziptie", "state")
+        if not os.path.isdir(state_dir):
+            return  # 배달된 적 없는 프로젝트 — 리셋할 마커도 없다 (stderr 노이즈 방지)
         prefix = f"{session}--"
         warned_marker = f"warned--{session}"
         removed = 0
