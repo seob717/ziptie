@@ -1,6 +1,6 @@
 {
   "name": "ziptie",
-  "description": "Zip-tie your rules to the moment they matter. CLAUDE.md 룰을 트리거 바인딩 훅으로 컴파일해 행동 직전에 배달한다.",
+  "description": "Zip-tie your rules to the moment they matter. Compiles CLAUDE.md rules into trigger-bound hooks and delivers them right before the action.",
   "version": "0.1.0",
   "author": { "name": "yuseobshim", "email": "seob717@jirocorp.io" },
   "license": "MIT"

@@ -2,19 +2,19 @@
 
 *"Zip-tie your rules to the moment they matter."*
 
-CLAUDE.md 룰을 트리거 바인딩 훅으로 컴파일해, 룰이 실제로 필요한 행동 직전에 배달하는 Claude Code 플러그인이다.
+A Claude Code plugin that compiles CLAUDE.md rules into trigger-bound hooks and delivers each rule right before the action it applies to.
 
-## 문제
+## The problem
 
-CLAUDE.md에 적어둔 룰은 세션이 시작되는 t=0에 한 번 로드되고 끝이다. 하지만 그 룰이 실제로 필요한 순간은 대개 수십 턴 뒤다. 컨텍스트가 쌓일수록 세션 서두에 있던 룰에 대한 모델의 주의는 옅어지고, 컴팩션(요약)이 한 번 지나가면 명시적 룰은 흐릿한 배경 정보로 강등된다. `@docs/pr-rules.md` 같은 참조 문서는 정작 그 룰이 필요한 행동(`gh pr create` 실행 등) 시점에는 컨텍스트에서 가장 먼 곳에 밀려나 있다. ziptie는 룰을 "세션 서두의 선언"이 아니라 "행동에 바인딩된 이벤트 리스너"로 컴파일해서, 룰이 필요한 시점과 룰이 배달되는 시점 사이의 거리를 0으로 만든다.
+A rule you write in CLAUDE.md is loaded once, at t=0 when the session starts, and that's it. But the moment that rule actually matters is usually dozens of turns later. As context piles up, the model's attention on a rule from the top of the session fades, and once a compaction (summary) passes through, an explicit rule gets demoted to blurry background. A referenced document like `@docs/pr-rules.md` ends up furthest from context at exactly the point where the rule is needed (e.g. when running `gh pr create`). ziptie compiles a rule not as a "declaration at the top of the session" but as an "event listener bound to an action," collapsing the distance between when a rule is needed and when it is delivered to zero.
 
-## 동작 방식
+## How it works
 
-1. **`/ziptie:compile`** — CLAUDE.md와 그 안의 `@참조` 문서를 읽어 룰을 추출하고, 각 룰에 트리거(도구, 정규식 패턴)를 추론해 `.claude/rules/*.md`로 컴파일한다.
-2. **룰 파일 검토** — 컴파일 결과는 사람이 읽고 수정할 수 있는 평문 파일이다. 트리거·강도·원본 문서 경로가 맞는지 확인하고 필요하면 손으로 고친다. 이 파일이 진실의 원천이다.
-3. **행동 순간 자동 배달** — PreToolUse 훅이 도구 호출을 가로채 트리거와 매칭한다. 매칭되면 그 시점에 `source` 문서를 직접 읽어(복붙된 사본이 아니라 원본을) 배달한다.
+1. **`/ziptie:compile`** — Reads CLAUDE.md and the `@referenced` documents inside it, extracts rules, infers a trigger (tool, regex pattern) for each rule, and compiles them into `.claude/rules/*.md`.
+2. **Review the rule files** — The compiled output is plain-text files you can read and edit. Check that the trigger, strength, and source document path are correct, and fix them by hand if needed. These files are the source of truth.
+3. **Just-in-time delivery at the moment of action** — A PreToolUse hook intercepts tool calls and matches them against triggers. On a match, it reads the `source` document directly at that moment (the original, not a pasted copy) and delivers it.
 
-## 룰 파일 포맷
+## Rule file format
 
 ```markdown
 ---
@@ -26,52 +26,52 @@ source: docs/pr-rules.md
 strength: require-read
 enabled: true
 ---
-PR 생성 전 docs/pr-rules.md를 반영해.
+Reflect docs/pr-rules.md before creating a PR.
 ```
 
-- `trigger.tool` / `trigger.pattern`: 어떤 도구 호출을, 어떤 정규식으로 가로챌지.
-- `source`: 배달 시점에 그 자리에서 읽어올 원본 문서 경로. 원본이 바뀌면 다음 배달부터 자동 반영된다.
-- `strength`: `require-read`(세션 최초 1회 차단 후 이유를 배달, 재시도는 통과) / `block`(항상 차단). `inject`는 v2 로드맵(아래 참고) — 현재 버전에서 지정하면 지원 이벤트가 없어 `require-read`로 자동 폴백되고, stderr에 경고가 남는다.
-- 본문: 원본 문서 대신 또는 원본에 더해 배달할 요약문.
+- `trigger.tool` / `trigger.pattern`: which tool call to intercept, and with what regex.
+- `source`: the path to the original document, read on the spot at delivery time. If the original changes, the change is reflected automatically from the next delivery on.
+- `strength`: `require-read` (block once per session and deliver the reason, let the retry through) / `block` (always block). `inject` is on the v2 roadmap (see below) — specifying it in the current version falls back to `require-read` automatically because there is no supporting event, and a warning is written to stderr.
+- Body: a summary to deliver instead of, or in addition to, the original document.
 
-## 실측 결과
+## Measured results
 
-측정 하네스: 샌드박스 레포 + mock `gh`(PR 캡처) + 기계 채점 가능한 PR 규칙 4개 + 헤드리스 `claude -p`(sonnet), 조건별 3런. (`pilot/` 디렉터리에 하네스 전체를 보존해 재실행 가능하게 해뒀다.)
+Measurement harness: a sandbox repo + a mock `gh` (captures PRs) + 4 machine-gradable PR rules + headless `claude -p` (sonnet), 3 runs per condition. (The full harness is preserved in the `pilot/` directory so it can be re-run.)
 
-| 조건 | 설명 | 전부통과 | 비고 |
+| Condition | Description | All-pass | Notes |
 |---|---|---|---|
-| A | CLAUDE.md만 (짧은 컨텍스트) | 3/3 | 천장 효과 — 룰이 방금 로드된 상태라 이 압력에선 무너지지 않음 |
-| AL | CLAUDE.md만 + 롱컨텍스트(~60k 토큰) | 3/3 | 롱컨텍스트에서도 천장 효과가 지속됨 |
-| HW | hookify warn | 3/3 | 경고 메시지가 모델에는 전달되지 않아 사실상 A와 동일 조건 |
-| HB | hookify block | 0/3 | `permissionDecisionReason`을 채우지 않아, 모델이 이유를 모른 채 막혀 3/3 작업이 파괴됨 |
-| Z | ziptie JIT 배달 (실제 엔진, E2E) | 3/3 | 훅 3/3 발동 — 1차 시도는 차단하며 이유(룰 원문)를 함께 배달, 재시도에서 전부 통과 |
+| A | CLAUDE.md only (short context) | 3/3 | Ceiling effect — the rule was just loaded, so it doesn't collapse under this pressure |
+| AL | CLAUDE.md only + long context (~60k tokens) | 3/3 | The ceiling effect persists even in long context |
+| HW | hookify warn | 3/3 | The warning message never reaches the model, so effectively the same condition as A |
+| HB | hookify block | 0/3 | It doesn't populate `permissionDecisionReason`, so the model is blocked without knowing why, destroying 3/3 of the tasks |
+| Z | ziptie JIT delivery (real engine, E2E) | 3/3 | Hook fired 3/3 — the first attempt is blocked while the reason (the rule's original text) is delivered, and all retries pass |
 
-이 표가 보여주는 것은 "JIT가 CLAUDE.md보다 준수율이 높다"는 우위가 아니다 — 이번 파일럿의 압력 수준(단순 룰 4개, 단일 과제, sonnet)에서는 CLAUDE.md 단독(A, AL)도 무너지지 않는 천장 효과가 나타났고, 이 결과는 숨기지 않는다. 대신 실측이 실제로 지지하는 것은 세 가지다.
+What this table shows is *not* an edge of "JIT has a higher compliance rate than CLAUDE.md" — at this pilot's pressure level (4 simple rules, a single task, sonnet), even CLAUDE.md alone (A, AL) held up with a ceiling effect, and we don't hide that result. What the measurement actually supports is three things:
 
-1. **hookify block은 유해하다.** 이유를 전달하지 않는 차단은 3/3 작업을 파괴한다. 같은 차단이라도 이유를 함께 배달하면(ziptie 방식) 0/3 → 3/3으로 바뀐다.
-2. **JIT 배달 메커니즘 자체는 동작하며 작업을 해치지 않는다.** 실제 ziptie 엔진을 붙인 E2E(조건 Z)에서 훅이 3/3 정상 발동했고, 차단 후 이유를 받아 재시도한 3런 모두 작업을 완수했다.
-3. **원본 문서 동기화와 배달 로깅이 실제로 동작한다.** `source`는 배달 시점에 매번 읽히므로 룰과 원본이 어긋나지 않고, 모든 트리거·배달·차단은 JSONL로 남아 `/ziptie:report`로 집계된다.
+1. **hookify block is harmful.** A block that doesn't communicate the reason destroys 3/3 of the tasks. The same block, when it delivers the reason alongside it (the ziptie way), flips 0/3 → 3/3.
+2. **The JIT delivery mechanism itself works and does not hurt the task.** In the E2E with the real ziptie engine attached (condition Z), the hook fired 3/3 normally, and all 3 runs — blocked, then given the reason and retried — completed the task.
+3. **Source-document sync and delivery logging actually work.** Because `source` is read every time at delivery, the rule and its original never drift apart, and every trigger, delivery, and block is recorded as JSONL and aggregated by `/ziptie:report`.
 
-더 강한 압력(약한 모델, 룰 수십 개, 멀티태스크, 컴팩션 발생 후 세션)에서 JIT가 우위를 보이는지는 아직 검증하지 않았고, 검증 전까지는 그 주장을 하지 않는다.
+Whether JIT shows an edge under stronger pressure (a weaker model, dozens of rules, multitasking, a session after compaction) has not been verified yet, and we don't make that claim until it is.
 
-## 설치
+## Installation
 
-아직 마켓플레이스에 등록되지 않았다. 로컬 디렉터리에서 직접 설치해서 쓴다.
+Not yet published to the marketplace. Install it directly from a local directory.
 
 ```bash
 git clone <this-repo> ziptie
 claude --plugin-dir /path/to/ziptie
 ```
 
-플러그인이 로드되면 `/ziptie:compile`, `/ziptie:report` 슬래시 커맨드와 PreToolUse 훅이 활성화된다.
+Once the plugin loads, the `/ziptie:compile` and `/ziptie:report` slash commands and the PreToolUse hook are active.
 
-## 한계와 로드맵
+## Limitations and roadmap
 
-MVP는 PreToolUse 훅의 `require-read`·`block` 두 강도만 지원한다. 다음은 아직 구현되지 않았고 로드맵에 있다.
+The MVP supports only the two strengths on the PreToolUse hook: `require-read` and `block`. The following are not implemented yet and are on the roadmap.
 
-- **`inject` 강도**: 차단 없이 컨텍스트에 룰 원문만 주입. 이벤트별 `additionalContext` 지원 여부 조사가 선행돼야 한다.
-- **시맨틱 저지**: 정규식 트리거가 아니라 LLM으로 출력 내용을 검사해 룰 위반을 잡는 방식. 지연·비용 트레이드오프 검토가 필요하다.
-- **Stop 이벤트 룰**: "작업 완료 전 이 조건을 만족했는가"를 세션 종료 시점에 검사하는 룰.
-- **준수율 리포트 UI**: 지금은 `/ziptie:report`가 로그를 표로 집계해 보여주는 수준이고, 더 정교한 분석은 백로그에 있다.
+- **`inject` strength**: injects only the rule's original text into context without blocking. It has to be preceded by an investigation into whether per-event `additionalContext` is supported.
+- **Semantic judging**: inspecting output content with an LLM to catch rule violations, rather than a regex trigger. This needs a latency/cost tradeoff review.
+- **Stop-event rules**: rules that check "was this condition satisfied before the task completed?" at session-end time.
+- **Compliance report UI**: right now `/ziptie:report` only aggregates the log into a table; more sophisticated analysis is in the backlog.
 
-또한 이 결과는 n=3 파일럿에 기반한다. 통계적으로 "100%"는 이 표본에서 실패를 관찰하지 못했다는 뜻 이상이 아니며, 더 큰 표본과 더 강한 압력 조건에서의 재검증이 필요하다.
+Also, these results are based on an n=3 pilot. Statistically, "100%" means no more than "we observed no failure in this sample," and it needs re-verification with a larger sample and stronger pressure conditions.

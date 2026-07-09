@@ -1,11 +1,11 @@
 ---
-description: ziptie 배달 로그를 집계해 룰별 배달 횟수와 죽은 룰을 보여준다
+description: Aggregate ziptie delivery logs to show per-rule delivery counts and dead rules
 ---
 
 # /ziptie:report
 
-1. 프로젝트 루트에서 실행해라: `PYTHONPATH="${CLAUDE_PLUGIN_ROOT}" python3 -m core.report`
-2. 출력을 표로 정리해 보여주고, 다음을 해설해라:
-   - **deny(배달) 횟수가 많은 룰**: 정규식이 넓어 과잉 트리거일 수 있다 — 패턴을 좁히길 제안.
-   - **한 번도 트리거되지 않은 룰**: 죽은 룰이다 — 트리거가 틀렸거나 해당 행동이 없었던 것. 확인을 제안.
-3. 로그가 없으면 "아직 배달 기록이 없다"고 알려라.
+1. Run from the project root: `PYTHONPATH="${CLAUDE_PLUGIN_ROOT}" python3 -m core.report`
+2. Organize the output into a table and explain the following:
+   - **Rules with a high deny (delivery) count**: the regex may be too broad and over-triggering — suggest narrowing the pattern.
+   - **Rules that never triggered**: these are dead rules — either the trigger is wrong or the action never happened. Suggest checking them.
+3. If there is no log, report that "there are no delivery records yet."
