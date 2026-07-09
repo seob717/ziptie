@@ -12,7 +12,7 @@ try:
 
     input_data = json.load(sys.stdin)
     project_dir = (
-        input_data.get("cwd") or os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()
+        os.environ.get("CLAUDE_PROJECT_DIR") or input_data.get("cwd") or os.getcwd()
     )
     result = decide(input_data, project_dir)
     if result:
