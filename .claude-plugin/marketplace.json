@@ -1,0 +1,12 @@
+{
+  "name": "ziptie-marketplace",
+  "owner": { "name": "yuseobshim", "email": "seob717@jirocorp.io" },
+  "description": "JIT rule-delivery plugin — compiles CLAUDE.md rules into trigger-bound hooks.",
+  "plugins": [
+    {
+      "name": "ziptie",
+      "source": "./",
+      "description": "Zip-tie your rules to the moment they matter. Compiles CLAUDE.md rules into trigger-bound hooks and delivers them right before the action."
+    }
+  ]
+}

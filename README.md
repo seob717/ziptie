@@ -56,10 +56,17 @@ Whether JIT shows an edge under stronger pressure (a weaker model, dozens of rul
 
 ## Installation
 
-Not yet published to the marketplace. Install it directly from a local directory.
+### From the marketplace (recommended)
+
+```
+/plugin marketplace add seob717/ziptie
+/plugin install ziptie@ziptie-marketplace
+```
+
+### From a local directory
 
 ```bash
-git clone <this-repo> ziptie
+git clone https://github.com/seob717/ziptie.git
 claude --plugin-dir /path/to/ziptie
 ```
 
