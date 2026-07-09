@@ -79,6 +79,15 @@ def test_invalid_name_uppercase_returns_none_with_warning(capsys):
     assert "PR-Rules" in err
 
 
+def test_enabled_typo_value_warns_and_stays_true(capsys):
+    injected = VALID.replace("enabled: true", "enabled: flase")
+    with tempfile.TemporaryDirectory() as d:
+        rule = parse_rule_file(_write(d, "r.md", injected))
+    assert rule.enabled is True
+    err = capsys.readouterr().err
+    assert "flase" in err
+
+
 def test_load_rules_filters_disabled_and_broken():
     with tempfile.TemporaryDirectory() as d:
         rules_dir = os.path.join(d, ".claude", "rules")

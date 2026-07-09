@@ -82,7 +82,17 @@ def parse_rule_file(path: str) -> Optional[Rule]:
                 file=sys.stderr,
             )
             strength = "require-read"
-        enabled = str(meta.get("enabled", "true")).lower() != "false"
+        enabled_raw = str(meta.get("enabled", "true"))
+        enabled_lower = enabled_raw.lower()
+        if enabled_lower not in ("true", "false"):
+            print(
+                f"ziptie: rule {name}: unrecognized enabled value '{enabled_raw}' — "
+                "true로 취급",
+                file=sys.stderr,
+            )
+            enabled = True
+        else:
+            enabled = enabled_lower == "true"
         return Rule(
             name=name,
             tool=tool,
