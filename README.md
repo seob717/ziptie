@@ -1,5 +1,8 @@
 # ziptie
 
+[![License](https://img.shields.io/github/license/seob717/ziptie)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/seob717/ziptie)](https://github.com/seob717/ziptie/releases)
+
 *"Zip-tie your rules to the moment they matter."*
 
 A Claude Code plugin that compiles CLAUDE.md rules into trigger-bound hooks and delivers each rule right before the action it applies to.
@@ -54,6 +57,11 @@ What this table shows is *not* an edge of "JIT has a higher compliance rate than
 
 Whether JIT shows an edge under stronger pressure (a weaker model, dozens of rules, multitasking, a session after compaction) has not been verified yet, and we don't make that claim until it is.
 
+## Requirements
+
+- [Claude Code](https://code.claude.com) with plugin support
+- Python 3 — the hook engine and `/ziptie:report` run on the standard library only; no external packages
+
 ## Installation
 
 ### From the marketplace (recommended)
@@ -72,6 +80,17 @@ claude --plugin-dir /path/to/ziptie
 
 Once the plugin loads, the `/ziptie:compile` and `/ziptie:report` slash commands and the PreToolUse hook are active.
 
+## Development
+
+```bash
+uvx pytest tests/              # run the test suite (stdlib-only code, pytest as the runner)
+uvx pre-commit run --all-files # lint & format (ruff)
+```
+
+## Contributing
+
+Issues and PRs are welcome. Commit messages must follow [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `docs:`, …) — [release-please](https://github.com/googleapis/release-please) derives versions and the changelog from them.
+
 ## Limitations and roadmap
 
 The MVP supports only the two strengths on the PreToolUse hook: `require-read` and `block`. The following are not implemented yet and are on the roadmap.
@@ -82,6 +101,10 @@ The MVP supports only the two strengths on the PreToolUse hook: `require-read` a
 - **Compliance report UI**: right now `/ziptie:report` only aggregates the log into a table; more sophisticated analysis is in the backlog.
 
 Also, these results are based on an n=3 pilot. Statistically, "100%" means no more than "we observed no failure in this sample," and it needs re-verification with a larger sample and stronger pressure conditions.
+
+## License
+
+[MIT](LICENSE)
 
 ---
 
