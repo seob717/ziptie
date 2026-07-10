@@ -50,6 +50,17 @@ def test_parse_defaults():
     assert rule.enabled is True  # 기본 활성
     assert rule.source is None
     assert rule.field is None  # 기본: 도구별 기본 필드(command/file_path)
+    assert rule.path_pattern is None  # 기본: 경로 제한 없음
+
+
+def test_parse_trigger_path():
+    with_path = (
+        "---\nname: no-any\ntrigger:\n  tool: Edit\n"
+        "  pattern: as\\s+any\n  field: new_string\n  path: \\.tsx?$\n---\nbody"
+    )
+    with tempfile.TemporaryDirectory() as d:
+        rule = parse_rule_file(_write(d, "r.md", with_path))
+    assert rule.path_pattern == "\\.tsx?$"
 
 
 def test_parse_trigger_field():

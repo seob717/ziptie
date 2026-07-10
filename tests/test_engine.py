@@ -309,6 +309,49 @@ def test_content_field_missing_or_non_string_no_match():
     assert decide(inp, d) == {}
 
 
+PATH_SCOPED_RULE = """---
+name: no-any
+trigger:
+  tool: Edit
+  pattern: \\bas\\s+any\\b
+  field: new_string
+  path: \\.tsx?$
+strength: block
+---
+any 금지.
+"""
+
+
+def test_path_scoped_content_rule_matches_code_file():
+    d = make_project(PATH_SCOPED_RULE, with_source=False)
+    out = decide(_edit_input("ps1", "const x = y as any", file_path="src/a.ts"), d)
+    assert out["hookSpecificOutput"]["permissionDecision"] == "deny"
+
+
+def test_path_scoped_content_rule_skips_other_paths():
+    # 실사용 오탐 사례: 문서 속 예시 코드가 content 패턴에 걸리면 안 된다.
+    d = make_project(PATH_SCOPED_RULE, with_source=False)
+    inp = _edit_input("ps2", "const x = y as any", file_path="docs/typescript.md")
+    assert decide(inp, d) == {}
+
+
+def test_path_scoped_rule_missing_file_path_no_match():
+    d = make_project(PATH_SCOPED_RULE, with_source=False)
+    inp = {
+        "hook_event_name": "PreToolUse",
+        "session_id": "ps3",
+        "tool_name": "Edit",
+        "tool_input": {"new_string": "y as any"},  # file_path 없음
+    }
+    assert decide(inp, d) == {}
+
+
+def test_path_scoped_rule_invalid_path_regex_skipped():
+    bad = PATH_SCOPED_RULE.replace("path: \\.tsx?$", "path: \\.tsx?$[")
+    d = make_project(bad, with_source=False)
+    assert decide(_edit_input("ps4", "y as any", file_path="src/a.ts"), d) == {}
+
+
 def test_inject_first_match_returns_additional_context_only():
     # PROBE-inject.md 판정 ②: permissionDecision을 넣으면 권한 시스템을
     # 우회하므로 additionalContext 단독으로 반환해야 한다.

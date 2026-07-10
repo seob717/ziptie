@@ -19,10 +19,12 @@ From each document, extract only rules that "are effective when recalled right b
 ## 3. Infer triggers
 For each rule, set a `tool` (Bash|Edit|Write) and a `pattern` (Python regex). Examples:
 - PR rules → tool: Bash, pattern: `gh\s+pr\s+create`
-- Commit conventions → tool: Bash, pattern: `git\s+commit`
+- Commit conventions → tool: Bash, pattern: `git(\s+-\S+(\s+\S+)?)*\s+commit`
 - Migration file rules → tool: Edit, pattern: `migrations/`
-- Content rules ("no console.log") → tool: Edit, pattern: `console\.log`, field: `new_string`
-A Bash rule's pattern matches against the command string; an Edit/Write rule's pattern matches against the file path. Add `field: <tool_input key>` under `trigger` to match against a specific input field instead (e.g. `new_string` for edit content, `content` for Write).
+- Content rules ("no console.log") → tool: Edit, pattern: `console\.log`, field: `new_string`, path: `\.(ts|tsx)$`
+A Bash rule's pattern matches against the command string; an Edit/Write rule's pattern matches against the file path. Add `field: <tool_input key>` under `trigger` to match against a specific input field instead (e.g. `new_string` for edit content, `content` for Write). Two hard-won cautions:
+- **Content rules must carry a `path:` regex** (ANDed with `pattern` against the file path) scoping them to code files — otherwise the rule fires on example code inside markdown, comments, and even its own source document.
+- **Git command patterns must allow global options** — `git\s+commit` misses `git -C <dir> commit`; use the `git(\s+-\S+(\s+\S+)?)*\s+<subcommand>` shape.
 
 ## 4. Decide strength
 - The default is `require-read` (block once per session with the rule as the reason, let the retry through — guarantees a read at the cost of one retry).

@@ -21,6 +21,7 @@ class Rule:
     body: str
     path: str
     field: Optional[str] = None  # tool_input에서 매칭할 필드 (없으면 도구별 기본)
+    path_pattern: Optional[str] = None  # file_path AND 조건 (content 룰 오탐 방지)
 
 
 def _parse_frontmatter(text: str):
@@ -110,6 +111,7 @@ def parse_rule_file(path: str, quiet: bool = False) -> Optional[Rule]:
             body=body,
             path=path,
             field=trigger.get("field") or None,
+            path_pattern=trigger.get("path") or None,
         )
     except Exception as e:  # 안전 기본값: 절대 세션을 죽이지 않는다
         if not quiet:

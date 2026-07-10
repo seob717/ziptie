@@ -147,6 +147,13 @@ def decide(input_data: dict, project_dir: str) -> dict:
                     continue
                 try:
                     matched = re.search(rule.pattern, field)
+                    if matched and rule.path_pattern:
+                        # path AND 조건 — content 룰이 문서·마크다운 속 예시
+                        # 코드에 걸리는 오탐 방지. file_path 부재는 매칭 불가.
+                        path = tool_input.get("file_path")
+                        matched = isinstance(path, str) and re.search(
+                            rule.path_pattern, path
+                        )
                 except re.error as e:
                     if not quiet:
                         print(

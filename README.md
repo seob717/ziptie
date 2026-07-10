@@ -36,6 +36,7 @@ Reflect docs/pr-rules.md before creating a PR.
 - `name`: lowercase letters, digits, and hyphens only (`[a-z0-9][a-z0-9-]*`). A file with an invalid name is rejected with a stderr warning instead of silently misbehaving.
 - `trigger.tool` / `trigger.pattern`: which tool call to intercept, and with what regex. By default the pattern matches a Bash rule against the command string and an Edit/Write rule against the file path.
 - `trigger.field` (optional): match against a specific `tool_input` field instead of the default. `field: new_string` on an Edit rule makes content rules expressible — e.g. pattern `console\.log` fires when the *edit being written* contains `console.log`, regardless of the file path.
+- `trigger.path` (optional): a file-path regex ANDed with `pattern` — the rule fires only when both match. Scope content rules to code files (`path: \.(ts|tsx)$`) so example code inside markdown or docs doesn't trigger them; without it, a `field: new_string` rule blocks *any* file whose edit contains the pattern — including the rule's own source document.
 - `source`: the path to the original document, read on the spot at delivery time. If the original changes, the change is reflected automatically from the next delivery on.
 - `strength`: three levels, in decreasing order of enforcement.
   - `block` — always block, delivering the rule as the reason. For actions a document marks as absolutely forbidden.
