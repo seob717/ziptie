@@ -109,6 +109,34 @@ def test_context_economics_sums_docs_bodies_and_deliveries():
         eco["deliveries"] == 2
     )  # deny 1 + inject 1 (allow-after-delivery는 배달 아님)
     assert eco["delivered_bytes"] == 2000
+    assert (
+        eco["sessions_seen"] == 1
+    )  # 로그의 고유 세션 수 — 하한 (무배달 세션은 흔적 없음)
+
+
+def test_context_economics_counts_distinct_sessions():
+    import json as _json
+
+    from core.report import context_economics
+
+    d = tempfile.mkdtemp()
+    log_dir = os.path.join(d, ".claude", "ziptie", "logs")
+    os.makedirs(log_dir)
+    with open(os.path.join(log_dir, "2026-07-10.jsonl"), "w") as f:
+        for sess in ("s1", "s2", "s2"):
+            f.write(
+                _json.dumps(
+                    {
+                        "ts": "t",
+                        "session": sess,
+                        "rule": "r",
+                        "tool": "Bash",
+                        "decision": "deny",
+                    }
+                )
+                + "\n"
+            )
+    assert context_economics(d)["sessions_seen"] == 2
 
 
 def test_context_economics_no_rules():

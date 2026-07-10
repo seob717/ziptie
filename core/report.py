@@ -53,6 +53,7 @@ def context_economics(project_dir: str) -> dict:
             except OSError:
                 pass
     deliveries = delivered_bytes = 0
+    sessions = set()
     for path in sorted(
         glob.glob(os.path.join(project_dir, ".claude", "ziptie", "logs", "*.jsonl"))
     ):
@@ -64,6 +65,8 @@ def context_economics(project_dir: str) -> dict:
                     continue
                 if not isinstance(entry, dict):
                     continue
+                if entry.get("session"):
+                    sessions.add(entry["session"])
                 if entry.get("decision") not in ("deny", "inject"):
                     continue
                 deliveries += 1
@@ -75,6 +78,8 @@ def context_economics(project_dir: str) -> dict:
         "body_bytes": body_bytes,
         "deliveries": deliveries,
         "delivered_bytes": delivered_bytes,
+        # 하한: 무배달 세션은 로그에 흔적이 없다 (SessionStart 훅은 compact 전용)
+        "sessions_seen": len(sessions),
     }
 
 
@@ -106,7 +111,9 @@ def main():
             f"ziptie 방식 세션 시작 비용은 룰 본문 {eco['body_bytes']:,}B "
             f"(세션당 약 {saved:,}B 절약). "
             f"배달 지출 {eco['deliveries']}건 ≈ {eco['delivered_bytes']:,}B "
-            f"(현재 문서 크기 기준 근사)."
+            f"(현재 문서 크기 기준 근사). "
+            f"로그에 잡힌 세션 {eco['sessions_seen']}개 — 하한(무배달 세션은 "
+            f"로그에 없음), 누적 절약은 최소 세션수×{saved:,}B − 배달 지출."
         )
 
 
