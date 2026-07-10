@@ -1,6 +1,6 @@
 {
-  "name": "ziptie",
-  "description": "Zip-tie your rules to the moment they matter. Compiles CLAUDE.md rules into trigger-bound hooks and delivers them right before the action.",
+  "name": "nunchi",
+  "description": "Rules with nunchi — delivered before you have to ask. Compiles CLAUDE.md rules into trigger-bound hooks and delivers them right before the action.",
   "version": "0.6.0",
   "author": {
     "name": "yuseobshim",

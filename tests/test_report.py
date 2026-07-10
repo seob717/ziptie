@@ -15,7 +15,7 @@ def test_summarize_counts_and_dead_rules():
     for n in ("pr-rules", "dead-rule"):
         with open(os.path.join(d, ".claude", "rules", n + ".md"), "w") as f:
             f.write(RULE.format(n=n))
-    log_dir = os.path.join(d, ".claude", "ziptie", "logs")
+    log_dir = os.path.join(d, ".claude", "nunchi", "logs")
     os.makedirs(log_dir)
     with open(os.path.join(log_dir, "2026-07-09.jsonl"), "w") as f:
         for dec in ("deny", "allow-after-delivery", "allow-after-delivery"):
@@ -38,7 +38,7 @@ def test_summarize_counts_and_dead_rules():
 
 
 def _write_log(d, entries):
-    log_dir = os.path.join(d, ".claude", "ziptie", "logs")
+    log_dir = os.path.join(d, ".claude", "nunchi", "logs")
     os.makedirs(log_dir)
     with open(os.path.join(log_dir, "2026-07-10.jsonl"), "w") as f:
         for rule, dec in entries:
@@ -120,7 +120,7 @@ def test_context_economics_counts_distinct_sessions():
     from core.report import context_economics
 
     d = tempfile.mkdtemp()
-    log_dir = os.path.join(d, ".claude", "ziptie", "logs")
+    log_dir = os.path.join(d, ".claude", "nunchi", "logs")
     os.makedirs(log_dir)
     with open(os.path.join(log_dir, "2026-07-10.jsonl"), "w") as f:
         for sess in ("s1", "s2", "s2"):
@@ -173,7 +173,7 @@ def test_context_economics_tracked_sessions():
     from core.report import context_economics
 
     d = tempfile.mkdtemp()
-    log_dir = os.path.join(d, ".claude", "ziptie", "logs")
+    log_dir = os.path.join(d, ".claude", "nunchi", "logs")
     os.makedirs(log_dir)
     with open(os.path.join(log_dir, "2026-07-10.jsonl"), "w") as f:
         rows = [
@@ -207,7 +207,7 @@ def test_summarize_empty_project():
 
 def test_summarize_skips_corrupted_lines():
     d = tempfile.mkdtemp()
-    log_dir = os.path.join(d, ".claude", "ziptie", "logs")
+    log_dir = os.path.join(d, ".claude", "nunchi", "logs")
     os.makedirs(log_dir)
     with open(os.path.join(log_dir, "2026-07-09.jsonl"), "w") as f:
         f.write("not json\n")

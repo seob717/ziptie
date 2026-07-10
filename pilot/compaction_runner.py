@@ -14,9 +14,9 @@
 
 조건:
     AC — 압박 CLAUDE.md(+@docs, 규칙 24개 = template/repo-pressure),
-         ziptie 훅 없음, 관측 전용 SessionStart(compact) 훅만 배선.
+         nunchi 훅 없음, 관측 전용 SessionStart(compact) 훅만 배선.
     ZC — AC와 동일 + .claude/rules/(pr-rules, commit-rules) +
-         ziptie PreToolUse 훅 + ziptie SessionStart(compact) 재무장 훅
+         nunchi PreToolUse 훅 + nunchi SessionStart(compact) 재무장 훅
          (관측 훅과 공존).
     AC2/ZC2 — 각각 AC/ZC와 동일 구성, 시퀀스만 3단 과제 + /compact 2회
          (DESIGN-compaction-followup.md §3: 1단 커밋 → compact → 2단
@@ -51,13 +51,13 @@ except ImportError:
     pexpect = None
 
 PILOT_DIR = os.path.dirname(os.path.abspath(__file__))
-ZIPTIE_ROOT = os.path.dirname(PILOT_DIR)
+NUNCHI_ROOT = os.path.dirname(PILOT_DIR)
 TEMPLATE_REPO = os.path.join(PILOT_DIR, "template", "repo-pressure")
 
 CONDITIONS = ("AC", "ZC", "AC2", "ZC2")
-# ziptie 훅(재무장 포함)이 배선되는 조건 — AC2/ZC2는 각각 AC/ZC의 훅 구성을
+# nunchi 훅(재무장 포함)이 배선되는 조건 — AC2/ZC2는 각각 AC/ZC의 훅 구성을
 # 그대로 쓰고 시퀀스만 3단·컴팩션 2회로 늘린다 (DESIGN-compaction-followup.md §3.2).
-ZIPTIE_CONDITIONS = ("ZC", "ZC2")
+NUNCHI_CONDITIONS = ("ZC", "ZC2")
 TWO_COMPACT_CONDITIONS = ("AC2", "ZC2")
 
 
@@ -137,8 +137,8 @@ class RunConfig:
         self.run_dir = os.path.join(PILOT_DIR, "runs", run_id)
         self.sandbox = os.path.join(self.run_dir, "repo")
         self.capture_dir = os.path.join(self.run_dir, "capture")
-        self.state_dir = os.path.join(self.sandbox, ".claude", "ziptie", "state")
-        self.log_dir = os.path.join(self.sandbox, ".claude", "ziptie", "logs")
+        self.state_dir = os.path.join(self.sandbox, ".claude", "nunchi", "state")
+        self.log_dir = os.path.join(self.sandbox, ".claude", "nunchi", "logs")
         self.observer_log = os.path.join(self.run_dir, "compact-observed.log")
         self.transcript_path = os.path.join(self.run_dir, "transcript.log")
         self.idle_results_path = os.path.join(self.run_dir, "idle-results.json")
@@ -177,15 +177,15 @@ def build_settings(cfg: RunConfig) -> dict:
 
     observer_script = os.path.join(PILOT_DIR, "observer_sessionstart.py")
     observer_cmd = (
-        f'ZIPTIE_OBSERVER_LOG="{cfg.observer_log}" python3 "{observer_script}"'
+        f'NUNCHI_OBSERVER_LOG="{cfg.observer_log}" python3 "{observer_script}"'
     )
     compact_hooks = [{"type": "command", "command": observer_cmd, "timeout": 10}]
 
     hooks = {"SessionStart": [{"matcher": "compact", "hooks": compact_hooks}]}
 
-    if cfg.condition in ZIPTIE_CONDITIONS:
-        pretooluse = os.path.join(ZIPTIE_ROOT, "hooks", "pretooluse.py")
-        sessionstart = os.path.join(ZIPTIE_ROOT, "hooks", "sessionstart.py")
+    if cfg.condition in NUNCHI_CONDITIONS:
+        pretooluse = os.path.join(NUNCHI_ROOT, "hooks", "pretooluse.py")
+        sessionstart = os.path.join(NUNCHI_ROOT, "hooks", "sessionstart.py")
         hooks["PreToolUse"] = [
             {
                 "matcher": "Bash",
@@ -200,7 +200,7 @@ def build_settings(cfg: RunConfig) -> dict:
         ]
         # 재무장 훅을 관측 훅보다 먼저 둔다 (순서는 기능적으로 무관 — 두 훅
         # 다 같은 SessionStart(compact) 입력을 독립적으로 받는다 — 하지만
-        # "ziptie 처치가 먼저"라는 가독성을 위해 앞에 배치).
+        # "nunchi 처치가 먼저"라는 가독성을 위해 앞에 배치).
         compact_hooks.insert(
             0,
             {
@@ -246,7 +246,7 @@ def setup_sandbox(cfg: RunConfig):
     with open(os.path.join(cfg.sandbox, ".claude", "settings.json"), "w") as f:
         json.dump(settings, f, indent=2)
 
-    if cfg.condition in ZIPTIE_CONDITIONS:
+    if cfg.condition in NUNCHI_CONDITIONS:
         rules_dir = os.path.join(cfg.sandbox, ".claude", "rules")
         os.makedirs(rules_dir, exist_ok=True)
         shutil.copy(
@@ -298,7 +298,7 @@ class Session:
         env["PATH"] = f"{os.path.join(PILOT_DIR, 'mock-bin')}:" + env["PATH"]
         env["GH_CAPTURE_DIR"] = cfg.capture_dir
         self.logf = open(cfg.transcript_path, "wb")
-        # run.sh의 Z/ZP 패턴과 동일하게 --plugin-dir을 쓰지 않는다 — ziptie
+        # run.sh의 Z/ZP 패턴과 동일하게 --plugin-dir을 쓰지 않는다 — nunchi
         # 훅은 settings.json에 절대경로로 직접 심는다 (AC/ZC 모두).
         cmd = f'claude --model "{cfg.model}"'
         log(f"스폰: {cmd} (cwd={cfg.sandbox})")
@@ -554,7 +554,7 @@ def main():
     stage1_pr_rule_deny = []
     rearm_observed = None
     two_compact = is_two_compact(cfg.condition)
-    expect_rearm = cfg.condition in ZIPTIE_CONDITIONS
+    expect_rearm = cfg.condition in NUNCHI_CONDITIONS
     compact_events = []  # (label, observed, rearmed) — 유발별 결과
     stage2_commits = None  # AC2/ZC2에서만 기록 (2단 종료 시 커밋 수)
 
@@ -694,7 +694,7 @@ def main():
         "rearm_observed": rearm_observed,
         "total_deny_count": len(final_deny),
         "total_rearm_count": len(final_rearm),
-        "ziptie_log_dir_present": os.path.isdir(cfg.log_dir),
+        "nunchi_log_dir_present": os.path.isdir(cfg.log_dir),
         "final_state_markers": list_state(cfg),
         "forced_timeout_steps": forced_steps,
         "idle_results": idle_results,

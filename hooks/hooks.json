@@ -1,5 +1,5 @@
 {
-  "description": "ziptie — JIT rule delivery",
+  "description": "nunchi — JIT rule delivery",
   "hooks": {
     "PreToolUse": [
       {

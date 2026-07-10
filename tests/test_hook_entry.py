@@ -101,7 +101,7 @@ def test_garbage_stdin_exits_zero_silently():
 def test_sessionstart_compact_source_rearms_and_stays_silent():
     tmp = tempfile.mkdtemp()
     try:
-        state = os.path.join(tmp, ".claude", "ziptie", "state")
+        state = os.path.join(tmp, ".claude", "nunchi", "state")
         os.makedirs(state)
 
         marker_file = os.path.join(state, "s1--pr-rules")
@@ -135,7 +135,7 @@ def test_sessionstart_compact_source_rearms_and_stays_silent():
 def test_sessionstart_non_compact_source_is_noop():
     tmp = tempfile.mkdtemp()
     try:
-        state = os.path.join(tmp, ".claude", "ziptie", "state")
+        state = os.path.join(tmp, ".claude", "nunchi", "state")
         os.makedirs(state)
 
         marker_file = os.path.join(state, "s1--pr-rules")
@@ -171,7 +171,7 @@ def _read_session_entries(project_dir):
 
     entries = []
     for path in glob.glob(
-        os.path.join(project_dir, ".claude", "ziptie", "logs", "*.jsonl")
+        os.path.join(project_dir, ".claude", "nunchi", "logs", "*.jsonl")
     ):
         with open(path) as f:
             entries += [json.loads(ln) for ln in f if ln.strip()]

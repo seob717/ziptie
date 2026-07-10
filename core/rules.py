@@ -1,4 +1,4 @@
-"""ziptie 룰 파일 로더 — .claude/rules/*.md (frontmatter + body)."""
+"""nunchi 룰 파일 로더 — .claude/rules/*.md (frontmatter + body)."""
 
 import glob
 import os
@@ -76,7 +76,7 @@ def parse_rule_file(path: str, quiet: bool = False) -> Optional[Rule]:
         if not _NAME_RE.match(name):
             if not quiet:
                 print(
-                    f"ziptie: rule {path}: invalid name '{name}' — [a-z0-9-]만 허용",
+                    f"nunchi: rule {path}: invalid name '{name}' — [a-z0-9-]만 허용",
                     file=sys.stderr,
                 )
             return None
@@ -84,7 +84,7 @@ def parse_rule_file(path: str, quiet: bool = False) -> Optional[Rule]:
         if strength not in ("require-read", "block", "inject"):
             if not quiet:
                 print(
-                    f"ziptie: rule {name}: unsupported strength '{strength}' — "
+                    f"nunchi: rule {name}: unsupported strength '{strength}' — "
                     "require-read로 폴백",
                     file=sys.stderr,
                 )
@@ -94,7 +94,7 @@ def parse_rule_file(path: str, quiet: bool = False) -> Optional[Rule]:
         if enabled_lower not in ("true", "false"):
             if not quiet:
                 print(
-                    f"ziptie: rule {name}: unrecognized enabled value "
+                    f"nunchi: rule {name}: unrecognized enabled value "
                     f"'{enabled_raw}' — true로 취급",
                     file=sys.stderr,
                 )
@@ -115,7 +115,7 @@ def parse_rule_file(path: str, quiet: bool = False) -> Optional[Rule]:
         )
     except Exception as e:  # 안전 기본값: 절대 세션을 죽이지 않는다
         if not quiet:
-            print(f"ziptie: rule parse error {path}: {e}", file=sys.stderr)
+            print(f"nunchi: rule parse error {path}: {e}", file=sys.stderr)
         return None
 
 

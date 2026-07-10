@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""ziptie InstructionsLoaded 엔트리포인트 — 세션 관측 기록 (#10).
+"""nunchi InstructionsLoaded 엔트리포인트 — 세션 관측 기록 (#10).
 
 CLAUDE.md/.claude/rules가 컨텍스트에 로드될 때마다 발화하므로 모든 세션을
 잡는다. 세션당 1줄만 기록한다(record_session이 마커로 dedupe).
@@ -21,5 +21,5 @@ try:
     )
     record_session(input_data, project_dir)
 except Exception as e:
-    print(f"ziptie: instructionsloaded hook error: {e}", file=sys.stderr)
+    print(f"nunchi: instructionsloaded hook error: {e}", file=sys.stderr)
 sys.exit(0)

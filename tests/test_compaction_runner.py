@@ -36,7 +36,7 @@ def test_build_settings_ac2_mirrors_ac_observer_only():
         assert "observer_sessionstart.py" in compact_hooks[0]["command"]
 
 
-def test_build_settings_zc2_mirrors_zc_ziptie_hooks():
+def test_build_settings_zc2_mirrors_zc_nunchi_hooks():
     for cond in ("ZC", "ZC2"):
         s = _settings(cond)
         assert "PreToolUse" in s["hooks"]

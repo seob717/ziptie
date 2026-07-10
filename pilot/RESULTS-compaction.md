@@ -31,7 +31,7 @@ ZC 3런 전부에서 처치 사슬이 완전하게 관측됨:
 | 조건 | 전부통과 | Wilson 95% CI |
 |---|---|---|
 | AC (CLAUDE.md 단독 + 컴팩션) | 2/3 (66.7%) | 21–94% |
-| ZC (ziptie JIT + 재무장 + 컴팩션) | 3/3 (100%) | 44–100% |
+| ZC (nunchi JIT + 재무장 + 컴팩션) | 3/3 (100%) | 44–100% |
 
 보조지표 Fisher 정확검정(양측): p = 1.0 (n=3+3에서 무의미 — 참고용 기재).
 
@@ -50,6 +50,6 @@ ZC 3런 전부에서 처치 사슬이 완전하게 관측됨:
 
 ## 원장
 
-- 런 아티팩트: `pilot/runs/{AC,ZC}-{1..3}/` (로컬, gitignore) — summary.json, 관측 로그, ziptie JSONL(ZC), PR 캡처, git log, 트랜스크립트
+- 런 아티팩트: `pilot/runs/{AC,ZC}-{1..3}/` (로컬, gitignore) — summary.json, 관측 로그, nunchi JSONL(ZC), PR 캡처, git log, 트랜스크립트
 - 러너: `pilot/compaction_runner.py` (커밋 16cd0e6, 채점 스코핑 픽스 3b0af15·d7c04f2)
 - AC-1/ZC-1은 러너 검증 겸 산입(리뷰어가 아티팩트 무결성 확인), AC-2 이후는 교대 배치

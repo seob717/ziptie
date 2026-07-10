@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""ziptie PreToolUse 엔트리포인트. 어떤 실패도 exit 0 + 무출력(allow)."""
+"""nunchi PreToolUse 엔트리포인트. 어떤 실패도 exit 0 + 무출력(allow)."""
 
 import json
 import os
@@ -18,5 +18,5 @@ try:
     if result:
         print(json.dumps(result, ensure_ascii=False))
 except Exception as e:
-    print(f"ziptie: hook error: {e}", file=sys.stderr)
+    print(f"nunchi: hook error: {e}", file=sys.stderr)
 sys.exit(0)

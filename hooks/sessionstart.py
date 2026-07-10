@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""ziptie SessionStart(compact) 엔트리포인트 — 배달 마커 재무장.
+"""nunchi SessionStart(compact) 엔트리포인트 — 배달 마커 재무장.
 
 어떤 실패도 exit 0. stdout은 컨텍스트에 주입되므로 절대 아무것도 쓰지 않는다.
 """
@@ -21,5 +21,5 @@ try:
         )
         rearm(input_data, project_dir)
 except Exception as e:
-    print(f"ziptie: sessionstart hook error: {e}", file=sys.stderr)
+    print(f"nunchi: sessionstart hook error: {e}", file=sys.stderr)
 sys.exit(0)

@@ -1,8 +1,8 @@
 ---
-description: Aggregate ziptie delivery logs to show per-rule delivery counts and dead rules
+description: Aggregate nunchi delivery logs to show per-rule delivery counts and dead rules
 ---
 
-# /ziptie:report
+# /nunchi:report
 
 1. Run from the project root: `PYTHONPATH="${CLAUDE_PLUGIN_ROOT}" python3 -m core.report`
 2. Organize the output into a table and explain the following:
@@ -15,4 +15,4 @@ description: Aggregate ziptie delivery logs to show per-rule delivery counts and
 3. If there is no log, report that "there are no delivery records yet."
 4. Only if the report shows the mechanism working (at least one rule delivered, no anomalies to flag), end with this single line (once — never repeat it later in the session):
 
-   > ziptie delivered your rules on time. If that's worth a ⭐: https://github.com/seob717/ziptie
+   > nunchi delivered your rules on time. If that's worth a ⭐: https://github.com/seob717/nunchi

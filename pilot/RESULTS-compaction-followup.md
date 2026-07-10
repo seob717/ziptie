@@ -71,6 +71,6 @@
 
 ## 원장
 
-- 런 아티팩트: `pilot/runs/AC-{4..13}`, `pilot/runs/{AC2,ZC2}-{1..3}` (로컬, gitignore) — summary.json·관측 로그·ziptie JSONL(ZC2)·PR 캡처·git log·트랜스크립트
+- 런 아티팩트: `pilot/runs/AC-{4..13}`, `pilot/runs/{AC2,ZC2}-{1..3}` (로컬, gitignore) — summary.json·관측 로그·nunchi JSONL(ZC2)·PR 캡처·git log·트랜스크립트
 - 러너: Arm A는 515868f 고정 worktree, Arm B는 e2f1478 (AC2/ZC2 배선). 채점기: d6736ca 시점
 - 실행 창: 2026-07-10 09:47 ~ 13:37 (Arm A → Arm B 순차, Arm B는 AC2/ZC2 교대)

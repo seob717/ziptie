@@ -1,19 +1,19 @@
-# ziptie
+# nunchi
 
-[![License](https://img.shields.io/github/license/seob717/ziptie)](LICENSE)
-[![Release](https://img.shields.io/github/v/release/seob717/ziptie)](https://github.com/seob717/ziptie/releases)
+[![License](https://img.shields.io/github/license/seob717/nunchi)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/seob717/nunchi)](https://github.com/seob717/nunchi/releases)
 
-*"Zip-tie your rules to the moment they matter."*
+*"Rules with nunchi — delivered before you have to ask."*
 
 A Claude Code plugin that compiles CLAUDE.md rules into trigger-bound hooks and delivers each rule right before the action it applies to.
 
 ## The problem
 
-A rule you write in CLAUDE.md is loaded once, at t=0 when the session starts, and that's it. But the moment that rule actually matters is usually dozens of turns later. As context piles up, the model's attention on a rule from the top of the session fades, and once a compaction (summary) passes through, an explicit rule gets demoted to blurry background. A referenced document like `@docs/pr-rules.md` ends up furthest from context at exactly the point where the rule is needed (e.g. when running `gh pr create`). ziptie compiles a rule not as a "declaration at the top of the session" but as an "event listener bound to an action," collapsing the distance between when a rule is needed and when it is delivered to zero.
+A rule you write in CLAUDE.md is loaded once, at t=0 when the session starts, and that's it. But the moment that rule actually matters is usually dozens of turns later. As context piles up, the model's attention on a rule from the top of the session fades, and once a compaction (summary) passes through, an explicit rule gets demoted to blurry background. A referenced document like `@docs/pr-rules.md` ends up furthest from context at exactly the point where the rule is needed (e.g. when running `gh pr create`). nunchi compiles a rule not as a "declaration at the top of the session" but as an "event listener bound to an action," collapsing the distance between when a rule is needed and when it is delivered to zero.
 
 ## How it works
 
-1. **`/ziptie:compile`** — Reads CLAUDE.md and the `@referenced` documents inside it, extracts rules, infers a trigger (tool, regex pattern) for each rule, and compiles them into `.claude/rules/*.md`.
+1. **`/nunchi:compile`** — Reads CLAUDE.md and the `@referenced` documents inside it, extracts rules, infers a trigger (tool, regex pattern) for each rule, and compiles them into `.claude/rules/*.md`.
 2. **Review the rule files** — The compiled output is plain-text files you can read and edit. Check that the trigger, strength, and source document path are correct, and fix them by hand if needed. These files are the source of truth.
 3. **Just-in-time delivery at the moment of action** — A PreToolUse hook intercepts tool calls and matches them against triggers. On a match, it reads the `source` document directly at that moment (the original, not a pasted copy) and delivers it. When several rules match the same tool call, their contents are delivered together in a single block, so one action costs at most one retry.
 4. **Re-arm after compaction** — A SessionStart hook scoped to compaction resets the session's delivery markers, so a rule that was already delivered before a compaction (and whose text was therefore summarized away) is delivered again, just-in-time, the next time its trigger matches. No context is spent at compaction time.
@@ -41,17 +41,17 @@ Reflect docs/pr-rules.md before creating a PR.
 - `strength`: three levels, in decreasing order of enforcement.
   - `block` — always block, delivering the rule as the reason. For actions a document marks as absolutely forbidden.
   - `require-read` (default) — block once per session with the rule text as the reason, then let the retry through. One retry buys a guaranteed read.
-  - `inject` — deliver the rule via `additionalContext` alongside the tool call, with **zero blocking and zero retry cost**. The delivery carries a provenance framing (project-owner hook, registered rule path, `source` path) because we measured that unframed injected instructions get treated as prompt injection and refused, while framed ones are followed (see `pilot/PROBE-inject.md`). Softer than `require-read`: compliance rides on the model's judgment instead of a forced retry. ziptie never returns `permissionDecision: allow`, so your permission prompts are untouched.
+  - `inject` — deliver the rule via `additionalContext` alongside the tool call, with **zero blocking and zero retry cost**. The delivery carries a provenance framing (project-owner hook, registered rule path, `source` path) because we measured that unframed injected instructions get treated as prompt injection and refused, while framed ones are followed (see `pilot/PROBE-inject.md`). Softer than `require-read`: compliance rides on the model's judgment instead of a forced retry. nunchi never returns `permissionDecision: allow`, so your permission prompts are untouched.
 - Body: a summary to deliver instead of, or in addition to, the original document. **Keep it to one line** — see below.
 
 ### Interaction with Claude Code's native `.claude/rules/` loader
 
-Claude Code itself (v2.0.64+) also reads `.claude/rules/*.md`: a file without a `paths:` frontmatter key gets its body loaded into context at session start (verified by probe on v2.1.206). ziptie embraces this rather than fighting it — the two loaders split the work:
+Claude Code itself (v2.0.64+) also reads `.claude/rules/*.md`: a file without a `paths:` frontmatter key gets its body loaded into context at session start (verified by probe on v2.1.206). nunchi embraces this rather than fighting it — the two loaders split the work:
 
 - The **body** doubles as an always-on one-line declaration, natively loaded at t=0 ("PR rules exist for this repo").
-- The **source document** is what ziptie delivers just-in-time, in full, at the moment the trigger fires.
+- The **source document** is what nunchi delivers just-in-time, in full, at the moment the trigger fires.
 
-This is why rule bodies must stay at one summary line: a long body would be injected at session start *and* delivered again at trigger time. `/ziptie:compile` generates bodies this way by default.
+This is why rule bodies must stay at one summary line: a long body would be injected at session start *and* delivered again at trigger time. `/nunchi:compile` generates bodies this way by default.
 
 ## Measured results
 
@@ -63,13 +63,13 @@ Measurement harness: a sandbox repo + a mock `gh` (captures PRs) + 4 machine-gra
 | AL | CLAUDE.md only + long context (~60k tokens) | 3/3 | The ceiling effect persists even in long context |
 | HW | hookify warn | 3/3 | The warning message never reaches the model, so effectively the same condition as A |
 | HB | hookify block | 0/3 | It doesn't populate `permissionDecisionReason`, so the model is blocked without knowing why, destroying 3/3 of the tasks |
-| Z | ziptie JIT delivery (real engine, E2E) | 3/3 | Hook fired 3/3 — the first attempt is blocked while the reason (the rule's original text) is delivered, and all retries pass |
+| Z | nunchi JIT delivery (real engine, E2E) | 3/3 | Hook fired 3/3 — the first attempt is blocked while the reason (the rule's original text) is delivered, and all retries pass |
 
 What this table shows is *not* an edge of "JIT has a higher compliance rate than CLAUDE.md" — at this pilot's pressure level (4 simple rules, a single task, sonnet), even CLAUDE.md alone (A, AL) held up with a ceiling effect, and we don't hide that result. What the measurement actually supports is three things:
 
-1. **hookify block is harmful.** A block that doesn't communicate the reason destroys 3/3 of the tasks. The same block, when it delivers the reason alongside it (the ziptie way), flips 0/3 → 3/3.
-2. **The JIT delivery mechanism itself works and does not hurt the task.** In the E2E with the real ziptie engine attached (condition Z), the hook fired 3/3 normally, and all 3 runs — blocked, then given the reason and retried — completed the task.
-3. **Source-document sync and delivery logging actually work.** Because `source` is read every time at delivery, the rule and its original never drift apart, and every trigger, delivery, and block is recorded as JSONL and aggregated by `/ziptie:report`.
+1. **hookify block is harmful.** A block that doesn't communicate the reason destroys 3/3 of the tasks. The same block, when it delivers the reason alongside it (the nunchi way), flips 0/3 → 3/3.
+2. **The JIT delivery mechanism itself works and does not hurt the task.** In the E2E with the real nunchi engine attached (condition Z), the hook fired 3/3 normally, and all 3 runs — blocked, then given the reason and retried — completed the task.
+3. **Source-document sync and delivery logging actually work.** Because `source` is read every time at delivery, the rule and its original never drift apart, and every trigger, delivery, and block is recorded as JSONL and aggregated by `/nunchi:report`.
 
 **Pressure re-verification (pre-registered):** we then scaled the pressure to 24 rules behind a 3-level `@reference` structure plus the same ~268KB long-context task and re-ran the CLAUDE.md-only condition (design and results: `pilot/DESIGN-pressure.md`, `pilot/RESULTS-pressure.md`). The ceiling held — all-pass stayed 100% across 5 valid runs (40/40 graded checkpoints), so the pre-registered gate for a confirmatory JIT-vs-CLAUDE.md comparison was not met and we did not run it.
 
@@ -77,17 +77,17 @@ What this table shows is *not* an edge of "JIT has a higher compliance rate than
 
 **Compaction follow-up (pre-registered):** two further arms (design and results: `pilot/DESIGN-compaction-followup.md`, `pilot/RESULTS-compaction-followup.md`). A 10-run expansion of the CLAUDE.md-only compaction condition produced no new violations in 9 valid runs, putting the observed single-compaction violation rate at 1/12 (~8%). A double-compaction preflight (3-stage task, two forced `/compact`s) again did not meet the pre-registered gate (all valid baseline runs passed), so no superiority comparison was run and none is claimed. What it did verify: **the re-arm mechanism survives repeated compaction** — deliver → compact → re-deliver → compact → re-deliver again, in 2/2 valid treated runs — and JIT delivery still didn't hurt task completion after two compactions.
 
-**Context economics (measured probe):** `@imported` files are "expanded and loaded into context at launch" ([official memory docs](https://code.claude.com/docs/en/memory)), and the official best practices warn that "longer files consume more context and reduce adherence" ([best practices](https://code.claude.com/docs/en/best-practices)) — the official remedy, path-scoped rules, covers file-read triggers; ziptie extends the same idea to action triggers with enforcement. Moving rule documents out of CLAUDE.md `@imports` and into ziptie rules changes when their tokens are paid. We measured it head-to-head (`pilot/PROBE-context-economics.md`): the same repo with 8 rule docs (~76KB) loaded via `@import` cost **79,683 prompt tokens at session start**; the ziptie configuration (one-line rule bodies, docs delivered just-in-time by trigger) cost **45,808** — a saving of **~34k tokens (−42.5%) per session start**, with the rule-doc payload itself dropping 97% (34,878 → 1,003 tokens). The full document is then paid only in sessions where its action actually fires, at the moment it fires. Two honesty caveats: a doc that also carries always-on guidance (about half of wild rules, per the compile benchmark below) should keep its `@reference` — the saving applies to action-bindable docs; and in a session that triggers many rules the delivery spend adds back up, arriving as precisely-timed context rather than upfront freight. `/ziptie:report` computes these numbers for your own repo from your rule files and delivery logs.
+**Context economics (measured probe):** `@imported` files are "expanded and loaded into context at launch" ([official memory docs](https://code.claude.com/docs/en/memory)), and the official best practices warn that "longer files consume more context and reduce adherence" ([best practices](https://code.claude.com/docs/en/best-practices)) — the official remedy, path-scoped rules, covers file-read triggers; nunchi extends the same idea to action triggers with enforcement. Moving rule documents out of CLAUDE.md `@imports` and into nunchi rules changes when their tokens are paid. We measured it head-to-head (`pilot/PROBE-context-economics.md`): the same repo with 8 rule docs (~76KB) loaded via `@import` cost **79,683 prompt tokens at session start**; the nunchi configuration (one-line rule bodies, docs delivered just-in-time by trigger) cost **45,808** — a saving of **~34k tokens (−42.5%) per session start**, with the rule-doc payload itself dropping 97% (34,878 → 1,003 tokens). The full document is then paid only in sessions where its action actually fires, at the moment it fires. Two honesty caveats: a doc that also carries always-on guidance (about half of wild rules, per the compile benchmark below) should keep its `@reference` — the saving applies to action-bindable docs; and in a session that triggers many rules the delivery spend adds back up, arriving as precisely-timed context rather than upfront freight. `/nunchi:report` computes these numbers for your own repo from your rule files and delivery logs.
 
-**Compile benchmark on wild CLAUDE.md files (pre-registered pilot):** we ran the `/ziptie:compile` instructions over 12 real-world CLAUDE.md files (166KB total: apache/airflow, vercel/next.js, supabase, plus a deterministic sample from [awesome-claude-md](https://github.com/josix/awesome-claude-md), with an empty-stub negative control) — design and results: `pilot/DESIGN-compile-bench.md`, `pilot/RESULTS-compile-bench.md`. Of 88 extracted rules: 100% valid regexes and tools, 100% of content rules carried the required `path:` scope, zero fabricated rules on the empty control, and all 8 `block`-strength assignments traced to explicit "Never/MUST NOT" wording in the source (verified quote-by-quote). About half of wild rules (51%) were action-bindable at all — the other half is always-on guidance, which is exactly why ziptie is designed to coexist with CLAUDE.md rather than replace it. Recall (rules the compiler missed) is not yet measured.
+**Compile benchmark on wild CLAUDE.md files (pre-registered pilot):** we ran the `/nunchi:compile` instructions over 12 real-world CLAUDE.md files (166KB total: apache/airflow, vercel/next.js, supabase, plus a deterministic sample from [awesome-claude-md](https://github.com/josix/awesome-claude-md), with an empty-stub negative control) — design and results: `pilot/DESIGN-compile-bench.md`, `pilot/RESULTS-compile-bench.md`. Of 88 extracted rules: 100% valid regexes and tools, 100% of content rules carried the required `path:` scope, zero fabricated rules on the empty control, and all 8 `block`-strength assignments traced to explicit "Never/MUST NOT" wording in the source (verified quote-by-quote). About half of wild rules (51%) were action-bindable at all — the other half is always-on guidance, which is exactly why nunchi is designed to coexist with CLAUDE.md rather than replace it. Recall (rules the compiler missed) is not yet measured.
 
-## How ziptie compares
+## How nunchi compares
 
-Different tools solve different layers of "make the agent follow the rules". Static distributors ([Ruler](https://github.com/intellectronica/ruler), [rulesync](https://github.com/dyoshikawa/rulesync)) answer *"how do I ship the same rules to every agent?"*. Guardrail hooks ([hookify](https://github.com/anthropics/claude-code/tree/main/plugins/hookify)) answer *"how do I stop a bad action?"*. ziptie answers *"how do I get the right rule into the model's context at the moment it matters — and keep it there across compactions?"*. These compose: you can distribute rule documents with Ruler and deliver them with ziptie.
+Different tools solve different layers of "make the agent follow the rules". Static distributors ([Ruler](https://github.com/intellectronica/ruler), [rulesync](https://github.com/dyoshikawa/rulesync)) answer *"how do I ship the same rules to every agent?"*. Guardrail hooks ([hookify](https://github.com/anthropics/claude-code/tree/main/plugins/hookify)) answer *"how do I stop a bad action?"*. nunchi answers *"how do I get the right rule into the model's context at the moment it matters — and keep it there across compactions?"*. These compose: you can distribute rule documents with Ruler and deliver them with nunchi.
 
-The table below is a **scope map, not a scoreboard** — an empty cell or a "by design" note usually marks a deliberate design choice, and several rows go the other way (hookify covers more hook events, Writ retrieves semantically, Ruler distributes to 30+ agents — none of which ziptie does).
+The table below is a **scope map, not a scoreboard** — an empty cell or a "by design" note usually marks a deliberate design choice, and several rows go the other way (hookify covers more hook events, Writ retrieves semantically, Ruler distributes to 30+ agents — none of which nunchi does).
 
-| Capability | ziptie | hookify | Claude Code native rules | Ruler / rulesync | Writ |
+| Capability | nunchi | hookify | Claude Code native rules | Ruler / rulesync | Writ |
 |---|---|---|---|---|---|
 | Action (command) triggers — `gh pr create`, `git commit` | ✅ | ✅ | file-read path globs | out of scope¹ | partial (built-in gates) |
 | Content triggers — what's being *written* | ✅ `trigger.field` | ✅ | — | out of scope¹ | partial (static-analysis pre-write) |
@@ -96,7 +96,7 @@ The table below is a **scope map, not a scoreboard** — an empty cell or a "by 
 | Delivery state — once per session, no block loops | ✅ | stateless by design | — | out of scope¹ | ✅ per-phase IDs + token budget |
 | Re-armed after compaction | ✅ measured 5/5 | stateless by design | root CLAUDE.md documented; rules files unspecified | out of scope¹ | ✅ PostCompact re-inject |
 | Source document read at delivery time (no drift) | ✅ | message lives in the rule file | ✅ | copied at generation | ✅ |
-| Delivery log + report | ✅ JSONL, `/ziptie:report` | — | — | out of scope¹ | ✅ friction log + dashboard |
+| Delivery log + report | ✅ JSONL, `/nunchi:report` | — | — | out of scope¹ | ✅ friction log + dashboard |
 | Hook events beyond PreToolUse (PostToolUse, Stop, UserPromptSubmit) | not yet — Stop rules on the roadmap | ✅ 4 events | — | — | ✅ broad coverage |
 | Semantic rule matching (meaning, not regex) | regex by design (deterministic) | regex | path globs | — | ✅ hybrid-RAG |
 | Multi-agent rule distribution (Cursor, Cline, …) | not planned | — | — | ✅ 30+ agents | — |
@@ -107,30 +107,30 @@ The table below is a **scope map, not a scoreboard** — an empty cell or a "by 
 
 Hook overhead, measured: ~24ms median per tool call (26ms when a rule is delivered). Rows verified against each tool's source or official docs as of July 2026 — corrections welcome via issue.
 
-Credit where due: hookify pioneered markdown-frontmatter rules on Claude Code hooks and covers more hook events (PostToolUse, Stop, UserPromptSubmit); Ruler and rulesync solve cross-agent distribution properly; Writ explores semantic retrieval-based delivery. ziptie's niche is deliberately narrow: deterministic, action-triggered delivery with delivery-state tracking — and only measured claims.
+Credit where due: hookify pioneered markdown-frontmatter rules on Claude Code hooks and covers more hook events (PostToolUse, Stop, UserPromptSubmit); Ruler and rulesync solve cross-agent distribution properly; Writ explores semantic retrieval-based delivery. nunchi's niche is deliberately narrow: deterministic, action-triggered delivery with delivery-state tracking — and only measured claims.
 
 ## Requirements
 
 - [Claude Code](https://code.claude.com) with plugin support
-- Python 3 — the hook engine and `/ziptie:report` run on the standard library only; no external packages
+- Python 3 — the hook engine and `/nunchi:report` run on the standard library only; no external packages
 
 ## Installation
 
 ### From the marketplace (recommended)
 
 ```
-/plugin marketplace add seob717/ziptie
-/plugin install ziptie@ziptie-marketplace
+/plugin marketplace add seob717/nunchi
+/plugin install nunchi@nunchi-marketplace
 ```
 
 ### From a local directory
 
 ```bash
-git clone https://github.com/seob717/ziptie.git
-claude --plugin-dir /path/to/ziptie
+git clone https://github.com/seob717/nunchi.git
+claude --plugin-dir /path/to/nunchi
 ```
 
-Once the plugin loads, the `/ziptie:compile` and `/ziptie:report` slash commands and the PreToolUse hook are active.
+Once the plugin loads, the `/nunchi:compile` and `/nunchi:report` slash commands and the PreToolUse hook are active.
 
 ## Development
 
@@ -149,7 +149,7 @@ The following are not implemented yet and are on the roadmap.
 
 - **Semantic judging**: inspecting output content with an LLM to catch rule violations, rather than a regex trigger. This needs a latency/cost tradeoff review.
 - **Stop-event rules**: rules that check "was this condition satisfied before the task completed?" at session-end time.
-- **Compliance report UI**: right now `/ziptie:report` only aggregates the log into a table; more sophisticated analysis is in the backlog.
+- **Compliance report UI**: right now `/nunchi:report` only aggregates the log into a table; more sophisticated analysis is in the backlog.
 
 Also, these results come from an n=3-per-condition pilot plus a pre-registered pressure preflight (6 runs). Statistically, "100%" means no more than "we observed no failure in this sample," and any claim of a JIT compliance edge still awaits a pressure level that actually breaks the baseline.
 
@@ -159,4 +159,4 @@ Also, these results come from an n=3-per-condition pilot plus a pre-registered p
 
 ---
 
-If ziptie keeps your rules alive when they matter, a ⭐ on this repo helps others find it.
+If nunchi keeps your rules alive when they matter, a ⭐ on this repo helps others find it.

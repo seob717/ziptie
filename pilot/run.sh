@@ -40,8 +40,8 @@ for i in $(seq 1 "$COUNT"); do
       cp "$PILOT/template/settings-A.json" "$RUN/repo/.claude/settings.json"
       mkdir -p "$RUN/repo/.claude/rules"
       cp "$PILOT/template/rules-pr.md" "$RUN/repo/.claude/rules/pr-rules.md"
-      ZIPTIE_HOOK="$(cd "$PILOT/.." && pwd)/hooks/pretooluse.py"
-      python3 - "$RUN/repo/.claude/settings.json" "$ZIPTIE_HOOK" <<'PYEOF'
+      NUNCHI_HOOK="$(cd "$PILOT/.." && pwd)/hooks/pretooluse.py"
+      python3 - "$RUN/repo/.claude/settings.json" "$NUNCHI_HOOK" <<'PYEOF'
 import json, sys
 path, hook = sys.argv[1], sys.argv[2]
 with open(path) as f:
@@ -60,8 +60,8 @@ PYEOF
       mkdir -p "$RUN/repo/.claude/rules"
       cp "$PILOT/template/rules-pressure-pr.md" "$RUN/repo/.claude/rules/pr-rules.md"
       cp "$PILOT/template/rules-pressure-commit.md" "$RUN/repo/.claude/rules/commit-rules.md"
-      ZIPTIE_HOOK="$(cd "$PILOT/.." && pwd)/hooks/pretooluse.py"
-      python3 - "$RUN/repo/.claude/settings.json" "$ZIPTIE_HOOK" <<'PYEOF'
+      NUNCHI_HOOK="$(cd "$PILOT/.." && pwd)/hooks/pretooluse.py"
+      python3 - "$RUN/repo/.claude/settings.json" "$NUNCHI_HOOK" <<'PYEOF'
 import json, sys
 path, hook = sys.argv[1], sys.argv[2]
 with open(path) as f:

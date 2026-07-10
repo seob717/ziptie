@@ -49,7 +49,7 @@ def test_first_match_denies_with_source_content():
     hso = out["hookSpecificOutput"]
     assert hso["permissionDecision"] == "deny"
     assert "[LAB-123]" in hso["permissionDecisionReason"]  # 원본 문서가 배달됨
-    assert "ziptie" in hso["permissionDecisionReason"]
+    assert "nunchi" in hso["permissionDecisionReason"]
 
 
 def test_second_call_same_session_allows():
@@ -101,7 +101,7 @@ def test_file_tool_matches_on_file_path():
 def test_logs_written():
     d = make_project()
     decide(hook_input(session="s7"), d)
-    logs = glob.glob(os.path.join(d, ".claude", "ziptie", "logs", "*.jsonl"))
+    logs = glob.glob(os.path.join(d, ".claude", "nunchi", "logs", "*.jsonl"))
     assert logs
     entry = json.loads(open(logs[0]).readline())
     assert entry["rule"] == "pr-rules" and entry["decision"] == "deny"
@@ -115,7 +115,7 @@ def test_engine_never_raises_on_garbage_input():
 
 def _session_log_entries(d):
     entries = []
-    for path in glob.glob(os.path.join(d, ".claude", "ziptie", "logs", "*.jsonl")):
+    for path in glob.glob(os.path.join(d, ".claude", "nunchi", "logs", "*.jsonl")):
         with open(path) as f:
             entries += [json.loads(ln) for ln in f if ln.strip()]
     return [e for e in entries if e["decision"] == "session-start"]
@@ -158,7 +158,7 @@ def test_record_session_sanitizes_session_id():
     engine.record_session({"session_id": "../evil/../../x"}, d)
     entries = _session_log_entries(d)
     assert len(entries) == 1
-    state = os.path.join(d, ".claude", "ziptie", "state")
+    state = os.path.join(d, ".claude", "nunchi", "state")
     assert not any("/" in fn for fn in os.listdir(state))
 
 
@@ -187,7 +187,7 @@ def test_multiple_require_read_rules_merge_in_single_deny():
     assert "pr-rules" in reason and "pr-rules-2" in reason
     assert "\n\n---\n\n" in reason
 
-    state_dir = os.path.join(d, ".claude", "ziptie", "state")
+    state_dir = os.path.join(d, ".claude", "nunchi", "state")
     assert os.path.exists(os.path.join(state_dir, "s10--pr-rules"))
     assert os.path.exists(os.path.join(state_dir, "s10--pr-rules-2"))
 
@@ -231,7 +231,7 @@ def test_require_read_markers_sanitize_session_id_across_calls():
     second = decide(hook_input(session="weird/session2"), d)
     assert second == {}
 
-    state_dir = os.path.join(d, ".claude", "ziptie", "state")
+    state_dir = os.path.join(d, ".claude", "nunchi", "state")
     assert os.path.exists(os.path.join(state_dir, "weird-session2--pr-rules"))
 
 
@@ -252,7 +252,7 @@ def test_bad_encoding_source_does_not_void_batch():
     assert "[LAB-123]" in reason  # rule1 콘텐츠는 정상 배달
     assert "pr-rules-2" in reason  # rule2도 (폴백이든 스킵이든) 배치에서 사라지지 않음
 
-    state_dir = os.path.join(d, ".claude", "ziptie", "state")
+    state_dir = os.path.join(d, ".claude", "nunchi", "state")
     assert os.path.exists(os.path.join(state_dir, "s30--pr-rules"))
 
     # 두번째 호출에서 배달되지 않은 룰이 조용히 allow되면 안 된다.
@@ -276,7 +276,7 @@ def test_broken_rule_warning_once_per_session(capsys):
     second_err = capsys.readouterr().err
     assert second_err == ""
 
-    marker = os.path.join(d, ".claude", "ziptie", "state", "warned--s9")
+    marker = os.path.join(d, ".claude", "nunchi", "state", "warned--s9")
     assert os.path.exists(marker)
 
 
@@ -419,7 +419,7 @@ def test_inject_first_match_returns_additional_context_only():
     ctx = hso["additionalContext"]
     assert "[LAB-123]" in ctx  # 원본 문서가 배달됨
     # PROBE-inject.md 판정 ③: 신뢰 프레이밍 필수 — 출처(.claude/rules, source 경로) 명시
-    assert "ziptie" in ctx and ".claude/rules" in ctx and "docs/pr-rules.md" in ctx
+    assert "nunchi" in ctx and ".claude/rules" in ctx and "docs/pr-rules.md" in ctx
 
 
 def test_inject_second_call_same_session_silent():
@@ -440,7 +440,7 @@ def test_inject_marker_reset_by_rearm_delivers_again():
 def test_inject_logs_inject_decision():
     d = make_project(RULE.replace("strength: require-read", "strength: inject"))
     decide(hook_input(session="i4"), d)
-    logs = glob.glob(os.path.join(d, ".claude", "ziptie", "logs", "*.jsonl"))
+    logs = glob.glob(os.path.join(d, ".claude", "nunchi", "logs", "*.jsonl"))
     entries = [json.loads(ln) for ln in open(logs[0]) if ln.strip()]
     assert any(e["decision"] == "inject" and e["rule"] == "pr-rules" for e in entries)
 
@@ -469,7 +469,7 @@ def test_inject_mixed_with_require_read_merges_into_single_deny():
 class TestRearm(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.mkdtemp()
-        self.state = os.path.join(self.tmp, ".claude", "ziptie", "state")
+        self.state = os.path.join(self.tmp, ".claude", "nunchi", "state")
         os.makedirs(self.state)
 
     def tearDown(self):
@@ -496,7 +496,7 @@ class TestRearm(unittest.TestCase):
     def test_rearm_logs_rearm_event(self):
         self._touch("sess-1--pr-rules")
         engine.rearm({"session_id": "sess-1", "source": "compact"}, self.tmp)
-        log_dir = os.path.join(self.tmp, ".claude", "ziptie", "logs")
+        log_dir = os.path.join(self.tmp, ".claude", "nunchi", "logs")
         entries = []
         for fn in os.listdir(log_dir):
             with open(os.path.join(log_dir, fn)) as f:
@@ -509,7 +509,7 @@ class TestRearm(unittest.TestCase):
     def test_rearm_no_markers_no_log(self):
         engine.rearm({"session_id": "sess-1", "source": "compact"}, self.tmp)
         self.assertFalse(
-            os.path.exists(os.path.join(self.tmp, ".claude", "ziptie", "logs"))
+            os.path.exists(os.path.join(self.tmp, ".claude", "nunchi", "logs"))
         )
 
     def test_rearm_never_raises(self):

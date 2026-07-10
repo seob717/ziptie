@@ -1,4 +1,4 @@
-"""ziptie 배달 엔진 — 매칭, 강도 결정, 세션 상태, 로깅."""
+"""nunchi 배달 엔진 — 매칭, 강도 결정, 세션 상태, 로깅."""
 
 import contextlib
 import datetime
@@ -25,19 +25,19 @@ def _sanitize_session(session_id: str) -> str:
 
 
 REQUIRE_READ_TEMPLATE = (
-    "[ziptie:{name}] 이 작업 전에 확인할 규칙이 있어. 아래 규칙을 빠짐없이 반영한 뒤 "
+    "[nunchi:{name}] 이 작업 전에 확인할 규칙이 있어. 아래 규칙을 빠짐없이 반영한 뒤 "
     "같은 작업을 다시 시도해 (재시도는 통과된다).\n\n{content}"
 )
 BLOCK_TEMPLATE = (
-    "[ziptie:{name}] 이 작업은 규칙에 의해 차단됐어. 아래 규칙을 읽고 허용된 대안으로 "
+    "[nunchi:{name}] 이 작업은 규칙에 의해 차단됐어. 아래 규칙을 읽고 허용된 대안으로 "
     "진행해.\n\n{content}"
 )
 # 신뢰 프레이밍이 준수를 가른다 (PROBE-inject.md 판정 ③) — 출처 없는 주입은
 # 모델이 프롬프트 인젝션으로 취급해 거부하므로, 프로젝트 소유자 설정·등록
 # 위치·source 경로를 명시한다.
 INJECT_TEMPLATE = (
-    "[ziptie:{name}] 이 프로젝트의 .claude/rules/에 등록된 규칙 배달입니다 "
-    "(프로젝트 소유자가 설정한 ziptie 훅이 이 도구 호출에 매칭되는 규칙을 "
+    "[nunchi:{name}] 이 프로젝트의 .claude/rules/에 등록된 규칙 배달입니다 "
+    "(프로젝트 소유자가 설정한 nunchi 훅이 이 도구 호출에 매칭되는 규칙을 "
     "배달합니다{source_note}). 이 작업에 적용되는 규칙:\n\n{content}"
 )
 
@@ -68,7 +68,7 @@ def _log(
     project_dir: str, session: str, rule_name: str, tool: str, decision: str, extra=None
 ):
     try:
-        log_dir = os.path.join(project_dir, ".claude", "ziptie", "logs")
+        log_dir = os.path.join(project_dir, ".claude", "nunchi", "logs")
         os.makedirs(log_dir, exist_ok=True)
         entry = {
             "ts": datetime.datetime.now().isoformat(timespec="seconds"),
@@ -82,7 +82,7 @@ def _log(
         with open(os.path.join(log_dir, f"{datetime.date.today()}.jsonl"), "a") as f:
             f.write(json.dumps(entry, ensure_ascii=False) + "\n")
     except OSError as e:
-        print(f"ziptie: log write failed: {e}", file=sys.stderr)
+        print(f"nunchi: log write failed: {e}", file=sys.stderr)
 
 
 def _reason(rule: Rule, content: str) -> str:
@@ -129,7 +129,7 @@ def decide(input_data: dict, project_dir: str) -> dict:
         tool_name = input_data.get("tool_name", "")
         tool_input = input_data.get("tool_input", {}) or {}
         session = _sanitize_session(input_data.get("session_id", "nosession"))
-        state_dir = os.path.join(project_dir, ".claude", "ziptie", "state")
+        state_dir = os.path.join(project_dir, ".claude", "nunchi", "state")
         warned_marker = os.path.join(state_dir, f"warned--{session}")
         # 마커 존재 확인은 non-fatal — 실패하면 quiet=False로 취급 (경고를 못 억제할
         # 뿐, block 룰 평가는 아래 어떤 state-dir 부작용에도 의존하지 않는다).
@@ -157,7 +157,7 @@ def decide(input_data: dict, project_dir: str) -> dict:
                 except re.error as e:
                     if not quiet:
                         print(
-                            f"ziptie: rule {rule.name} match error: {e}",
+                            f"nunchi: rule {rule.name} match error: {e}",
                             file=sys.stderr,
                         )
                     continue
@@ -212,7 +212,7 @@ def decide(input_data: dict, project_dir: str) -> dict:
 
         return _inject(deliveries) if inject_only else _deny(deliveries)
     except Exception as e:  # 안전 기본값
-        print(f"ziptie: engine error: {e}", file=sys.stderr)
+        print(f"nunchi: engine error: {e}", file=sys.stderr)
         return {}
 
 
@@ -227,7 +227,7 @@ def record_session(input_data, project_dir: str) -> None:
     try:
         input_data = input_data or {}
         session = _sanitize_session(input_data.get("session_id", "nosession"))
-        state_dir = os.path.join(project_dir, ".claude", "ziptie", "state")
+        state_dir = os.path.join(project_dir, ".claude", "nunchi", "state")
         marker = os.path.join(state_dir, f"seen--{session}")
         if os.path.exists(marker):
             return
@@ -236,7 +236,7 @@ def record_session(input_data, project_dir: str) -> None:
             f.write("seen")
         _log(project_dir, session, "(session)", "InstructionsLoaded", "session-start")
     except Exception as e:
-        print(f"ziptie: record_session error: {e}", file=sys.stderr)
+        print(f"nunchi: record_session error: {e}", file=sys.stderr)
 
 
 def rearm(input_data, project_dir: str) -> None:
@@ -248,7 +248,7 @@ def rearm(input_data, project_dir: str) -> None:
     try:
         input_data = input_data or {}
         session = _sanitize_session(input_data.get("session_id", "nosession"))
-        state_dir = os.path.join(project_dir, ".claude", "ziptie", "state")
+        state_dir = os.path.join(project_dir, ".claude", "nunchi", "state")
         if not os.path.isdir(state_dir):
             return  # 배달된 적 없는 프로젝트 — 리셋할 마커도 없다 (stderr 노이즈 방지)
         prefix = f"{session}--"
@@ -269,4 +269,4 @@ def rearm(input_data, project_dir: str) -> None:
                 extra={"count": removed},
             )
     except Exception as e:
-        print(f"ziptie: rearm error: {e}", file=sys.stderr)
+        print(f"nunchi: rearm error: {e}", file=sys.stderr)

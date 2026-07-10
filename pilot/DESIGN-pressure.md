@@ -4,7 +4,7 @@
 
 ## 1. 목적과 배경
 
-1차 파일럿(README의 Measured results)에서 CLAUDE.md 단독 조건(A, AL)은 규칙 4개·롱컨텍스트 ~60k 토큰 압박에서도 3/3을 유지했다(천장 효과). 따라서 "JIT 전달이 CLAUDE.md 단독보다 규칙 준수율이 높다"는 ziptie의 핵심 가설은 아직 미검증이다. 본 실험은 천장을 깨는 압박 수준을 먼저 확인한 뒤(1단계), 그 수준에서 A vs Z를 확증 비교한다(2단계).
+1차 파일럿(README의 Measured results)에서 CLAUDE.md 단독 조건(A, AL)은 규칙 4개·롱컨텍스트 ~60k 토큰 압박에서도 3/3을 유지했다(천장 효과). 따라서 "JIT 전달이 CLAUDE.md 단독보다 규칙 준수율이 높다"는 nunchi의 핵심 가설은 아직 미검증이다. 본 실험은 천장을 깨는 압박 수준을 먼저 확인한 뒤(1단계), 그 수준에서 A vs Z를 확증 비교한다(2단계).
 
 - 압박 축: **다수 규칙(4→12/24개) + 롱컨텍스트(기존 268KB 로그 선독 유지)**
 - 제외한 축: 컴팩션 유발(headless에서 재현 제어 곤란), 약한 모델(서사 협소화 위험 — 모델은 파일럿과 동일하게 sonnet 고정)
@@ -39,14 +39,14 @@
 
 - CLAUDE.md에 요지 + `@docs/pr-rules.md`, `@docs/commit-rules.md`, `@docs/code-style.md` 참조 구조 (파일럿 골격의 스케일업)
 - 규칙 12개 버전: 채점 대상 8개 + 방해 4개 (프리플라이트용)
-- Z 조건의 `.claude/rules/`: 채점 대상에 해당하는 pr-rules, commit-rules 2개만 JIT 전달. 방해 규칙은 Z에서도 CLAUDE.md 쪽에 그대로 둔다 (행동 결부 규칙만 컴파일한다는 ziptie 원칙과 일치).
+- Z 조건의 `.claude/rules/`: 채점 대상에 해당하는 pr-rules, commit-rules 2개만 JIT 전달. 방해 규칙은 Z에서도 CLAUDE.md 쪽에 그대로 둔다 (행동 결부 규칙만 컴파일한다는 nunchi 원칙과 일치).
 
 ## 3. 조건과 실행
 
 | 조건 | 구성 |
 |---|---|
 | `AP` | 압박 CLAUDE.md(+@docs), 훅 없음, 롱컨텍스트 과제 |
-| `ZP` | AP와 동일 + `.claude/rules/` 2개 + ziptie PreToolUse 훅 (Bash 매처) |
+| `ZP` | AP와 동일 + `.claude/rules/` 2개 + nunchi PreToolUse 훅 (Bash 매처) |
 
 - 템플릿: 기존 `template/repo`를 보존하고 `template/repo-pressure`(24규칙)·`template/repo-pressure-12`(12규칙) 신설
 - 과제: 기존 LONG_TASK 그대로 (로그 분석 → 버그 수정 → 커밋 → PR)
@@ -61,7 +61,7 @@
 ### 2단계 — 확증 (40런)
 
 - 채택된 압박 수준에서 AP × 20, ZP × 20. AP/ZP를 교대 실행(시간대 편향 방지).
-- ZP 런마다 ziptie JSONL 전달 로그 보존 — 훅 발화 여부를 준수율과 분리 검증.
+- ZP 런마다 nunchi JSONL 전달 로그 보존 — 훅 발화 여부를 준수율과 분리 검증.
 
 ## 4. 채점
 

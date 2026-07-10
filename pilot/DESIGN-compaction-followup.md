@@ -36,7 +36,7 @@
 | 조건 | 구성 |
 |---|---|
 | `AC2` | AC와 동일 구성(압박 CLAUDE.md + @docs 24규칙, 관측 훅만), 3단 과제 + /compact 2회 |
-| `ZC2` | AC2와 동일 + ziptie rules 2개 + PreToolUse 훅 + SessionStart(compact) 재무장 훅 |
+| `ZC2` | AC2와 동일 + nunchi rules 2개 + PreToolUse 훅 + SessionStart(compact) 재무장 훅 |
 
 - 모델: sonnet 고정. **런 전체 타임아웃 35분**(단이 하나 늘고 컴팩션이 1회 추가 — 기존 25분에서 상향, 실행 전 고정).
 - ZC2 기대 처치 사슬: 1차 커밋 배달 → rearm① → 2차 커밋 **재배달** → rearm② → 3차 커밋 **재재배달** + pr-rules 첫 배달 (deny 4건, rearm 2건).
@@ -90,7 +90,7 @@
 Arm A 실행 중(Arm B 미실행) 별도 조사에서, Claude Code(v2.0.64+, 실측 v2.1.206)가
 `.claude/rules/*.md`를 **네이티브로도 읽는다**는 사실을 확인했다. `paths:`
 frontmatter가 없는 룰 파일은 세션 시작 시 본문이 컨텍스트에 로드된다 —
-ziptie 형식 룰 파일로 로컬 프로브를 돌려 본문 노출을 실측 확인함.
+nunchi 형식 룰 파일로 로컬 프로브를 돌려 본문 노출을 실측 확인함.
 
 - **영향 범위**: ZC/ZC2 조건에는 룰 본문 요약 1줄("PR 생성 규칙 — 제목 형식,
   필수 섹션(…), 라벨, 리뷰어 지정." 등)이 세션 시작 시부터 존재한다. 즉

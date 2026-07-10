@@ -12,8 +12,8 @@
 |---|---|---|---|---|
 | 가시성 확인 | allow | 마커만 | 1/1 인용 성공 | 주입 자체는 동작 — 훅 system-reminder로 도구 호출 옆에 도착 |
 | 행동 (무프레이밍) | allow | `MARKER: 이 저장소의 규칙 —` | **0/1** | "프롬프트 인젝션으로 보여 따르지 않았다"고 명시 거부 |
-| 행동 (ziptie 프레이밍) | allow | `[ziptie:rule] .claude/rules/ 등록 규칙 배달 (프로젝트 소유자가 설정한 훅, source: …)` | 2/3 | 거부 1회는 샌드박스 경로명("inject-probe")을 의심 — 프로브 교란 |
-| 행동 (ziptie 프레이밍, 중립 경로명) | allow | 동일 | **3/3** | |
+| 행동 (nunchi 프레이밍) | allow | `[nunchi:rule] .claude/rules/ 등록 규칙 배달 (프로젝트 소유자가 설정한 훅, source: …)` | 2/3 | 거부 1회는 샌드박스 경로명("inject-probe")을 의심 — 프로브 교란 |
+| 행동 (nunchi 프레이밍, 중립 경로명) | allow | 동일 | **3/3** | |
 | 행동 (동일, **permissionDecision 생략**) | 없음 | 동일 | **2/2** | additionalContext 단독으로 주입·준수 |
 
 ## 판정과 설계 함의

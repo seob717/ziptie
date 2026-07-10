@@ -1,6 +1,6 @@
 # 컴팩션 프리플라이트 프로브 — 결과 기록
 
-pty로 띄운 대화형 `claude` 세션에서 `/compact`를 결정적으로 유발하고, ziptie의
+pty로 띄운 대화형 `claude` 세션에서 `/compact`를 결정적으로 유발하고, nunchi의
 `SessionStart(compact)` 훅(재무장)이 실제로 발화하는지 검증한 기술 스파이크
 결과다. 스크립트: `pilot/compact_probe.py`. 실행:
 
@@ -38,11 +38,11 @@ uv run --with pexpect python3 pilot/compact_probe.py
   필요).
 - `~/.claude.json`에 샌드박스 경로를 `hasTrustDialogAccepted: true`로 등록
   (run.sh와 동일 — 미등록 시 `.claude/settings.json`이 무시됨).
-- **ziptie 훅 배선은 `--plugin-dir`을 사용했다** (run.sh의 Z 조건처럼
+- **nunchi 훅 배선은 `--plugin-dir`을 사용했다** (run.sh의 Z 조건처럼
   `pretooluse.py`만 수동으로 settings.json에 절대경로로 심는 방식이 아님).
   이유: `hooks/hooks.json`이 PreToolUse와 `SessionStart(matcher: "compact")`를
   둘 다 이미 선언하고 있고 `${CLAUDE_PLUGIN_ROOT}`로 경로를 해석하므로,
-  `claude --plugin-dir /Users/yuseobshim/Projects/ziptie`만 넘기면 두 훅이
+  `claude --plugin-dir /Users/yuseobshim/Projects/nunchi`만 넘기면 두 훅이
   자동으로 배선된다. README의 로컬 개발 설치 방법과도 일치한다. run.sh의
   Z 조건은 애초에 SessionStart를 쓸 필요가 없었기 때문에 PreToolUse만
   수동으로 심었을 뿐, `--plugin-dir` 자체를 피할 이유가 있었던 건 아니다.
@@ -58,10 +58,10 @@ uv run --with pexpect python3 pilot/compact_probe.py
 
 1. 초기 렌더링 idle-wait.
 2. **룰 트리거**: "Bash 도구로 정확히 다음 명령어를 그대로 실행해(다른
-   명령은 실행하지 마): `gh pr create --title "ziptie probe" --body "probe
-   body"`" 전송 → ziptie PreToolUse 훅이 `gh\s+pr\s+create` 패턴에 매치해
-   deny, `.claude/ziptie/state/<session>--pr-rules` 마커 생성,
-   `.claude/ziptie/logs/*.jsonl`에 `"decision": "deny"` 기록.
+   명령은 실행하지 마): `gh pr create --title "nunchi probe" --body "probe
+   body"`" 전송 → nunchi PreToolUse 훅이 `gh\s+pr\s+create` 패턴에 매치해
+   deny, `.claude/nunchi/state/<session>--pr-rules` 마커 생성,
+   `.claude/nunchi/logs/*.jsonl`에 `"decision": "deny"` 기록.
 3. 필러 프롬프트 2개 (파일 요약 요청) — `/compact`가 "대화가 너무 짧다"며
    거부하는 것을 막기 위한 패딩.
 4. `/compact` 전송.
@@ -81,14 +81,14 @@ uv run --with pexpect python3 pilot/compact_probe.py
   수신 이후 idle(기본 4~5초) 동안 새 데이터가 없으면 "응답 완료"로
   판정했다.
 - **최종 판정은 항상 디스크 그라운드 트루스**: state 마커 파일 존재 여부와
-  `.claude/ziptie/logs/*.jsonl`의 `decision` 필드로 각 단계 성공 여부를
+  `.claude/nunchi/logs/*.jsonl`의 `decision` 필드로 각 단계 성공 여부를
   검증했다. idle-timeout은 "다음 입력을 보내도 되는 시점"을 잡는 용도로만
   쓰고, 실제 합격/불합격 판정에는 관여하지 않는다.
 - **확인창(confirmation dialog) 자동 처리**: 탐색 중, 모델이 재시도 시 PR
   본문에 개행이 포함된 다중 섹션(`## 변경 이유` 등)을 넣으면 Claude Code
   자체 안전장치가 "Newline followed by # inside a quoted argument can hide
   arguments from path validation — Do you want to proceed?"라는 확인창을
-  띄우는 것을 발견했다 (ziptie와 무관한 Claude Code 내장 휴리스틱). 최종
+  띄우는 것을 발견했다 (nunchi와 무관한 Claude Code 내장 휴리스틱). 최종
   스크립트는 누적 버퍼에서 확인창 문구를 정규식으로 감지하면 Enter(기본
   선택지 "1. Yes")를 자동 전송하도록 만들었다.
   **처음에는 `Do you want to proceed`처럼 리터럴 공백을 요구하는 정규식을
@@ -110,7 +110,7 @@ uv run --with pexpect python3 pilot/compact_probe.py
 |---|---|---|---|
 | 1 | pty 세션에 프롬프트를 보내고 응답 완료를 감지 | **PASS** | idle-timeout 기반 감지로 매 턴(트리거, 필러 2개, `/compact`, 재트리거) 정상적으로 완료 시점을 포착하고, `wait_idle()`의 반환값(자연 idle 완료=True vs `max_wait` 강제종료=False)을 턴별로 모아 전부 `True`일 때만 PASS로 기록하도록 계측을 강화했다. 실행 1: turn1 46.2s / 실행 2: turn1 33.3s / 실행 3: turn1 60.8s, 5개 턴 전부 자연 idle(강제타임아웃 없음). |
 | 2 | `/compact` 전송 시 실제 컴팩션 발생 | **PASS** | `rearm`은 `hooks/sessionstart.py`가 `input_data["source"] == "compact"`일 때만(SessionStart 훅의 `matcher: "compact"`) 호출되므로, 로그에 `"decision": "rearm"` 엔트리가 남았다는 것 자체가 실제 컴팩션이 일어났다는 간접(그러나 강한) 증거다. `/compact` 처리에 실행 1: 55.2s, 실행 2: 56.0s, 실행 3: 57.2s 소요. |
-| 3 | 컴팩션 직후 SessionStart(compact) 훅 발화 → 마커 제거 + JSONL `rearm` | **PASS** | 세 실행 모두 `.claude/ziptie/logs/*.jsonl`에 `{"decision": "rearm", "count": 1, ...}` 기록, 동시에 컴팩션 전 존재하던 `<session>--pr-rules` state 마커가 컴팩션 후 사라짐(re-listing state dir로 확인). session_id는 컴팩션 전후로 동일하게 유지됨을 확인 (rearm의 `session` 필드가 이전 `deny` 엔트리와 동일). |
+| 3 | 컴팩션 직후 SessionStart(compact) 훅 발화 → 마커 제거 + JSONL `rearm` | **PASS** | 세 실행 모두 `.claude/nunchi/logs/*.jsonl`에 `{"decision": "rearm", "count": 1, ...}` 기록, 동시에 컴팩션 전 존재하던 `<session>--pr-rules` state 마커가 컴팩션 후 사라짐(re-listing state dir로 확인). session_id는 컴팩션 전후로 동일하게 유지됨을 확인 (rearm의 `session` 필드가 이전 `deny` 엔트리와 동일). |
 | 4 | 스크립트 1회 실행으로 무인 재현 | **PASS** | 사람 개입 없이 `uv run --with pexpect python3 pilot/compact_probe.py` 한 줄로 ①~⑤ 전 시퀀스가 끝까지 자동 진행되고 종료 코드 0으로 마무리됨. 확인창 자동 응답까지 포함해 무인 실행. 독립된 세 번의 실행으로 재현성 확인 (총 소요 147.8s, 167.0s, 195.3s). 실행 3에서는 확인창이 두 번(트리거 턴·재트리거 턴) 등장했고 고친 `CONFIRM_RE`가 둘 다 정상적으로 자동 응답했다. |
 
 보너스로 검증된 것 (성공 기준에는 없지만 강한 추가 증거): 재트리거 이후

@@ -6,7 +6,7 @@
 
 강압박 재검증(규칙 24개 + 268KB 롱컨텍스트)에서도 CLAUDE.md 단독 준수율은 무너지지 않았다(천장 재확인). 사전등록된 다음 압박 축 1순위가 **컴팩션**이다. 공식 문서 기준으로 컴팩션 후 CLAUDE.md 본문은 재주입되지만 `@참조 문서`의 전개 내용은 손실된다 — 채점 대상 규칙의 세부가 @docs 안에만 있는 기존 압박 템플릿은 정확히 이 손실 지점을 때린다.
 
-ziptie 쪽 처치는 v2-2에서 구현된 **재무장(rearm)**: SessionStart(compact) 훅이 세션의 배달 마커를 리셋해, 컴팩션 전에 이미 배달된 룰이 다음 매칭 때 JIT로 재배달된다.
+nunchi 쪽 처치는 v2-2에서 구현된 **재무장(rearm)**: SessionStart(compact) 훅이 세션의 배달 마커를 리셋해, 컴팩션 전에 이미 배달된 룰이 다음 매칭 때 JIT로 재배달된다.
 
 - 압박 축: **컴팩션(/compact를 과제 중간에 강제 유발) + 다수 규칙(24개)**
 - 유발 방식: pty 스크립팅(COMPACT-PROBE.md에서 3런 재현 검증). 자동 컴팩션(비결정적)은 쓰지 않는다.
@@ -28,10 +28,10 @@ ziptie 쪽 처치는 v2-2에서 구현된 **재무장(rearm)**: SessionStart(com
 
 | 조건 | 구성 |
 |---|---|
-| `AC` | 압박 CLAUDE.md(+@docs, 규칙 24개 = `template/repo-pressure`), ziptie 훅 없음, 2단 과제 + 중간 /compact |
-| `ZC` | AC와 동일 + `.claude/rules/` 2개(pr-rules, commit-rules) + ziptie PreToolUse 훅 + **SessionStart(compact) 재무장 훅** |
+| `AC` | 압박 CLAUDE.md(+@docs, 규칙 24개 = `template/repo-pressure`), nunchi 훅 없음, 2단 과제 + 중간 /compact |
+| `ZC` | AC와 동일 + `.claude/rules/` 2개(pr-rules, commit-rules) + nunchi PreToolUse 훅 + **SessionStart(compact) 재무장 훅** |
 
-- **컴팩션 발생 검증(양 조건 공통)**: 양 조건 모두에 **관측 전용 SessionStart(compact) 훅**을 단다 — stdout에 아무것도 출력하지 않고(컨텍스트 무영향) 캡처 디렉터리에 `compact-observed` 타임스탬프만 기록. AC의 행동에 영향을 주지 않으면서 "컴팩션이 실제로 발생했다"를 양 조건에서 동일 기준으로 판정하기 위함이다. ZC는 이에 더해 ziptie 재무장 훅의 rearm JSONL을 별도로 보존한다.
+- **컴팩션 발생 검증(양 조건 공통)**: 양 조건 모두에 **관측 전용 SessionStart(compact) 훅**을 단다 — stdout에 아무것도 출력하지 않고(컨텍스트 무영향) 캡처 디렉터리에 `compact-observed` 타임스탬프만 기록. AC의 행동에 영향을 주지 않으면서 "컴팩션이 실제로 발생했다"를 양 조건에서 동일 기준으로 판정하기 위함이다. ZC는 이에 더해 nunchi 재무장 훅의 rearm JSONL을 별도로 보존한다.
 - 모델: sonnet 고정(파일럿·강압박과 동일). 대화형 pty라 max-turns 대신 **런 전체 타임아웃 25분** + 턴별 idle 감지(COMPACT-PROBE.md 전략)를 쓴다.
 
 ## 4. 실행
