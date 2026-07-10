@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.7.0](https://github.com/seob717/nunchi/compare/v0.6.0...v0.7.0) (2026-07-10)
+
+
+### ⚠ BREAKING CHANGES
+
+* 플러그인 이름이 nunchi로 바뀌어 기존 설치는 재설치가 필요하고, 로그·상태 디렉터리가 .claude/ziptie/에서 .claude/nunchi/로 이동한다(기존 로그는 자동 이관되지 않음).
+
+### ci
+
+* 1.0 이전 버전 범프 규칙 조정 — breaking은 minor, feat는 patch로 ([d8f03ea](https://github.com/seob717/nunchi/commit/d8f03ea97ef9befe33b10f52f1e36c1e5589d25f))
+
+
+### Features
+
+* InstructionsLoaded 훅으로 세션 전수 관측 — 절약 추정 정확화 ([8f434e8](https://github.com/seob717/nunchi/commit/8f434e8550a8e4a56cc21cd76c2e45226d332bc4)), closes [#10](https://github.com/seob717/nunchi/issues/10)
+* ziptie → nunchi 개명 ([608df82](https://github.com/seob717/nunchi/commit/608df8230be7f143233a4f72992640c2a7aca82f))
+
+
+### Docs
+
+* README 두괄식 재구성 — 핵심 요약·측정 성과·Quick start를 상단으로 ([044cee6](https://github.com/seob717/nunchi/commit/044cee6d833750eea87ef0807f49029723dc1e81))
+* README 로드맵에서 내부 작업 메모 2건 제거 (이슈로 이관) ([73812a4](https://github.com/seob717/nunchi/commit/73812a467e14ca6f28210eb5744ea1013d744921))
+* 로드맵에 InstructionsLoaded 세션 카운트·컴파일 recall 측정 추가 ([a9026b5](https://github.com/seob717/nunchi/commit/a9026b53463128d8b285d451cd127ed3945c851d))
+* 비교표를 스코어보드에서 범위 지도로 — ❌ 제거·중립 서술·ziptie 열세 행 2개 추가 ([1598337](https://github.com/seob717/nunchi/commit/1598337e6cba9d71d0b1a4765c056def04f51a73))
+
 ## [0.6.0](https://github.com/seob717/nunchi/compare/v0.5.0...v0.6.0) (2026-07-10)
 
 
