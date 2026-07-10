@@ -1,5 +1,50 @@
 # Changelog
 
+## [0.3.0](https://github.com/seob717/ziptie/compare/v0.2.0...v0.3.0) (2026-07-10)
+
+
+### Features
+
+* rearm — 컴팩션 후 배달 마커 리셋으로 룰 재배달 ([f392aa3](https://github.com/seob717/ziptie/commit/f392aa3a414e1d7d6535fceeabb09a47271542e7))
+* run.sh에 AP·AP12·ZP 압박 조건 추가 (DESIGN-pressure §3) ([c05269f](https://github.com/seob717/ziptie/commit/c05269f154fb5aa24974ae93fe302fd006cf8a65))
+* SessionStart(compact) 훅 — 컴팩션 직후 재무장 배선 ([c4ec724](https://github.com/seob717/ziptie/commit/c4ec724455839614ece3f5a518cf1996473647cd))
+* 강압박 실험용 압박 템플릿·rule 파일 추가 (DESIGN-pressure §2) ([05f8047](https://github.com/seob717/ziptie/commit/05f80478727c6171a3070e5040b704b5fdf5faf6))
+* 강압박 채점 집계 — 런 표·조건별 CI·Fisher 출력 ([282e92f](https://github.com/seob717/ziptie/commit/282e92fdcb3583fb43185d51391c438b68517503))
+* 강압박 채점 함수 P1~P6·C1~C2 + Wilson·Fisher (DESIGN-pressure §4) ([394dff3](https://github.com/seob717/ziptie/commit/394dff3f00d492abea4e4e4d8039f43545b3fdc7))
+* 다중 룰 매칭 시 병합 배달 — N턴 소모 제거 ([7f6c3f9](https://github.com/seob717/ziptie/commit/7f6c3f93bbee927c1826dd3095e1869361169033))
+
+
+### Bug Fixes
+
+* enabled 오타값에 경고 — 무경고 활성 취급 제거 ([2b51976](https://github.com/seob717/ziptie/commit/2b5197644fbfea12900d2e5a68d16d30e91ba082))
+* project_dir 해석 시 CLAUDE_PROJECT_DIR 우선 ([0857eeb](https://github.com/seob717/ziptie/commit/0857eeb68ce10d7e3ffd598454e0674ecf5d4e52))
+* rearm — 세션 id "warned" 충돌로 재무장이 무동작하던 결함 ([1d4d7ba](https://github.com/seob717/ziptie/commit/1d4d7bae7e2690943fdb77e546cb6c6afcdaf23a))
+* 룰 name 형식 검증 — 경로 문자로 인한 사일런트 룰 사망 방지 ([889d2ae](https://github.com/seob717/ziptie/commit/889d2ae22d6c5a473a4bf7e217e3c2f4cac06a93))
+* 룰 소스 인코딩 오류가 병합 배치 전체를 무효화하지 않게 함 ([f51d831](https://github.com/seob717/ziptie/commit/f51d831e219646912615d4b5564ae9a8e915e9d4))
+* 룰 파싱 경고를 세션당 1회로 제한 ([151275c](https://github.com/seob717/ziptie/commit/151275cd6634e8476edf066b669aef8c4bd61b0b))
+* 비정상 session_id가 block 룰 평가를 무산시키지 않게 함 ([385953d](https://github.com/seob717/ziptie/commit/385953d49aaeeca9568dd2fd97edaaa6938796ea))
+* 잘못된 정규식 경고도 세션당 1회로 제한 ([88bbf15](https://github.com/seob717/ziptie/commit/88bbf153f9101cd2831fa270d27c7d484947e8d6))
+* 채점 스코핑 — 컴팩션 이후 산출물 강제·타임아웃 하드스톱 (사전등록 §2 운영화) ([3b0af15](https://github.com/seob717/ziptie/commit/3b0af15098e0a9194b5d37af1ed570a368d9d965))
+* 채점기 — AC/ZC에서 summary.json 부재 시 레거시 폴백 차단(no_summary) ([d7c04f2](https://github.com/seob717/ziptie/commit/d7c04f2299d3be9dd5e3aaaa9d756868994569b0))
+* 컴팩션 프로브 — 확인창 응답 정규식·기준1 계측·실행 기록 정합 ([e732f26](https://github.com/seob717/ziptie/commit/e732f263656ec56eb902bc7a2a604a519a879c6d))
+
+
+### Tests
+
+* pty 컴팩션 프로브 — /compact 유발·재무장 발화 검증 ([6a895a0](https://github.com/seob717/ziptie/commit/6a895a0b2d587212e9e1db1dbdb99a51c0a53e4e))
+* 컴팩션 실험 러너 — AC/ZC 배선·관측 훅·2단 과제 ([16cd0e6](https://github.com/seob717/ziptie/commit/16cd0e6871d2dc34cf05dde279d8a953564959ab))
+
+
+### Docs
+
+* compile 커맨드 — $ARGUMENTS 명시, 검토 후 수정 절차, 파일명 규칙 ([f444717](https://github.com/seob717/ziptie/commit/f4447177225f8828aa9bcc90ca58154f4b88b2dc))
+* README 갱신 — 병합 배달·name 규칙·강압박 재검증 결과·PreCompact 로드맵 ([dc887b0](https://github.com/seob717/ziptie/commit/dc887b0205b44dd958bc5a72859f29528c096216))
+* 강압박 재검증 실험 설계 사전등록 (pilot/DESIGN-pressure.md) ([6d509a0](https://github.com/seob717/ziptie/commit/6d509a0440bb47dafb117e4672644e796b6c4084))
+* 강압박 프리플라이트 결과 — 게이트 미통과, 2단계 진입 금지 (천장 재확인) ([1be53f9](https://github.com/seob717/ziptie/commit/1be53f9c722dc0937b503d2ef4e086d7120eeca4))
+* 최종 리뷰 반영 — README 재무장·컴팩션 결과 갱신, P5 위반 양상 정밀화, rearm 무음 no-op ([e3f9e69](https://github.com/seob717/ziptie/commit/e3f9e6982411cfa9d887b0f8cfd009b378761d6c))
+* 컴팩션 준수율 실험 사전등록 — 2단 과제·게이트·제외 규칙 고정 ([2771480](https://github.com/seob717/ziptie/commit/27714806175198f34695071ea62ba224331645e0))
+* 컴팩션 프리플라이트 결과 — 게이트 미통과, 첫 균열(P5) 관측·재무장 3/3 검증 ([ec011fe](https://github.com/seob717/ziptie/commit/ec011fe8be95b4beb1ed98a443f3c10c4b10d8e1))
+
 ## [0.2.0](https://github.com/seob717/ziptie/compare/v0.1.0...v0.2.0) (2026-07-09)
 
 
