@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.5.0](https://github.com/seob717/ziptie/compare/v0.4.0...v0.5.0) (2026-07-10)
+
+
+### Features
+
+* trigger.path — content 룰에 파일 경로 AND 조건 추가 (실사용 오탐 실증 반영) ([392505d](https://github.com/seob717/ziptie/commit/392505de958c0b74e692b85b26e6a05bf5bb0726))
+
+
+### Bug Fixes
+
+* report에 inject 배달 집계 컬럼·rearm 요약 줄 추가 ([0ffcc85](https://github.com/seob717/ziptie/commit/0ffcc853ec0ad8ea7cfacbb282c22fd007e61fdf))
+
+
+### Docs
+
+* 비교표 재검증 정정 — hookify Stop 전달, Writ 중복방지·컴팩션 재무장·로그 셀 수정 ([fd02481](https://github.com/seob717/ziptie/commit/fd02481f866715a8f6614c69ea363c903bda9c79))
+
 ## [0.4.0](https://github.com/seob717/ziptie/compare/v0.3.0...v0.4.0) (2026-07-10)
 
 
