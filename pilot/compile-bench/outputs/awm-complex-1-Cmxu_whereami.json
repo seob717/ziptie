@@ -1,0 +1,41 @@
+{
+  "doc": "awm-complex-1-Cmxu_whereami",
+  "rules": [
+    {
+      "name": "playwright-run-headless",
+      "tool": "Bash",
+      "pattern": "playwright\\s+test\\b.*--headed",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "IMPORTANT: RUN HEADLESS whenever possible"
+    },
+    {
+      "name": "svelte-runes-no-legacy-reactive-edit",
+      "tool": "Edit",
+      "pattern": "(^|\\n)\\s*\\$:\\s",
+      "field": "new_string",
+      "path": "\\.svelte$",
+      "strength": "require-read",
+      "evidence": "Follow existing Svelte 5 runes patterns (no legacy reactive statements)"
+    },
+    {
+      "name": "svelte-runes-no-legacy-reactive-write",
+      "tool": "Write",
+      "pattern": "(^|\\n)\\s*\\$:\\s",
+      "field": "content",
+      "path": "\\.svelte$",
+      "strength": "require-read",
+      "evidence": "Follow existing Svelte 5 runes patterns (no legacy reactive statements)"
+    }
+  ],
+  "uncompilable": [
+    "Use TypeScript for all components with proper type imports — 특정 액션에 묶기 힘든 general coding style",
+    "Component props should be properly typed interfaces — general coding style",
+    "All API responses follow APIResponse<T> interface with success/error structure — 구조적 컨벤션, 신뢰할 만한 액션 결합 패턴 없음",
+    "All new features should have Playwright E2E tests — 단일 tool call에 묶기 힘든 워크플로 가이드",
+    "Development Workflow 순서(dev → check → lint → deploy → Playwright test) — 단일 액션 트리거가 아닌 일반 프로세스",
+    "Deployment reminder to run build+deploy 'when you are done making changes' — '완료 시점'의 명확한 tool-call 경계 없음",
+    "Update DEVELOPMENT.md task status if applicable — 조건부 워크플로 단계, 액션 특정 불가"
+  ]
+}

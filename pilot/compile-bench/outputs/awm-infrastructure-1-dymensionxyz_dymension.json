@@ -1,0 +1,74 @@
+{
+  "doc": "awm-infrastructure-1-dymensionxyz_dymension",
+  "rules": [
+    {
+      "name": "comment-why-not-what",
+      "tool": "Edit",
+      "pattern": "(^|\\n)\\s*//\\s*\\S",
+      "field": "new_string",
+      "path": "\\.go$",
+      "strength": "inject",
+      "evidence": "**NEVER** comment the WHAT of code (the code itself shows what it does) / **ONLY** add comments to explain WHY for unusual, unclear, or non-obvious implementations"
+    },
+    {
+      "name": "beginblocker-endblocker-no-panic",
+      "tool": "Edit",
+      "pattern": "BeginBlocker|EndBlocker",
+      "field": "new_string",
+      "path": "\\.go$",
+      "strength": "require-read",
+      "evidence": "BeginBlocker and Endblocker functions in module should never panic, it would cause a chain halt"
+    },
+    {
+      "name": "golangci-lint-scope",
+      "tool": "Bash",
+      "pattern": "golangci-lint\\s+run",
+      "field": null,
+      "path": null,
+      "strength": "inject",
+      "evidence": "`golangci-lint run` - Only if you modified Go code"
+    },
+    {
+      "name": "gofumpt-scope",
+      "tool": "Bash",
+      "pattern": "gofumpt\\s+-w",
+      "field": null,
+      "path": null,
+      "strength": "inject",
+      "evidence": "`gofumpt -w .` - Only if you modified Go code"
+    },
+    {
+      "name": "proto-gen-format-scope",
+      "tool": "Bash",
+      "pattern": "make\\s+proto-(format|gen)",
+      "field": null,
+      "path": null,
+      "strength": "inject",
+      "evidence": "`make proto-format` and `make proto-gen` - Only if you modified .proto files"
+    },
+    {
+      "name": "go-test-scope",
+      "tool": "Bash",
+      "pattern": "go\\s+test",
+      "field": null,
+      "path": null,
+      "strength": "inject",
+      "evidence": "`go test` - Only for packages you modified"
+    },
+    {
+      "name": "go-acc-full-suite-scope",
+      "tool": "Bash",
+      "pattern": "go-acc",
+      "field": null,
+      "path": null,
+      "strength": "inject",
+      "evidence": "Full test suite with `go-acc` - Only before final push or if requested"
+    }
+  ],
+  "uncompilable": [
+    "Cosmos SDK code runs single-threaded (no multithreading) — factual statement, not tied to an action",
+    "Transactions are atomic and rollback on error/panic — factual statement, not tied to an action",
+    "All cosmos validators must get the same result so code should be deterministic — general design principle, no specific pattern to bind to an action",
+    "Security Best Practices list for dymd CLI usage (never share keys, use hardware wallets, verify tx before signing, etc.) — end-user operational guidance for interacting with the chain, not a Claude Code coding action"
+  ]
+}

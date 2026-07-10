@@ -1,0 +1,50 @@
+{
+  "doc": "awm-libraries-1-Alive24_CKBoost",
+  "rules": [
+    {
+      "name": "no-task-master-reinit",
+      "tool": "Bash",
+      "pattern": "task-master\\s+init",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "DO NOT RE-INITIALIZE. That will not do anything beyond re-adding the same Taskmaster core files."
+    },
+    {
+      "name": "no-manual-tasks-json-edit",
+      "tool": "Edit",
+      "pattern": "\\.taskmaster/tasks/tasks\\.json",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Never manually edit `tasks.json` - use commands instead"
+    },
+    {
+      "name": "no-manual-taskmaster-config-edit",
+      "tool": "Edit",
+      "pattern": "\\.taskmaster/config\\.json",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Never manually edit `.taskmaster/config.json` - use `task-master models`"
+    },
+    {
+      "name": "no-edit-generated-molecule-code",
+      "tool": "Edit",
+      "pattern": "src/generated/ckboost\\.rs",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Molecule generates code for Molecule Schema. Don't edit the generated code, but use it as a reference."
+    }
+  ],
+  "uncompilable": [
+    "PRD 완료·승인 전 개발 착수 금지(PRD-First Development Mandate) — 특정 tool 호출에 묶을 수 없는 광범위 프로세스 게이트",
+    "Product Design Discussion → PRD Consolidation → Approval → Development 4단계 워크플로 — 단일 액션 트리거로 표현 불가",
+    "USE GENERATED TYPES: Molecule 스키마 생성 타입만 쓰고 중복 타입 정의 금지 — 어떤 코드가 '중복 타입'인지 정규식으로 판별 불가",
+    "Use `/clear` between different tasks to maintain focus — 세션 관리 습관, tool 호출과 결합 불가",
+    "PRD 파일 네이밍(`docs/*.prd.txt`)·저장 위치 컨벤션 — 올바른 이름인지 정규식만으로 검증 불가",
+    "Development Roadmap: 타임라인 추정 금지 등 문서 작성 스타일 지침 — 특정 액션에 묶이지 않는 일반 가이드",
+    "Visual Prototyping First → Smart Contract Design → Test-driven Design 개발 순서 원칙 — 프로세스 순서 가이드, 단일 tool 트리거 불가"
+  ]
+}

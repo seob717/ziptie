@@ -1,0 +1,97 @@
+{
+  "collected": [
+    {
+      "id": "awm-complex-1-Cmxu_whereami",
+      "url": "https://raw.githubusercontent.com/Cmxu/whereami/main/CLAUDE.md",
+      "origin": "awesome-claude-md complex-projects 알파벳순",
+      "bytes": 4642,
+      "sha256": "b86ee800e34a25960baebe57c19faff23482622dbda21650bc567ec97858ff78"
+    },
+    {
+      "id": "awm-developer-1-JakeTheRabbit_HA-Irrigation-Strategy",
+      "url": "https://raw.githubusercontent.com/JakeTheRabbit/HA-Irrigation-Strategy/main/CLAUDE.md",
+      "origin": "awesome-claude-md developer-tooling 알파벳순",
+      "bytes": 11861,
+      "sha256": "f92773d3ddc16841847ab78c32f81e7e8b6bf63419981fb8d4fec9db13899741"
+    },
+    {
+      "id": "awm-developer-2-coder_claudecode.nvim",
+      "url": "https://raw.githubusercontent.com/coder/claudecode.nvim/main/CLAUDE.md",
+      "origin": "awesome-claude-md developer-tooling 알파벳순",
+      "bytes": 23293,
+      "sha256": "7cb9a1271568b82ab7c80d5d07eec711a8a36ebe43fc3ce5a850a9f5e6c51ced"
+    },
+    {
+      "id": "awm-getting-1-aker-dev_microfolio",
+      "url": "https://raw.githubusercontent.com/aker-dev/microfolio/main/CLAUDE.md",
+      "origin": "awesome-claude-md getting-started 알파벳순",
+      "bytes": 4222,
+      "sha256": "a3b656c3666cea3f46d6336b508809b9d7e0b9d9eb15c924af296d18c4536ffc"
+    },
+    {
+      "id": "awm-infrastructure-1-dymensionxyz_dymension",
+      "url": "https://raw.githubusercontent.com/dymensionxyz/dymension/main/CLAUDE.md",
+      "origin": "awesome-claude-md infrastructure-projects 알파벳순",
+      "bytes": 24598,
+      "sha256": "495348ba884ac11847edfd451595b187f3bc7081b7255624f1618addd0901b27"
+    },
+    {
+      "id": "awm-libraries-1-Alive24_CKBoost",
+      "url": "https://raw.githubusercontent.com/Alive24/CKBoost/main/CLAUDE.md",
+      "origin": "awesome-claude-md libraries-frameworks 알파벳순",
+      "bytes": 33229,
+      "sha256": "daae208b19ee73624f0ad7bd2500947b9c937100235f99134dd433ae68f7f521"
+    },
+    {
+      "id": "awm-project-1-KentBeck_BPlusTree3",
+      "url": "https://raw.githubusercontent.com/KentBeck/BPlusTree3/main/rust/docs/CLAUDE.md",
+      "origin": "awesome-claude-md project-handoffs 알파벳순",
+      "bytes": 3449,
+      "sha256": "902ad61c59fbfec75ad0852126b6229b379e8fd5d5e0d25012fd1a5009d1ffc3"
+    },
+    {
+      "id": "airflow",
+      "url": "https://raw.githubusercontent.com/apache/airflow/main/AGENTS.md",
+      "origin": "명명 코퍼스",
+      "bytes": 35188,
+      "sha256": "4e9a2086932519668f87b0b10bd5d7c4c699bf5202a51e54ff3f1082ca4b8bbd",
+      "note": "CLAUDE.md는 AGENTS.md 심링크 — 실체 수집"
+    },
+    {
+      "id": "nextjs",
+      "url": "https://raw.githubusercontent.com/vercel/next.js/canary/AGENTS.md",
+      "origin": "명명 코퍼스",
+      "bytes": 22407,
+      "sha256": "80e84a252f6c0a3d6b500b09246de9586b59b180abc40423c9e5b6a8e6c1cf9d",
+      "note": "CLAUDE.md는 AGENTS.md 심링크 — 실체 수집"
+    },
+    {
+      "id": "supabase",
+      "url": "https://raw.githubusercontent.com/supabase/supabase/master/.claude/CLAUDE.md",
+      "origin": "명명 코퍼스",
+      "bytes": 2032,
+      "sha256": "13c127361e6a7309602268f741afccbd69a6e54a45629de94e4bd105be9d6322"
+    },
+    {
+      "id": "langgraph",
+      "url": "https://raw.githubusercontent.com/langchain-ai/langgraph/main/CLAUDE.md",
+      "origin": "명명 코퍼스",
+      "bytes": 1863,
+      "sha256": "9ac68fdcd0c7c44b2d3c1d9d2c72049c314222d50b29f813c4a5e19baeb01945"
+    },
+    {
+      "id": "cloudflare",
+      "url": "https://raw.githubusercontent.com/cloudflare/workers-sdk/main/CLAUDE.md",
+      "origin": "명명 코퍼스",
+      "bytes": 132,
+      "sha256": "66f93be8471bbf4b06a1c6121b39bae27020b72cd612bd488906eef0f8abaa27"
+    }
+  ],
+  "log": [
+    "skip complex-projects/ChaseNoCap_h1b-visa-analysis: View Original 링크 없음",
+    "skip developer-tooling/ChaseNoCap_sdlc-engine: View Original 링크 없음",
+    "skip developer-tooling/SepineTam_stata-mcp: 원본 404 (https://raw.githubusercontent.com/SepineTam/stata-mcp/main/CLAUDE.md)",
+    "skip developer-tooling/cloudflare_workers-sdk: 명명 코퍼스와 중복(cloudflare/workers-sdk)",
+    "skip infrastructure-projects/cloudflare_workerd: 원본 404 (https://raw.githubusercontent.com/cloudflare/workerd/main/CLAUDE.md)"
+  ]
+}

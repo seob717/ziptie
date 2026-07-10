@@ -1,0 +1,46 @@
+{
+  "doc": "supabase",
+  "rules": [
+    {
+      "name": "ui-primitive-check-before-create",
+      "tool": "Write",
+      "pattern": "packages/ui/.*\\.(tsx|ts)$",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Check `packages/ui/index.tsx` before creating new primitives."
+    },
+    {
+      "name": "styling-no-hardcoded-colors",
+      "tool": "Edit",
+      "pattern": "#[0-9a-fA-F]{3,8}\\b|rgba?\\(|hsla?\\(",
+      "field": "new_string",
+      "path": "\\.(tsx|jsx|ts|css)$",
+      "strength": "require-read",
+      "evidence": "Styling — Tailwind only, semantic tokens (`bg-muted`, `text-foreground-light`), no hardcoded colors."
+    },
+    {
+      "name": "studio-shortcut-registry",
+      "tool": "Edit",
+      "pattern": "addEventListener\\(\\s*['\"]key(down|up)['\"]|onKeyDown\\s*=",
+      "field": "new_string",
+      "path": "apps/studio/.*\\.(tsx|ts)$",
+      "strength": "require-read",
+      "evidence": "Prefer registered, discoverable shortcuts over one-off keyboard listeners; keep `G then ...` chords for navigation."
+    },
+    {
+      "name": "studio-avoid-barrel-exports",
+      "tool": "Write",
+      "pattern": "export\\s*\\*\\s*from|export\\s*\\{[^}]*\\}\\s*from",
+      "field": "content",
+      "path": "apps/studio/.*/index\\.(ts|tsx)$",
+      "strength": "inject",
+      "evidence": "Avoid barrel re-export files."
+    }
+  ],
+  "uncompilable": [
+    "Language — Use U.S. English everywhere (tone/general guidance, not tied to a specific action).",
+    "Studio — Co-locate sub-components with parent (file-placement guidance, not expressible as a content/path regex trigger).",
+    "UI — import from 'ui', use `_Shadcn_` suffixed variants for form primitives (correct-vs-incorrect variant usage can't be distinguished by a simple regex)."
+  ]
+}

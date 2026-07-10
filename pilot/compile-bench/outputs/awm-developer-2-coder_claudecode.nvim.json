@@ -1,0 +1,31 @@
+{
+  "doc": "awm-developer-2-coder_claudecode.nvim",
+  "rules": [
+    {
+      "name": "mise-run-all-before-commit",
+      "tool": "Bash",
+      "pattern": "git(\\s+-\\S+(\\s+\\S+)?)*\\s+commit",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "**ALWAYS run `mise run all` before committing any changes.** This runs code quality checks and formatting that must pass for CI to succeed. Never skip this step - many PRs fail CI because contributors don't run the build commands before committing."
+    },
+    {
+      "name": "version-bump-update-all-files",
+      "tool": "Edit",
+      "pattern": "\\d+\\.\\d+\\.\\d+",
+      "field": "new_string",
+      "path": "(lua/claudecode/init\\.lua|scripts/claude_interactive\\.sh|scripts/lib_claude\\.sh|CHANGELOG\\.md)$",
+      "strength": "require-read",
+      "evidence": "When updating the version number for a new release, you must update **ALL** of these files:"
+    }
+  ],
+  "uncompilable": [
+    "새 통합(파일 탐색기/터미널 등) 추가 시 fixture 설정 생성 등 5단계 절차 — 특정 디렉터리로 특정되지 않아 하나의 tool 트리거에 묶기 어려움",
+    "새 MCP 도구 추가 시 JSON 스키마·테스트·문서화 등 5단계 절차 — 단일 액션에 매이지 않는 일반 프로세스 가이드",
+    "도구 코드의 JSON-RPC 에러 포맷 표준 — 코드 내용의 정합성을 정규식으로 신뢰성 있게 검증할 수 없음",
+    "Code Quality Standards(테스트 커버리지·0 warning·VS Code 호환성·문서 갱신 등) — 특정 액션에 묶이지 않는 일반 품질 목표",
+    "Testing Organization Principles(isolation·mocking·coverage·clarity) — 테스트 작성 스타일에 대한 일반 지침",
+    "Logging Best Practices(DEBUG/WARN/ERROR 레벨 선택 기준) — 특정 트리거 가능한 액션에 묶이지 않는 일반 스타일 지침"
+  ]
+}

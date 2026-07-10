@@ -1,0 +1,286 @@
+{
+  "doc": "airflow",
+  "rules": [
+    {
+      "name": "no-direct-host-commands",
+      "tool": "Bash",
+      "pattern": "^(pytest|python|airflow)\\b",
+      "field": null,
+      "path": null,
+      "strength": "block",
+      "evidence": "**Never run pytest, python, or airflow commands directly on the host** — always use `breeze`."
+    },
+    {
+      "name": "no-new-airflow-exception",
+      "tool": "Edit",
+      "pattern": "raise\\s+AirflowException\\(",
+      "field": "new_string",
+      "path": "\\.py$",
+      "strength": "block",
+      "evidence": "**Never add new direct `raise AirflowException(...)` usages** — the community is actively reducing them, not adding more, and the `check-no-new-airflow-exceptions` prek hook enforces this across `airflow-core`, `airflow-ctl`, `task-sdk`, `providers`, and `shared`."
+    },
+    {
+      "name": "selective-checks-sync",
+      "tool": "Edit",
+      "pattern": "dev/breeze/src/airflow_breeze/utils/selective_checks\\.py$",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Whenever you change a rule there — add/rename a file group, change what forces full_tests_needed/all_versions, alter how providers or test types are selected, or change which prek hooks are skipped — update dev/breeze/doc/ci/04_selective_checks.md in the same PR (the decision-rules list, the diagrams, the outputs table, and the worked examples as applicable) and add/adjust tests in dev/breeze/tests/test_selective_checks.py."
+    },
+    {
+      "name": "newsfragment-golden-rule",
+      "tool": "Write",
+      "pattern": "newsfragments/",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "**Golden rule: never create a newsfragment unless you are certain the change is user-facing.**"
+    },
+    {
+      "name": "newsfragment-no-providers-ctl",
+      "tool": "Write",
+      "pattern": "(providers|airflow-ctl)/.*newsfragments/",
+      "field": null,
+      "path": null,
+      "strength": "block",
+      "evidence": "**Never add newsfragments for `providers/` or `airflow-ctl/`** — those distributions are released from `main` and their release managers regenerate the changelog from `git log`, so per-PR newsfragments are not consumed."
+    },
+    {
+      "name": "fastapi-exception-translation",
+      "tool": "Edit",
+      "pattern": "airflow-core/src/airflow/core_api/.*route",
+      "field": null,
+      "path": null,
+      "strength": "inject",
+      "evidence": "In `airflow-core/src/airflow/core_api/` route handlers, catch errors raised by domain code (e.g., `ValueError` from `airflow.state.metastore.MetastoreStateBackend` for a missing row or invalid input) and re-raise as `HTTPException` with the right status (`404` for not-found, `400` for invalid input). Otherwise they propagate as `500 Internal Server Error`, leaking internals and misleading clients."
+    },
+    {
+      "name": "license-header-new-files",
+      "tool": "Write",
+      "pattern": "\\.py$",
+      "field": null,
+      "path": null,
+      "strength": "inject",
+      "evidence": "Apache License header on all new files (prek enforces this)."
+    },
+    {
+      "name": "pytest-not-unittest",
+      "tool": "Edit",
+      "pattern": "unittest\\.TestCase",
+      "field": "new_string",
+      "path": "test.*\\.py$",
+      "strength": "require-read",
+      "evidence": "Use pytest patterns, not `unittest.TestCase`."
+    },
+    {
+      "name": "mock-patch-spec",
+      "tool": "Edit",
+      "pattern": "mock\\.patch\\(",
+      "field": "new_string",
+      "path": "test.*\\.py$",
+      "strength": "inject",
+      "evidence": "Use `spec`/`autospec` when mocking."
+    },
+    {
+      "name": "mock-patch-decorator-pref",
+      "tool": "Edit",
+      "pattern": "with\\s+mock\\.patch\\(",
+      "field": "new_string",
+      "path": "test.*\\.py$",
+      "strength": "require-read",
+      "evidence": "Prefer `@mock.patch` decorators over `with mock.patch(...)` context managers for patching."
+    },
+    {
+      "name": "no-datetime-now-in-tests",
+      "tool": "Edit",
+      "pattern": "datetime\\.now\\(\\)",
+      "field": "new_string",
+      "path": "test.*\\.py$",
+      "strength": "require-read",
+      "evidence": "Use `time_machine` for time-dependent tests. Do not use `datetime.now()`"
+    },
+    {
+      "name": "no-caplog-in-tests",
+      "tool": "Edit",
+      "pattern": "caplog",
+      "field": "new_string",
+      "path": "test.*\\.py$",
+      "strength": "require-read",
+      "evidence": "Do not use `caplog` in tests, prefer checking logic and not log output."
+    },
+    {
+      "name": "commit-message-no-conventional",
+      "tool": "Bash",
+      "pattern": "git(\\s+-\\S+(\\s+\\S+)?)*\\s+commit",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Use the **imperative mood** and a plain message — do **not** use Conventional Commits prefixes (`fix:`, `feat:`, `chore:`, `docs:`, `refactor:`, …). apache/airflow does not follow that convention."
+    },
+    {
+      "name": "commit-no-self-coauthor",
+      "tool": "Bash",
+      "pattern": "git(\\s+-\\S+(\\s+\\S+)?)*\\s+commit(?=.*Co-Authored-By)",
+      "field": null,
+      "path": null,
+      "strength": "block",
+      "evidence": "NEVER add Co-Authored-By with yourself as co-author of the commit."
+    },
+    {
+      "name": "check-remote-before-remote-cmd",
+      "tool": "Bash",
+      "pattern": "git(\\s+-\\S+(\\s+\\S+)?)*\\s+(push|fetch|pull)\\b",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Before running any remote-based command, run git remote -v and verify the names match this convention. If they do not — for example, the upstream remote is called apache, or origin points at apache/airflow with the fork under a different name like fork — do not silently go along with the existing names."
+    },
+    {
+      "name": "no-push-upstream-or-main",
+      "tool": "Bash",
+      "pattern": "git(\\s+-\\S+(\\s+\\S+)?)*\\s+push\\b(?=.*\\b(upstream|main)\\b)",
+      "field": null,
+      "path": null,
+      "strength": "block",
+      "evidence": "Always push branches to `origin`. Never push directly to `upstream` (and never push directly to `main` on either remote)."
+    },
+    {
+      "name": "rebase-before-push",
+      "tool": "Bash",
+      "pattern": "git(\\s+-\\S+(\\s+\\S+)?)*\\s+push\\b",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Before pushing, always rebase your branch onto the latest target branch (usually `main`) to avoid merge conflicts and ensure CI runs against up-to-date code."
+    },
+    {
+      "name": "check-existing-pr-before-create",
+      "tool": "Bash",
+      "pattern": "gh\\s+pr\\s+create",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Before working on an issue, check for open PRs already addressing it (`gh pr list --search \"<issue number or keywords>\"`, and look for `closes:` / `fixes:` references)."
+    },
+    {
+      "name": "pr-self-review-checklist",
+      "tool": "Bash",
+      "pattern": "gh\\s+pr\\s+create",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Before pushing, perform a self-review of your changes following the Gen-AI review guidelines in contributing-docs/05_pull_requests.rst and the code review checklist in .github/instructions/code-review.instructions.md."
+    },
+    {
+      "name": "avoid-issue-when-pr-imminent",
+      "tool": "Bash",
+      "pattern": "gh\\s+issue\\s+create",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "If you already know how to fix the problem and you (or the user) are going to open the PR shortly, **do not file a GitHub issue first**. Go straight to the PR."
+    },
+    {
+      "name": "github-comment-attribution-footer",
+      "tool": "Bash",
+      "pattern": "gh\\s+(pr|issue)\\s+(comment|review)",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Anything an agent drafts that ends up posted to GitHub on the user's account — PR / issue comments, PR-level reviews, line-level review comments, discussion replies — must end with an attribution footer."
+    },
+    {
+      "name": "no-tagging-individuals",
+      "tool": "Bash",
+      "pattern": "gh\\s+(pr|issue)\\s+(comment|review).*@[A-Za-z0-9_-]+",
+      "field": null,
+      "path": null,
+      "strength": "block",
+      "evidence": "AI agents MUST NOT mention or tag individual contributors, committers, PMC members, or maintainers using GitHub usernames (e.g. `@user`) unless explicitly instructed by a human reviewer."
+    },
+    {
+      "name": "migration-ask-first",
+      "tool": "Edit",
+      "pattern": "migrations/",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Ask first ... Destructive data or migration changes."
+    },
+    {
+      "name": "no-hand-edit-uv-lock",
+      "tool": "Edit",
+      "pattern": "uv\\.lock$",
+      "field": null,
+      "path": null,
+      "strength": "block",
+      "evidence": "Never ... Edit generated files by hand when a generation workflow exists."
+    },
+    {
+      "name": "no-destructive-git-ops",
+      "tool": "Bash",
+      "pattern": "git(\\s+-\\S+(\\s+\\S+)?)*\\s+(reset\\s+--hard|clean\\s+-f|branch\\s+-D|push\\s+(--force|-f)\\b)",
+      "field": null,
+      "path": null,
+      "strength": "block",
+      "evidence": "Never ... Use destructive git operations unless explicitly requested."
+    },
+    {
+      "name": "time-monotonic-not-time",
+      "tool": "Edit",
+      "pattern": "time\\.time\\(\\)",
+      "field": "new_string",
+      "path": "\\.py$",
+      "strength": "require-read",
+      "evidence": "`time.monotonic()` for durations, not `time.time()`."
+    },
+    {
+      "name": "no-session-commit",
+      "tool": "Edit",
+      "pattern": "session\\.commit\\(\\)",
+      "field": "new_string",
+      "path": "airflow-core/.*\\.py$",
+      "strength": "require-read",
+      "evidence": "In `airflow-core`, functions with a `session` parameter must not call `session.commit()`. Use keyword-only `session` parameters."
+    },
+    {
+      "name": "guard-kubernetes-client-import",
+      "tool": "Edit",
+      "pattern": "kubernetes\\.client",
+      "field": "new_string",
+      "path": "\\.py$",
+      "strength": "require-read",
+      "evidence": "Guard heavy type-only imports (e.g., `kubernetes.client`) with `TYPE_CHECKING` in multi-process code paths."
+    },
+    {
+      "name": "no-assert-production",
+      "tool": "Edit",
+      "pattern": "\\bassert\\b",
+      "field": "new_string",
+      "path": "^(?!.*tests?/).*\\.py$",
+      "strength": "require-read",
+      "evidence": "No `assert` in production code."
+    }
+  ],
+  "uncompilable": [
+    "Dag/DAG 대소문자 표기 규칙 — 산문과 리터럴 코드 토큰을 구분해야 해서 정규식으로 안정적으로 탐지 불가",
+    "prek/breeze 설치 등 1회성 환경 설정 단계 — 반복되는 액션 전 규칙이 아님",
+    "임시 스크립트를 dev/ 아래 두라는 규칙 — 식별 가능한 파일 패턴/확장자가 없음",
+    "Commands 섹션의 테스트/린트/빌드 명령어 표 — 규칙이 아니라 정보성 조회 테이블",
+    "Architecture Boundaries 서술 — 시스템 설계 설명이며 에이전트가 수행하는 액션이 아님",
+    "보안 취약점 분류(실제 취약점/알려진 한계/배포 강화) 가이드 — 분석적 판단이 필요해 툴콜 트리거로 매핑 불가",
+    "함수/메서드 동사형 네이밍 규칙 — 명사형인지 동사형인지 의미론적 판단이 필요해 정규식 탐지 불가",
+    "벌크 DELETE/UPDATE 배치 처리 및 LIMIT 커밋 규칙 — '무제한 벌크 쓰기'인지 정규식으로 판별 불가",
+    "PR 변경분 100% 커버리지 목표 — 특정 액션이 아닌 PR 전체 정책",
+    "@pytest.mark.parametrize로 유사 테스트 통합 규칙 — '유사한 테스트'인지 의미론적 판단 필요",
+    "@pytest.mark.db_test 사용 규칙 — DB 접근 여부가 정규식으로 판단 불가",
+    "생성 파일(리포트/스크래치 산출물)을 files/ 아래 두라는 규칙 — 식별 가능한 경로/확장자 패턴 없음",
+    "임포트는 파일 상단에 두되 예외 허용 — 스니펫 단위 regex로는 파일 전체 구조 판단 불가",
+    "코드 주석은 절제해서 '왜'만 남기라는 가이드 — 서술형 comment인지 판단은 의미론적 작업",
+    "워크어라운드에 대한 추적 이슈 생성·코드 내 링크 첨부 규칙 — '이 변경이 워크어라운드인지' 의미론적 판단 필요",
+    "PR 리뷰 시 magpie-pr-management-code-review 스킬 사용 선호 — Bash/Edit/Write 툴콜 액션이 아님",
+    "대규모 크로스패키지 리팩터링/광범위한 영향의 신규 의존성 추가 시 먼저 물어보기 — '대규모'/'광범위'의 정규식 판별 불가",
+    "비밀정보·자격증명·토큰 커밋 금지 — 문서에 특정 탐지 패턴이 없어 범용 시크릿 스캐닝이 필요"
+  ]
+}

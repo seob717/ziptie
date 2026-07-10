@@ -1,0 +1,27 @@
+{
+  "doc": "langgraph",
+  "rules": [
+    {
+      "name": "make-format-lint-test-before-pr",
+      "tool": "Bash",
+      "pattern": "gh\\s+pr\\s+create",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "When you modify code in any library, run the following commands in that library's directory before creating a pull request:"
+    },
+    {
+      "name": "no-sphinx-double-backticks",
+      "tool": "Edit",
+      "pattern": "``[^`]+``",
+      "field": "new_string",
+      "path": "\\.py$",
+      "strength": "require-read",
+      "evidence": "Do NOT use Sphinx-style double backtick formatting (` ``code`` `). Use single backticks (`` `code` ``) for inline code references in docstrings and comments."
+    }
+  ],
+  "uncompilable": [
+    "라이브러리 목록과 의존성 다이어그램(Libraries/Dependency map)은 특정 도구 호출에 결합할 수 없는 참고용 구조 설명이라 스킵",
+    "TEST 변수로 특정 pytest 파일/옵션을 지정하는 사용법 안내는 강제 규칙이 아닌 CLI 사용법 문서라 스킵"
+  ]
+}

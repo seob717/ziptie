@@ -1,0 +1,41 @@
+{
+  "doc": "awm-project-1-KentBeck_BPlusTree3",
+  "rules": [
+    {
+      "name": "commit-discipline",
+      "tool": "Bash",
+      "pattern": "git(\\s+-\\S+(\\s+\\S+)?)*\\s+commit",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Only commit when: 1. ALL tests are passing 2. ALL compiler/linter warnings have been resolved 3. The change represents a single logical unit of work 4. Commit messages clearly state whether the commit contains structural or behavioral changes"
+    },
+    {
+      "name": "tidy-first-separation",
+      "tool": "Bash",
+      "pattern": "git(\\s+-\\S+(\\s+\\S+)?)*\\s+commit",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Never mix structural and behavioral changes in the same commit"
+    },
+    {
+      "name": "small-frequent-commits",
+      "tool": "Bash",
+      "pattern": "git(\\s+-\\S+(\\s+\\S+)?)*\\s+commit",
+      "field": null,
+      "path": null,
+      "strength": "inject",
+      "evidence": "Use small, frequent commits rather than large, infrequent ones"
+    }
+  ],
+  "uncompilable": [
+    "1행: plan.md 지침 준수 및 사용자가 'go'라 말할 때 시작되는 워크플로 — 특정 tool call이 아닌 대화 트리거라 결합 불가",
+    "ROLE AND EXPERTISE / CORE DEVELOPMENT PRINCIPLES: TDD Red-Green-Refactor 사이클 전반 — 특정 액션에 결합되지 않는 일반 코딩 스타일",
+    "TDD METHODOLOGY GUIDANCE: 테스트 명명·실패 메시지·결함 수정 시 테스트 작성 순서 등 — 특정 tool call로 한정할 수 없는 일반 방법론",
+    "TIDY FIRST APPROACH: 구조적 변경을 먼저 하고 전후로 테스트를 돌려 검증하라는 지침 — 특정 명령/파일 패턴이 없어 결합 불가",
+    "CODE QUALITY STANDARDS: 중복 제거, 명확한 네이밍, 작은 메서드 등 코드 품질 일반 원칙 — 액션 결합 불가",
+    "REFACTORING GUIDELINES: 리팩터링 시점·패턴 사용 등 일반 원칙 — 특정 tool call에 결합 불가",
+    "EXAMPLE WORKFLOW: 신규 기능 접근 시의 7단계 예시 워크플로 — 특정 액션이 아닌 전체 프로세스 서술이라 결합 불가"
+  ]
+}
