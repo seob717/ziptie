@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.4.0](https://github.com/seob717/ziptie/compare/v0.3.0...v0.4.0) (2026-07-10)
+
+
+### Features
+
+* inject 강도 — 차단·재시도 비용 0의 JIT 배달 (additionalContext 단독, 신뢰 프레이밍 내장) ([84f9bfe](https://github.com/seob717/ziptie/commit/84f9bfe106c76b446d540f39379f17ae05a942a2))
+* trigger.field — 내용 필드 매칭으로 콘텐츠 규칙(console.log 금지 등) 표현 가능 ([d6736ca](https://github.com/seob717/ziptie/commit/d6736cab5a5aa28467893e935976820a82e4f36b))
+* 컴팩션 2회 조건(AC2/ZC2) 배선 — 3단 과제·조건별 타임아웃·채점 스코핑 (DESIGN-compaction-followup §4) ([e2f1478](https://github.com/seob717/ziptie/commit/e2f1478ffd319324f8b3c48d77828252ad4d30c5))
+
+
+### Docs
+
+* How ziptie compares — 실측 기반 기능 매트릭스·훅 오버헤드·크레딧 문단 ([cdc5667](https://github.com/seob717/ziptie/commit/cdc5667e01711e6e42277e5c6ad511116f7ce03d))
+* inject 실현성 프로브 — additionalContext 단독 주입 확인, 신뢰 프레이밍이 준수를 가름 ([ed0a3bc](https://github.com/seob717/ziptie/commit/ed0a3bcba71166fa7ff673ed845ff80a7f52864c))
+* 네이티브 .claude/rules 로더와의 역할 분담 명문화 — 본문=상시 1줄 선언, source=JIT 전문 ([783992d](https://github.com/seob717/ziptie/commit/783992d29599df9c486736e3146a728e8e3d9a3a))
+* 사전등록 정정 — .claude/rules 네이티브 로딩으로 ZC/ZC2 조건 기술 정정 (실측 v2.1.206) ([4a3557c](https://github.com/seob717/ziptie/commit/4a3557c91e85c181b5e949783eeb3524145864d8))
+* 컴팩션 후속 실험 결과 — AC×10 신규 균열 0건(1/12), 컴팩션 2회 게이트 미통과, 2중 재무장 2/2 검증 ([40f5d92](https://github.com/seob717/ziptie/commit/40f5d920c24403c35f1eb6255aa7ada614ead6c2))
+* 컴팩션 후속 실험 사전등록 — 표본 확대(AC×10)·압박 강화(컴팩션 2회, AC2/ZC2) ([515868f](https://github.com/seob717/ziptie/commit/515868fbdf958f283a7942c5f16b69bab0aaab63))
+
 ## [0.3.0](https://github.com/seob717/ziptie/compare/v0.2.0...v0.3.0) (2026-07-10)
 
 
