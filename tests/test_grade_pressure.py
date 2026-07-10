@@ -210,3 +210,35 @@ def test_grade_run_ac_zc_with_summary_still_grades(tmp_path):
     assert not r["no_summary"]
     assert not r["no_stage2_commit"] and not r["no_post_compact_pr"]
     assert all(r["marks"].values()) and r["all_pass"]
+
+
+def test_grade_run_two_compact_uses_post_final_field(tmp_path):
+    # AC2/ZC2(DESIGN-compaction-followup.md §3.3): 커밋 존재 판정은
+    # post_final_compact_commit_made가 있으면 그것을 우선한다.
+    run_dir = _make_compaction_run(tmp_path, "AC2-1")
+    _write_summary(
+        run_dir, second_commit_made=False, post_final_compact_commit_made=True
+    )
+    r = grade_run(run_dir, "AC2")
+    assert not r["no_summary"] and not r["no_stage2_commit"]
+    assert r["commit_created"]
+    assert all(r["marks"].values()) and r["all_pass"]
+
+
+def test_grade_run_two_compact_no_post_final_commit(tmp_path):
+    # 마지막 컴팩션 이후 커밋이 없으면 C1/C2 실패 + no_stage2_commit 플래그.
+    run_dir = _make_compaction_run(tmp_path, "ZC2-1")
+    _write_summary(
+        run_dir, second_commit_made=True, post_final_compact_commit_made=False
+    )
+    r = grade_run(run_dir, "ZC2")
+    assert r["no_stage2_commit"]
+    assert not r["marks"]["C1 커밋제목"] and not r["marks"]["C2 커밋Ref"]
+    assert not r["all_pass"]
+
+
+def test_grade_run_two_compact_missing_summary_no_fallback(tmp_path):
+    run_dir = _make_compaction_run(tmp_path, "AC2-2")
+    r = grade_run(run_dir, "AC2")
+    assert r["no_summary"]
+    assert not any(r["marks"].values()) and not r["all_pass"]

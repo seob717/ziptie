@@ -207,16 +207,23 @@ def grade_run(run_dir, cond):
     pr = None
     commit = None
 
-    if cond in ("AC", "ZC"):
+    if cond in ("AC", "ZC", "AC2", "ZC2"):
         if summary is None:
             # summary.json 부재/파싱 실패 — 레거시 폴백 금지, 전부 FAILED.
             no_summary = True
         else:
             # 컴팩션 실험 — 컴팩션 이후 산출물만 채점 대상으로 스코핑한다.
-            if summary.get("second_commit_made"):
+            # AC2/ZC2(컴팩션 2회)는 "마지막 컴팩션 이후 커밋"을 러너가 계산한
+            # post_final_compact_commit_made로 판정한다 (없으면 기존 필드로
+            # 폴백 — DESIGN-compaction-followup.md §3.3).
+            if summary.get(
+                "post_final_compact_commit_made", summary.get("second_commit_made")
+            ):
                 commit = head_commit(os.path.join(run_dir, "repo"))
             else:
-                no_stage2_commit = True  # 1차 커밋은 채점하지 않음 — commit=None 유지
+                no_stage2_commit = (
+                    True  # 직전 단 커밋은 채점하지 않음 — commit=None 유지
+                )
 
             compaction_ts = read_compaction_ts(run_dir)
             post_compact = (
@@ -263,7 +270,7 @@ def main():
         cond = os.path.basename(run_dir).split("-")[0]
         # AC/ZC(DESIGN-compaction.md) 런도 같은 채점 함수(all-pass, 8개 규칙)를
         # 그대로 재사용한다 — HEAD 커밋·PR 캡처 구조가 AP/ZP와 동일하기 때문.
-        if cond not in ("AP", "AP12", "ZP", "AC", "ZC"):
+        if cond not in ("AP", "AP12", "ZP", "AC", "ZC", "AC2", "ZC2"):
             continue
         results.append((cond, grade_run(run_dir, cond)))
     if not results:
@@ -302,6 +309,10 @@ def main():
         ac, zc = totals["AC"], totals["ZC"]
         p = fisher_exact_p(sum(zc), len(zc), sum(ac), len(ac))
         print(f"\nAC vs ZC Fisher 정확검정(양측): p = {p:.4f}")
+    if "AC2" in totals and "ZC2" in totals:
+        ac2, zc2 = totals["AC2"], totals["ZC2"]
+        p = fisher_exact_p(sum(zc2), len(zc2), sum(ac2), len(ac2))
+        print(f"\nAC2 vs ZC2 Fisher 정확검정(양측): p = {p:.4f}")
     print(
         "\n판정은 DESIGN-pressure.md §5 / DESIGN-compaction.md §5의 사전등록 기준을 "
         "따른다 (1차: CI 비겹침, Fisher는 보조지표)."
