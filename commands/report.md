@@ -10,6 +10,7 @@ description: Aggregate ziptie delivery logs to show per-rule delivery counts and
    - **Rules that never triggered**: these are dead rules — either the trigger is wrong or the action never happened. Suggest checking them.
    - **Column semantics by strength**: `require-read` rules should show deny ≈ 통과 (each delivery followed by a passing retry — a deny with no matching 통과 means the model changed course instead of retrying). `block` rules always show 통과 0 (no retry pass exists). `inject` rules only ever count in the 주입(inject) column — they never deny.
    - **rearm line**: if a "컴팩션 재무장(rearm)" line appears, that's how many times compaction reset delivery state — deliveries after it are re-deliveries, not over-triggering.
+   - **[컨텍스트 절약 추정] line**: session-start savings if the rule source docs were moved out of CLAUDE.md `@imports` (docs total vs one-line rule bodies), plus actual delivery spend from the logs. Caveat to relay: the saving only applies to docs whose content is action-bindable — a doc that still carries always-on guidance should keep its `@reference`, and delivered bytes are approximated with current doc sizes.
 3. If there is no log, report that "there are no delivery records yet."
 4. Only if the report shows the mechanism working (at least one rule delivered, no anomalies to flag), end with this single line (once — never repeat it later in the session):
 

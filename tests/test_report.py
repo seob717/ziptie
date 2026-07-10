@@ -82,6 +82,49 @@ def test_main_output_rearm_as_summary_line(capsys, monkeypatch):
     assert "rearm" in out
 
 
+def test_context_economics_sums_docs_bodies_and_deliveries():
+    from core.report import context_economics
+
+    d = tempfile.mkdtemp()
+    os.makedirs(os.path.join(d, ".claude", "rules"))
+    os.makedirs(os.path.join(d, "docs"))
+    with open(os.path.join(d, "docs", "pr.md"), "w") as f:
+        f.write("x" * 1000)
+    rule = (
+        "---\nname: {n}\ntrigger:\n  tool: Bash\n  pattern: x\n"
+        "source: docs/pr.md\n---\n요약 한 줄"
+    )
+    # 같은 문서를 참조하는 룰 2개 — 문서 크기는 중복 계상하지 않는다
+    for n in ("pr-a", "pr-b"):
+        with open(os.path.join(d, ".claude", "rules", n + ".md"), "w") as f:
+            f.write(rule.format(n=n))
+    _write_log(
+        d, [("pr-a", "deny"), ("pr-a", "allow-after-delivery"), ("pr-b", "inject")]
+    )
+    eco = context_economics(d)
+    assert eco["n_docs"] == 1
+    assert eco["import_bytes"] == 1000
+    assert eco["body_bytes"] == 2 * len("요약 한 줄".encode())
+    assert (
+        eco["deliveries"] == 2
+    )  # deny 1 + inject 1 (allow-after-delivery는 배달 아님)
+    assert eco["delivered_bytes"] == 2000
+
+
+def test_context_economics_no_rules():
+    from core.report import context_economics
+
+    d = tempfile.mkdtemp()
+    eco = context_economics(d)
+    assert eco == {
+        "n_docs": 0,
+        "import_bytes": 0,
+        "body_bytes": 0,
+        "deliveries": 0,
+        "delivered_bytes": 0,
+    }
+
+
 def test_summarize_empty_project():
     d = tempfile.mkdtemp()
     assert summarize(d) == {"rules": {}, "never_triggered": []}

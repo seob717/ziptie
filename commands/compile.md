@@ -51,6 +51,10 @@ enabled: true
 PR creation rules — title format, required sections, reviewer assignment.
 ```
 
+## 5.5 Propose dropping covered `@references`
+
+If every rule extracted from an `@referenced` document was compiled (nothing from it landed in the uncompilable list), tell the user the `@path` line in CLAUDE.md can be removed: the document will then load just-in-time via the rule's `source` instead of at every session start (measured: `pilot/PROBE-context-economics.md`). If the document also produced uncompilable always-on guidance, do NOT propose removing it — say which part still needs the `@reference`.
+
 ## 6. User review
 Show the list of generated rule files as a table (name / trigger / strength / source), and along with the list of uncompilable rules, ask "is there anything to fix?" An overly broad regex becomes a false positive, so scoping it conservatively narrow is the default.
 
