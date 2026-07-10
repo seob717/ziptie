@@ -34,6 +34,8 @@ A Bash rule's pattern matches against the command string; an Edit/Write rule's p
 ## 5. Generate rule files
 For each rule, create `.claude/rules/<kebab-case-name>.md`. If there is an original document, put its project-relative path in `source` and write only a **one-line summary** in the body. Two reasons, both hard requirements: the original is read at delivery time (so a pasted copy would drift), and Claude Code's native `.claude/rules/` loader injects the body at session start (so a long body would enter context twice — the body is the always-on declaration, the source is the JIT payload):
 
+**Recompiling over existing rules**: a rule file that already matches its source document is kept — but "matches the document" is not enough. Also check every kept rule against the current trigger guidance (content rules must carry `path:`; git patterns must allow global options). If a kept rule violates it, don't keep it silently: include it in the review table with a proposed upgraded trigger, marked as an upgrade.
+
 Filename convention: base the filename on the source document's filename in kebab-case (e.g. `docs/pr-rules.md` → `pr-rules.md`). If a single document yields multiple rules, append a content-based suffix to disambiguate (e.g. `pr-rules-title.md`, `pr-rules-reviewer.md`). If the resulting filename collides with an existing rule file, confirm with the user before overwriting it.
 
 ```markdown
