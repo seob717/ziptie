@@ -79,7 +79,7 @@ def parse_rule_file(path: str, quiet: bool = False) -> Optional[Rule]:
                 )
             return None
         strength = meta.get("strength", "require-read")
-        if strength not in ("require-read", "block"):
+        if strength not in ("require-read", "block", "inject"):
             if not quiet:
                 print(
                     f"ziptie: rule {name}: unsupported strength '{strength}' — "

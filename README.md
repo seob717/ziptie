@@ -36,7 +36,10 @@ Reflect docs/pr-rules.md before creating a PR.
 - `name`: lowercase letters, digits, and hyphens only (`[a-z0-9][a-z0-9-]*`). A file with an invalid name is rejected with a stderr warning instead of silently misbehaving.
 - `trigger.tool` / `trigger.pattern`: which tool call to intercept, and with what regex.
 - `source`: the path to the original document, read on the spot at delivery time. If the original changes, the change is reflected automatically from the next delivery on.
-- `strength`: `require-read` (block once per session and deliver the reason, let the retry through) / `block` (always block). `inject` is on the v2 roadmap (see below) — specifying it in the current version falls back to `require-read` automatically because there is no supporting event, and a warning is written to stderr.
+- `strength`: three levels, in decreasing order of enforcement.
+  - `block` — always block, delivering the rule as the reason. For actions a document marks as absolutely forbidden.
+  - `require-read` (default) — block once per session with the rule text as the reason, then let the retry through. One retry buys a guaranteed read.
+  - `inject` — deliver the rule via `additionalContext` alongside the tool call, with **zero blocking and zero retry cost**. The delivery carries a provenance framing (project-owner hook, registered rule path, `source` path) because we measured that unframed injected instructions get treated as prompt injection and refused, while framed ones are followed (see `pilot/PROBE-inject.md`). Softer than `require-read`: compliance rides on the model's judgment instead of a forced retry. ziptie never returns `permissionDecision: allow`, so your permission prompts are untouched.
 - Body: a summary to deliver instead of, or in addition to, the original document.
 
 ## Measured results
@@ -97,9 +100,9 @@ Issues and PRs are welcome. Commit messages must follow [Conventional Commits](h
 
 ## Limitations and roadmap
 
-The MVP supports only the two strengths on the PreToolUse hook: `require-read` and `block`. The following are not implemented yet and are on the roadmap.
+The following are not implemented yet and are on the roadmap.
 
-- **`inject` strength**: injects only the rule's original text into context without blocking. It has to be preceded by an investigation into whether per-event `additionalContext` is supported.
+- **Content-field triggers**: matching on what is being written (e.g. `new_string` of an Edit) rather than just the command string or file path, so rules like "no console.log in commits" become expressible.
 - **Semantic judging**: inspecting output content with an LLM to catch rule violations, rather than a regex trigger. This needs a latency/cost tradeoff review.
 - **Stop-event rules**: rules that check "was this condition satisfied before the task completed?" at session-end time.
 - **Compliance report UI**: right now `/ziptie:report` only aggregates the log into a table; more sophisticated analysis is in the backlog.

@@ -256,6 +256,65 @@ def test_broken_regex_rule_does_not_disable_others():
     )  # pr-rules는 여전히 발동
 
 
+def test_inject_first_match_returns_additional_context_only():
+    # PROBE-inject.md 판정 ②: permissionDecision을 넣으면 권한 시스템을
+    # 우회하므로 additionalContext 단독으로 반환해야 한다.
+    d = make_project(RULE.replace("strength: require-read", "strength: inject"))
+    out = decide(hook_input(session="i1"), d)
+    hso = out["hookSpecificOutput"]
+    assert hso["hookEventName"] == "PreToolUse"
+    assert "permissionDecision" not in hso
+    assert "permissionDecisionReason" not in hso
+    ctx = hso["additionalContext"]
+    assert "[LAB-123]" in ctx  # 원본 문서가 배달됨
+    # PROBE-inject.md 판정 ③: 신뢰 프레이밍 필수 — 출처(.claude/rules, source 경로) 명시
+    assert "ziptie" in ctx and ".claude/rules" in ctx and "docs/pr-rules.md" in ctx
+
+
+def test_inject_second_call_same_session_silent():
+    d = make_project(RULE.replace("strength: require-read", "strength: inject"))
+    decide(hook_input(session="i2"), d)
+    assert decide(hook_input(session="i2"), d) == {}
+
+
+def test_inject_marker_reset_by_rearm_delivers_again():
+    d = make_project(RULE.replace("strength: require-read", "strength: inject"))
+    decide(hook_input(session="i3"), d)
+    assert decide(hook_input(session="i3"), d) == {}
+    engine.rearm({"session_id": "i3", "source": "compact"}, d)
+    out = decide(hook_input(session="i3"), d)
+    assert "additionalContext" in out["hookSpecificOutput"]
+
+
+def test_inject_logs_inject_decision():
+    d = make_project(RULE.replace("strength: require-read", "strength: inject"))
+    decide(hook_input(session="i4"), d)
+    logs = glob.glob(os.path.join(d, ".claude", "ziptie", "logs", "*.jsonl"))
+    entries = [json.loads(ln) for ln in open(logs[0]) if ln.strip()]
+    assert any(e["decision"] == "inject" and e["rule"] == "pr-rules" for e in entries)
+
+
+def test_inject_mixed_with_require_read_merges_into_single_deny():
+    # deny가 이미 발생하는 호출이면 inject 내용도 그 사유에 병합 배달한다 —
+    # 한 번의 재시도로 전부 커버 (기존 병합 배달 철학 유지).
+    d = make_project()
+    inject_rule = RULE.replace("name: pr-rules", "name: pr-inject")
+    inject_rule = inject_rule.replace("strength: require-read", "strength: inject")
+    inject_rule = inject_rule.replace("docs/pr-rules.md", "docs/pr-inject.md")
+    with open(os.path.join(d, ".claude", "rules", "pr-inject.md"), "w") as f:
+        f.write(inject_rule)
+    with open(os.path.join(d, "docs", "pr-inject.md"), "w") as f:
+        f.write("# inject 규칙\ninject 전용 내용")
+
+    out = decide(hook_input(session="i5"), d)
+    hso = out["hookSpecificOutput"]
+    assert hso["permissionDecision"] == "deny"
+    assert "inject 전용 내용" in hso["permissionDecisionReason"]
+
+    # 둘 다 배달 확정 — 두번째 호출은 완전 통과
+    assert decide(hook_input(session="i5"), d) == {}
+
+
 class TestRearm(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.mkdtemp()

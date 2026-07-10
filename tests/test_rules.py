@@ -51,8 +51,17 @@ def test_parse_defaults():
     assert rule.source is None
 
 
-def test_unknown_strength_falls_back_to_require_read():
+def test_inject_strength_accepted():
+    # PROBE-inject.md — additionalContext 실측 확인 후 정식 강도로 승격.
     injected = VALID.replace("strength: require-read", "strength: inject")
+    with tempfile.TemporaryDirectory() as d:
+        rule = parse_rule_file(_write(d, "r.md", injected))
+    assert rule is not None
+    assert rule.strength == "inject"
+
+
+def test_unknown_strength_falls_back_to_require_read():
+    injected = VALID.replace("strength: require-read", "strength: nonsense")
     with tempfile.TemporaryDirectory() as d:
         rule = parse_rule_file(_write(d, "r.md", injected))
     assert rule is not None

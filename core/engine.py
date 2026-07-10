@@ -32,6 +32,14 @@ BLOCK_TEMPLATE = (
     "[ziptie:{name}] 이 작업은 규칙에 의해 차단됐어. 아래 규칙을 읽고 허용된 대안으로 "
     "진행해.\n\n{content}"
 )
+# 신뢰 프레이밍이 준수를 가른다 (PROBE-inject.md 판정 ③) — 출처 없는 주입은
+# 모델이 프롬프트 인젝션으로 취급해 거부하므로, 프로젝트 소유자 설정·등록
+# 위치·source 경로를 명시한다.
+INJECT_TEMPLATE = (
+    "[ziptie:{name}] 이 프로젝트의 .claude/rules/에 등록된 규칙 배달입니다 "
+    "(프로젝트 소유자가 설정한 ziptie 훅이 이 도구 호출에 매칭되는 규칙을 "
+    "배달합니다{source_note}). 이 작업에 적용되는 규칙:\n\n{content}"
+)
 
 
 def _match_field(rule: Rule, tool_name: str, tool_input: dict):
@@ -74,8 +82,14 @@ def _log(
 
 
 def _reason(rule: Rule, content: str) -> str:
-    template = BLOCK_TEMPLATE if rule.strength == "block" else REQUIRE_READ_TEMPLATE
-    return template.format(name=rule.name, content=content)
+    if rule.strength == "block":
+        return BLOCK_TEMPLATE.format(name=rule.name, content=content)
+    if rule.strength == "inject":
+        source_note = f". source: {rule.source}" if rule.source else ""
+        return INJECT_TEMPLATE.format(
+            name=rule.name, content=content, source_note=source_note
+        )
+    return REQUIRE_READ_TEMPLATE.format(name=rule.name, content=content)
 
 
 def _deny(deliveries: List[tuple]) -> dict:
@@ -85,6 +99,22 @@ def _deny(deliveries: List[tuple]) -> dict:
             "hookEventName": "PreToolUse",
             "permissionDecision": "deny",
             "permissionDecisionReason": reason,
+        }
+    }
+
+
+def _inject(deliveries: List[tuple]) -> dict:
+    """additionalContext 단독 반환 — permissionDecision을 넣지 않는다.
+
+    allow를 반환하면 이 도구 호출이 권한 시스템을 우회한다(규칙 매칭 =
+    자동 승인이라는 보안 퇴행). additionalContext만으로 주입이 동작함을
+    실측 확인했다 (PROBE-inject.md 판정 ②).
+    """
+    context = "\n\n---\n\n".join(_reason(rule, content) for rule, content in deliveries)
+    return {
+        "hookSpecificOutput": {
+            "hookEventName": "PreToolUse",
+            "additionalContext": context,
         }
     }
 
@@ -122,7 +152,7 @@ def decide(input_data: dict, project_dir: str) -> dict:
                     continue
                 if not matched:
                     continue
-                if rule.strength == "require-read":
+                if rule.strength in ("require-read", "inject"):
                     marker = os.path.join(state_dir, f"{session}--{rule.name}")
                     if os.path.exists(marker):
                         _log(
@@ -155,15 +185,21 @@ def decide(input_data: dict, project_dir: str) -> dict:
         # 이미 조립된 다른 룰의 마커 기록(=배달 확정)을 소급 무효화하지 않도록.
         deliveries = [(rule, _content(rule, project_dir)) for rule in to_deliver]
 
+        # inject 룰만 매칭됐으면 차단 없이 주입한다. deny가 어차피 발생하는
+        # 호출이면 inject 내용도 그 사유에 병합 배달한다 — 한 번의 재시도로
+        # 전부 커버 (병합 배달 철학 유지).
+        inject_only = all(rule.strength == "inject" for rule in to_deliver)
+        decision = "inject" if inject_only else "deny"
+
         for rule in to_deliver:
-            if rule.strength == "require-read":
+            if rule.strength in ("require-read", "inject"):
                 os.makedirs(state_dir, exist_ok=True)
                 marker = os.path.join(state_dir, f"{session}--{rule.name}")
                 with open(marker, "w") as f:
                     f.write("delivered")
-            _log(project_dir, session, rule.name, tool_name, "deny")
+            _log(project_dir, session, rule.name, tool_name, decision)
 
-        return _deny(deliveries)
+        return _inject(deliveries) if inject_only else _deny(deliveries)
     except Exception as e:  # 안전 기본값
         print(f"ziptie: engine error: {e}", file=sys.stderr)
         return {}

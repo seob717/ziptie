@@ -24,8 +24,9 @@ For each rule, set a `tool` (Bash|Edit|Write) and a `pattern` (Python regex). Ex
 A Bash rule's pattern matches against the command string; an Edit/Write rule's pattern matches against the file path.
 
 ## 4. Decide strength
-- The default is `require-read` (deliver the rule only once per session and let retries through).
+- The default is `require-read` (block once per session with the rule as the reason, let the retry through — guarantees a read at the cost of one retry).
 - Only actions a document explicitly marks as "absolutely forbidden" get `block`.
+- Use `inject` for advisory rules where even one blocked attempt is overkill (style reminders, soft conventions): the rule is delivered alongside the tool call with zero friction, but compliance is left to the model's judgment rather than forced by a retry.
 
 ## 5. Generate rule files
 For each rule, create `.claude/rules/<kebab-case-name>.md`. If there is an original document, put its project-relative path in `source` and write only a one-line summary in the body (no copy-paste, since the original is read at delivery time):
