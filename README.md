@@ -150,8 +150,6 @@ The following are not implemented yet and are on the roadmap.
 - **Semantic judging**: inspecting output content with an LLM to catch rule violations, rather than a regex trigger. This needs a latency/cost tradeoff review.
 - **Stop-event rules**: rules that check "was this condition satisfied before the task completed?" at session-end time.
 - **Compliance report UI**: right now `/ziptie:report` only aggregates the log into a table; more sophisticated analysis is in the backlog.
-- **Exact session counting via the `InstructionsLoaded` hook**: the context-savings estimate in `/ziptie:report` counts sessions from delivery logs, which is a lower bound (a session that never triggers a rule leaves no trace). The new `InstructionsLoaded` hook fires in every session when rules load, so subscribing to it would make the cumulative-savings number exact.
-- **Compile recall measurement**: the compile benchmark (`pilot/RESULTS-compile-bench.md`) verified zero formal defects in 88 extracted rules, but "rules the compiler missed" is unmeasured — it needs a hand-built ground-truth rule set per corpus document.
 
 Also, these results come from an n=3-per-condition pilot plus a pre-registered pressure preflight (6 runs). Statistically, "100%" means no more than "we observed no failure in this sample," and any claim of a JIT compliance edge still awaits a pressure level that actually breaks the baseline.
 
