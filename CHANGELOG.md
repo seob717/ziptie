@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.6.0](https://github.com/seob717/ziptie/compare/v0.5.0...v0.6.0) (2026-07-10)
+
+
+### Features
+
+* report 절약 추정에 로그 기준 세션 수(하한) 추가 + compile 종료 before/after 라인 ([54ea212](https://github.com/seob717/ziptie/commit/54ea2123c788df6c89be912f97d962a5578cfd5f))
+* 컨텍스트 절약 실측 프로브 + report 절약 추정 섹션 + @참조 제거 제안 지침 ([0952a5d](https://github.com/seob717/ziptie/commit/0952a5dba98f9a22ec09d6ff8ec1d16b523c243b))
+* 컴파일 벤치마크 채점기 M1~M4 (DESIGN-compile-bench §4) ([9a0c7c4](https://github.com/seob717/ziptie/commit/9a0c7c42d3faf332bc5dbdd898ebc5e48ba59a2a))
+
+
+### Bug Fixes
+
+* 재컴파일 시 기존 룰도 현행 트리거 가이드로 업그레이드 제안하도록 지침 보완 ([2b030a6](https://github.com/seob717/ziptie/commit/2b030a660506f380a1ad658f016ff0e9c384d246))
+
+
+### Tests
+
+* context_economics 빈 프로젝트 기대값에 sessions_seen 반영 ([dac195b](https://github.com/seob717/ziptie/commit/dac195b2eee9cb017f06b8ed7afe8909c9063500))
+
+
+### Docs
+
+* Context economics에 공식 문서 근거 인용 추가 ([@import](https://github.com/import) 전개 로드·200줄 권고) ([974bdfb](https://github.com/seob717/ziptie/commit/974bdfb0fcac56f0173ad0e1b36df3e79f81ea2c))
+* README에 컴파일 벤치마크 파일럿 결과 문단 추가 ([f6985cf](https://github.com/seob717/ziptie/commit/f6985cf9a1e886e838e66baea09e2a2b74e8f565))
+* 경쟁 스윕 노트 — 트리거 결합 컴파일 카테고리 판정·인접 도구 지도 ([b44b736](https://github.com/seob717/ziptie/commit/b44b736007c7d5d563dd469d62f84d206316186d))
+* 컴파일 벤치마크 파일럿 결과 — 야생 CLAUDE.md 12건, 88룰 형식 결함 0 ([91104fa](https://github.com/seob717/ziptie/commit/91104fa5afa2d370ab291b5c18916ae64fe8c1e7))
+* 컴파일 벤치마크 파일럿 사전등록 (pilot/DESIGN-compile-bench.md) ([fbf02b0](https://github.com/seob717/ziptie/commit/fbf02b03810e561e0dc61b0b036494b1b04b42d0))
+
 ## [0.5.0](https://github.com/seob717/ziptie/compare/v0.4.0...v0.5.0) (2026-07-10)
 
 
