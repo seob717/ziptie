@@ -83,16 +83,16 @@ Different tools solve different layers of "make the agent follow the rules". Sta
 | Capability | ziptie | hookify | Claude Code native rules | Ruler / rulesync | Writ |
 |---|---|---|---|---|---|
 | Action (command) triggers — `gh pr create`, `git commit` | ✅ | ✅ | ❌ (file-path globs only) | ❌ | partial (gates) |
-| Content triggers — what's being *written* | ✅ `trigger.field` | ✅ | ❌ | ❌ | ❌ |
-| Delivers rule text **to the model** on block | ✅ reason | ❌ user-facing message only | — | — | ✅ |
+| Content triggers — what's being *written* | ✅ `trigger.field` | ✅ | ❌ | ❌ | partial (static analysis pre-write, not rule patterns) |
+| Delivers rule text **to the model** on block | ✅ reason | Stop events ✅ / PreToolUse ❌ (user-facing only) | — | — | ✅ rule ID + reason |
 | Non-blocking JIT injection | ✅ `inject` | ❌ | at file-read only | ❌ | ✅ every turn |
-| Delivery state — once per session, no block loops | ✅ | ❌ (fires every time) | — | — | ❌ |
-| Re-armed after compaction | ✅ measured 5/5 | ❌ | root CLAUDE.md only | ❌ | unverified |
-| Source document read at delivery time (no drift) | ✅ | ❌ (fixed message) | ✅ | ❌ (copied at generation) | ✅ |
-| Delivery log + report | ✅ JSONL, `/ziptie:report` | ❌ | ❌ | ❌ | partial |
+| Delivery state — once per session, no block loops | ✅ | ❌ (fires every time) | — | — | ✅ per-phase IDs + token budget |
+| Re-armed after compaction | ✅ measured 5/5 | ❌ | root CLAUDE.md documented; rules files unspecified | ❌ | ✅ PostCompact re-inject |
+| Source document read at delivery time (no drift) | ✅ | ❌ (message lives in the rule file itself) | ✅ | ❌ (copied at generation) | ✅ |
+| Delivery log + report | ✅ JSONL, `/ziptie:report` | ❌ | ❌ | ❌ | ✅ friction log + dashboard |
 | Multi-agent rule distribution (Cursor, Cline, …) | ❌ | ❌ | ❌ | ✅ 30+ agents | ❌ |
 | Runtime dependencies | Python stdlib only | Python stdlib | — | Node | Docker + Neo4j + FastAPI |
-| Published compliance measurements | ✅ pre-registered runs above | ❌ | ❌ | ❌ | ❌ |
+| Published compliance measurements | ✅ pre-registered runs above | ❌ | ❌ | ❌ | ❌ (qualitative pressure-run transcripts only) |
 
 Hook overhead, measured: ~24ms median per tool call (26ms when a rule is delivered). Rows verified against each tool's source or official docs as of July 2026 — corrections welcome via issue.
 
