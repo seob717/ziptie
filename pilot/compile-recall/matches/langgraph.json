@@ -1,0 +1,40 @@
+{
+  "doc": "langgraph",
+  "judge": "llm:codex-0.144.1(GPT-5)",
+  "matches": [
+    {
+      "gold_id": "g1",
+      "output_rule": "make-format-lint-test-before-pr",
+      "rationale": "The extracted rule is a Bash rule triggered before pull-request creation after library changes, and its name and evidence encompass the required make format command. Under the 1:1 constraint it is assigned to this single gold rule."
+    },
+    {
+      "gold_id": "g5",
+      "output_rule": "no-sphinx-double-backticks",
+      "rationale": "The Edit rule directly detects Sphinx-style double-backtick content in Python edits, matching the prohibition on adding or changing such inline references."
+    }
+  ],
+  "misses": [
+    {
+      "gold_id": "g2",
+      "category": "structure",
+      "note": "The lint requirement is a distinct item in a three-item Markdown list. The compiler collapsed that list into one combined extracted rule, which can only be assigned once under the 1:1 rule."
+    },
+    {
+      "gold_id": "g3",
+      "category": "structure",
+      "note": "The test requirement is a distinct item in a three-item Markdown list. The compiler collapsed that list into one combined extracted rule, which can only be assigned once under the 1:1 rule."
+    },
+    {
+      "gold_id": "g4",
+      "category": "other",
+      "note": "The compiler deliberately skipped this usage rule as uncompilable: \"TEST 변수로 특정 pytest 파일/옵션을 지정하는 사용법 안내는 강제 규칙이 아닌 CLI 사용법 문서라 스킵\"."
+    },
+    {
+      "gold_id": "g6",
+      "category": "other",
+      "note": "The positive single-backtick requirement is explicit, but the compiler combined it with the double-backtick prohibition in one extracted rule. That rule is closer to g5 because its pattern specifically detects double backticks and cannot also match g6 under the 1:1 constraint."
+    }
+  ],
+  "unmatched_extracted": [],
+  "gold_amendments": []
+}

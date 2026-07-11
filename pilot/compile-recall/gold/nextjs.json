@@ -321,6 +321,142 @@
       "trigger_intent": "run a command that requires a secret missing from the local environment",
       "strength": "block",
       "evidence": "If a required secret is missing locally, stop and ask the user rather than inventing placeholder credentials."
+    },
+    {
+      "id": "g41",
+      "summary": "Never commit local secret files; document environment setup only with placeholders.",
+      "tool": "Bash",
+      "trigger_intent": "stage or commit a local secret or environment file",
+      "strength": "block",
+      "evidence": "Never commit local secret files; if documenting env setup, use placeholder-only examples."
+    },
+    {
+      "id": "g42",
+      "summary": "After an SSH authentication failure, do not change Git remotes to HTTPS or attempt another workaround unless requested.",
+      "tool": "Bash",
+      "trigger_intent": "change or add a Git remote using HTTPS after an SSH authentication failure",
+      "strength": "block",
+      "evidence": "Do not switch remotes to HTTPS, mutate remote URLs, retry repeatedly, or attempt another authentication workaround unless the user explicitly requests it."
+    },
+    {
+      "id": "g43",
+      "summary": "Before a force push or stack rebase that may hydrate partial-clone objects, prefer a lightweight SSH preflight.",
+      "tool": "Bash",
+      "trigger_intent": "force-push or stack-rebase in a partial clone",
+      "strength": "inject",
+      "evidence": "Before a force-push or stack rebase that may hydrate partial-clone objects, prefer a lightweight SSH preflight."
+    },
+    {
+      "id": "g44",
+      "summary": "Do not add Generated with Claude Code or co-author footers to commits.",
+      "tool": "Bash",
+      "trigger_intent": "create a Git commit",
+      "strength": "block",
+      "evidence": "Do NOT add \"Generated with Claude Code\" or co-author footers to commits or PRs"
+    },
+    {
+      "id": "g45",
+      "summary": "Keep commit messages concise and descriptive.",
+      "tool": "Bash",
+      "trigger_intent": "create a Git commit message",
+      "strength": "inject",
+      "evidence": "Keep commit messages concise and descriptive"
+    },
+    {
+      "id": "g46",
+      "summary": "Run the specified formatting and lint checks on changed files before committing.",
+      "tool": "Bash",
+      "trigger_intent": "create a Git commit after changing files",
+      "strength": "require-read",
+      "evidence": "Pre-validate before committing to avoid slow lint-staged failures (~2 min each)"
+    },
+    {
+      "id": "g47",
+      "summary": "Make PR descriptions focus on what changed and why.",
+      "tool": "Bash",
+      "trigger_intent": "create a pull request description",
+      "strength": "inject",
+      "evidence": "PR descriptions should focus on what changed and why"
+    },
+    {
+      "id": "g48",
+      "summary": "Do not mark pull requests ready for review; leave them in draft for the user.",
+      "tool": "Bash",
+      "trigger_intent": "mark a pull request ready for review",
+      "strength": "block",
+      "evidence": "Do NOT mark PRs as \"ready for review\" (`gh pr ready`) - leave PRs in draft mode and let the user decide when to mark them ready"
+    },
+    {
+      "id": "g49",
+      "summary": "Rebuild Next.js before integration tests when source files have changed.",
+      "tool": "Bash",
+      "trigger_intent": "run a Next.js integration test after source changes",
+      "strength": "require-read",
+      "evidence": "When running Next.js integration tests, you must rebuild if source files have changed"
+    },
+    {
+      "id": "g50",
+      "summary": "When adding a flag, wire its type, schema, and user-bundled environment definition.",
+      "tool": "Edit",
+      "trigger_intent": "edit code to add a new Next.js feature flag",
+      "strength": "require-read",
+      "evidence": "New flags: add type in `config-shared.ts`, schema in `config-schema.ts`, and `define-env.ts` when used in user-bundled code."
+    },
+    {
+      "id": "g51",
+      "summary": "In edge builds, force flags guarding Node-only imports to false in define-env.ts.",
+      "tool": "Edit",
+      "trigger_intent": "edit an edge-build feature flag that gates Node-only imports",
+      "strength": "require-read",
+      "evidence": "In edge builds, force feature flags that gate Node-only imports to `false` in `define-env.ts`."
+    },
+    {
+      "id": "g52",
+      "summary": "Keep react-server-dom-webpack imports in entry-base.ts and consume its exports elsewhere.",
+      "tool": "Edit",
+      "trigger_intent": "add a react-server-dom-webpack import outside entry-base.ts",
+      "strength": "block",
+      "evidence": "`react-server-dom-webpack/*` imports must stay in `entry-base.ts`; consume via component module exports elsewhere."
+    },
+    {
+      "id": "g53",
+      "summary": "Do not require internal modules by relative path from app-page.ts.",
+      "tool": "Edit",
+      "trigger_intent": "add a relative internal require to app-page.ts",
+      "strength": "block",
+      "evidence": "You cannot require internal modules with relative paths because they won't be resolvable from the user's project."
+    },
+    {
+      "id": "g54",
+      "summary": "Do not use browser.back() to return to a router-act page with visible accordion links.",
+      "tool": "Edit",
+      "trigger_intent": "edit a router-act test to navigate back to a page with visible accordion links",
+      "strength": "block",
+      "evidence": "Never use `browser.back()` to return to a page where accordion links are already visible"
+    },
+    {
+      "id": "g55",
+      "summary": "Avoid new super:: imports in Rust except inside inline mod blocks.",
+      "tool": "Edit",
+      "trigger_intent": "add a super:: import to a Rust file",
+      "strength": "inject",
+      "evidence": "Avoid adding new `super::` imports except in inline `mod` blocks"
+    },
+    {
+      "id": "g56",
+      "summary": "When adding code-block highlight attributes, count the actual lines and highlight relevant code.",
+      "tool": "Edit",
+      "trigger_intent": "add a highlight attribute to a documentation code block",
+      "strength": "inject",
+      "evidence": "When adding `highlight={...}` attributes to code blocks, carefully count the actual line numbers within the code block"
+    },
+    {
+      "id": "g57",
+      "summary": "Flag new reads of nonstandard request headers for security review.",
+      "tool": "Edit",
+      "trigger_intent": "review server code that newly reads a nonstandard request header",
+      "strength": "require-read",
+      "evidence": "if new code reads a request header that is not a standard HTTP header ... flag it for security review"
     }
   ]
 }

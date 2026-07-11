@@ -1,0 +1,450 @@
+{
+  "doc": "nextjs",
+  "judge": "llm:codex-0.144.1(GPT-5)",
+  "matches": [
+    {
+      "gold_id": "g1",
+      "output_rule": "readme-read-before-edit",
+      "rationale": "Same Edit tool and the trigger targets edits under repository subdirectories where path README files must be read."
+    },
+    {
+      "gold_id": "g2",
+      "output_rule": "readme-read-before-write",
+      "rationale": "Same Write tool and the trigger targets creation under repository subdirectories where path README files must be read."
+    },
+    {
+      "gold_id": "g3",
+      "output_rule": "dev-watch-before-source-edit",
+      "rationale": "Same Edit tool and the rule targets Next.js source and test edits with the required watch-process precondition."
+    },
+    {
+      "gold_id": "g11",
+      "output_rule": "bootstrap-build-after-branch-switch",
+      "rationale": "Same Bash tool and the checkout/switch trigger exactly represents switching branches and requiring the bootstrap build."
+    },
+    {
+      "gold_id": "g13",
+      "output_rule": "no-no-turbopack-flag",
+      "rationale": "Same Bash tool and the trigger specifically catches use of the nonexistent flag on next build or dev."
+    },
+    {
+      "gold_id": "g15",
+      "output_rule": "mandatory-new-test-generation",
+      "rationale": "Same Write tool and the trigger targets manual creation of test-suite files that must instead be generated with pnpm new-test."
+    },
+    {
+      "gold_id": "g18",
+      "output_rule": "no-settimeout-in-tests",
+      "rationale": "Same Edit tool and the rule targets introducing setTimeout in test code, the prohibited waiting mechanism."
+    },
+    {
+      "gold_id": "g19",
+      "output_rule": "no-check-deprecated",
+      "rationale": "Same Edit tool and the rule targets introducing deprecated check() calls in tests."
+    },
+    {
+      "gold_id": "g20",
+      "output_rule": "prefer-fixture-directories",
+      "rationale": "Same Edit tool and the rule targets inline files objects in test fixture configuration."
+    },
+    {
+      "gold_id": "g32",
+      "output_rule": "pr-description-llm-comment",
+      "rationale": "Same Bash tool and gh pr create is an action that writes a PR description requiring the specified footer."
+    },
+    {
+      "gold_id": "g41",
+      "output_rule": "no-secret-files-commit",
+      "rationale": "gold 갱신(§4)으로 추가된 룰 — 추출 룰 자체에서 유래하므로 정의상 매치"
+    },
+    {
+      "gold_id": "g42",
+      "output_rule": "no-https-remote-switch",
+      "rationale": "gold 갱신(§4)으로 추가된 룰 — 추출 룰 자체에서 유래하므로 정의상 매치"
+    },
+    {
+      "gold_id": "g43",
+      "output_rule": "ssh-preflight-before-force-push",
+      "rationale": "gold 갱신(§4)으로 추가된 룰 — 추출 룰 자체에서 유래하므로 정의상 매치"
+    },
+    {
+      "gold_id": "g44",
+      "output_rule": "no-ai-footer-in-commit",
+      "rationale": "gold 갱신(§4)으로 추가된 룰 — 추출 룰 자체에서 유래하므로 정의상 매치"
+    },
+    {
+      "gold_id": "g45",
+      "output_rule": "commit-message-style",
+      "rationale": "gold 갱신(§4)으로 추가된 룰 — 추출 룰 자체에서 유래하므로 정의상 매치"
+    },
+    {
+      "gold_id": "g46",
+      "output_rule": "pre-validate-before-commit",
+      "rationale": "gold 갱신(§4)으로 추가된 룰 — 추출 룰 자체에서 유래하므로 정의상 매치"
+    },
+    {
+      "gold_id": "g47",
+      "output_rule": "pr-description-focus",
+      "rationale": "gold 갱신(§4)으로 추가된 룰 — 추출 룰 자체에서 유래하므로 정의상 매치"
+    },
+    {
+      "gold_id": "g48",
+      "output_rule": "no-pr-ready",
+      "rationale": "gold 갱신(§4)으로 추가된 룰 — 추출 룰 자체에서 유래하므로 정의상 매치"
+    },
+    {
+      "gold_id": "g49",
+      "output_rule": "rebuild-before-integration-tests",
+      "rationale": "gold 갱신(§4)으로 추가된 룰 — 추출 룰 자체에서 유래하므로 정의상 매치"
+    },
+    {
+      "gold_id": "g50",
+      "output_rule": "flags-config-shared-wiring",
+      "rationale": "gold 갱신(§4)으로 추가된 룰 — 추출 룰 자체에서 유래하므로 정의상 매치"
+    },
+    {
+      "gold_id": "g51",
+      "output_rule": "edge-define-env-flags",
+      "rationale": "gold 갱신(§4)으로 추가된 룰 — 추출 룰 자체에서 유래하므로 정의상 매치"
+    },
+    {
+      "gold_id": "g52",
+      "output_rule": "react-server-dom-webpack-import-scope",
+      "rationale": "gold 갱신(§4)으로 추가된 룰 — 추출 룰 자체에서 유래하므로 정의상 매치"
+    },
+    {
+      "gold_id": "g53",
+      "output_rule": "app-page-template-require-constraint",
+      "rationale": "gold 갱신(§4)으로 추가된 룰 — 추출 룰 자체에서 유래하므로 정의상 매치"
+    },
+    {
+      "gold_id": "g54",
+      "output_rule": "router-act-no-browser-back",
+      "rationale": "gold 갱신(§4)으로 추가된 룰 — 추출 룰 자체에서 유래하므로 정의상 매치"
+    },
+    {
+      "gold_id": "g55",
+      "output_rule": "rust-avoid-super-imports",
+      "rationale": "gold 갱신(§4)으로 추가된 룰 — 추출 룰 자체에서 유래하므로 정의상 매치"
+    },
+    {
+      "gold_id": "g56",
+      "output_rule": "docs-highlight-line-count",
+      "rationale": "gold 갱신(§4)으로 추가된 룰 — 추출 룰 자체에서 유래하므로 정의상 매치"
+    },
+    {
+      "gold_id": "g57",
+      "output_rule": "security-review-nonstandard-headers",
+      "rationale": "gold 갱신(§4)으로 추가된 룰 — 추출 룰 자체에서 유래하므로 정의상 매치"
+    }
+  ],
+  "misses": [
+    {
+      "gold_id": "g4",
+      "category": "other",
+      "note": "The compiler extracted the watch precondition only for Edit, not Write, so no same-tool rule covers creation of source or integration-test files."
+    },
+    {
+      "gold_id": "g5",
+      "category": "structure",
+      "note": "The keep-running instruction is embedded as a comment inside the watch-build code block and no Bash rule captures the ongoing process requirement."
+    },
+    {
+      "gold_id": "g6",
+      "category": "structure",
+      "note": "The mode/bundler mapping is expressed through a heading and four-command code block; the compiler reported 'Build Commands / Testing / Linting command reference sections — plain documentation of available commands, no action to bind'."
+    },
+    {
+      "gold_id": "g7",
+      "category": "other",
+      "note": "The explicit end-of-session cleanup requirement has no extracted Bash rule."
+    },
+    {
+      "gold_id": "g8",
+      "category": "other",
+      "note": "The explicit types-versus-build choice has no extracted Bash rule; the compiler broadly reported command reference sections as documentation with 'no action to bind'."
+    },
+    {
+      "gold_id": "g9",
+      "category": "other",
+      "note": "The conditional preference for the filtered build has no extracted Bash rule."
+    },
+    {
+      "gold_id": "g10",
+      "category": "other",
+      "note": "The extracted branch-switch rule covers only one part of this broader trigger and is already the closest match to g11; no rule covers CI push or multi-package changes."
+    },
+    {
+      "gold_id": "g12",
+      "category": "structure",
+      "note": "The webpack selection requirement is conveyed by a short lead-in plus commands in a code block, and no extracted Bash rule targets --webpack."
+    },
+    {
+      "gold_id": "g14",
+      "category": "other",
+      "note": "The compiler extracted a Write guard for manually creating test files, but no same-tool Bash rule covers invoking the mandatory generator."
+    },
+    {
+      "gold_id": "g16",
+      "category": "structure",
+      "note": "The noninteractive invocation format is primarily documented through comments and a command in a code block; no Bash rule captures it."
+    },
+    {
+      "gold_id": "g17",
+      "category": "other",
+      "note": "The compiler deliberately reported 'Never re-run the same test suite with different grep filters; capture output once — a cross-call behavioral pattern, not a single tool-call trigger'."
+    },
+    {
+      "gold_id": "g21",
+      "category": "other",
+      "note": "The compiler deliberately reported 'Run the pr-status script when the user asks about CI failures/PR status — triggered by user intent, not a specific tool call'."
+    },
+    {
+      "gold_id": "g22",
+      "category": "other",
+      "note": "The compiler deliberately grouped this under 'General PR-status triage rules (prioritize blocking failures, assume failures real, reproduce with CI env vars, mode-specific test command) — broad judgment guidance'."
+    },
+    {
+      "gold_id": "g23",
+      "category": "other",
+      "note": "The compiler deliberately grouped this under 'General PR-status triage rules (prioritize blocking failures, assume failures real, reproduce with CI env vars, mode-specific test command) — broad judgment guidance'."
+    },
+    {
+      "gold_id": "g24",
+      "category": "other",
+      "note": "The compiler deliberately grouped same-mode/environment reproduction under general PR-status guidance and called it broad judgment guidance."
+    },
+    {
+      "gold_id": "g25",
+      "category": "other",
+      "note": "The compiler deliberately grouped the mode-specific test requirement under general PR-status guidance and called it broad judgment guidance."
+    },
+    {
+      "gold_id": "g26",
+      "category": "reference-depth",
+      "note": "The actionable workflow requires following the referenced skill; the compiler reported 'Specialized Skills list ($pr-status-triage, $flags, etc.) — routing reference, not a rule'."
+    },
+    {
+      "gold_id": "g27",
+      "category": "structure",
+      "note": "This appears in the nested CI Analysis Tips list; the compiler's broad PR-triage omission leaves no matching Bash rule."
+    },
+    {
+      "gold_id": "g28",
+      "category": "structure",
+      "note": "The command sequence is nested under CI Analysis Tips; the compiler reported 'CI Analysis Tips conditional fix suggestions per failure type (cargo fmt, prettier --write) — reactive to CI output, not a proactive tool-call trigger'."
+    },
+    {
+      "gold_id": "g29",
+      "category": "structure",
+      "note": "The command is nested under CI Analysis Tips; the compiler reported 'CI Analysis Tips conditional fix suggestions per failure type (cargo fmt, prettier --write) — reactive to CI output, not a proactive tool-call trigger'."
+    },
+    {
+      "gold_id": "g30",
+      "category": "structure",
+      "note": "The action is a nested CI Analysis Tips bullet and no extracted Bash rule targets local reproduction of the failing path."
+    },
+    {
+      "gold_id": "g31",
+      "category": "structure",
+      "note": "The mode choice is represented by a heading and code block; the compiler grouped mode-specific test commands into broad judgment guidance."
+    },
+    {
+      "gold_id": "g33",
+      "category": "implicit",
+      "note": "This is a terse development tip rather than a strongly framed requirement, and no Bash rule captures DEBUG=next:*."
+    },
+    {
+      "gold_id": "g34",
+      "category": "implicit",
+      "note": "This is a terse development tip rather than a strongly framed requirement, and no Bash rule captures the telemetry environment setting."
+    },
+    {
+      "gold_id": "g35",
+      "category": "other",
+      "note": "The compiler deliberately reported 'NODE_ENV vs __NEXT_DEV_SERVER semantic explanation — informational, not a proscribed action'."
+    },
+    {
+      "gold_id": "g36",
+      "category": "other",
+      "note": "The compiler deliberately reported 'NODE_ENV vs __NEXT_DEV_SERVER semantic explanation — informational, not a proscribed action'."
+    },
+    {
+      "gold_id": "g37",
+      "category": "other",
+      "note": "The sensitivity rule has no extracted Bash trigger; the compiler treated the related secret-handling guidance as too broad to bind safely."
+    },
+    {
+      "gold_id": "g38",
+      "category": "other",
+      "note": "The compiler deliberately reported 'Never print or paste secret values in chat responses/commits/logs — too broad to bind to one tool call without false positives'."
+    },
+    {
+      "gold_id": "g39",
+      "category": "other",
+      "note": "The compiler deliberately reported 'Mirror CI env names/modes but don't inline literal secret values — no regex-detectable trigger'."
+    },
+    {
+      "gold_id": "g40",
+      "category": "other",
+      "note": "The compiler deliberately reported 'If a required secret is missing locally, stop and ask the user — conditional on runtime state, not a tool-call trigger'."
+    }
+  ],
+  "unmatched_extracted": [
+    {
+      "output_rule": "no-secret-files-commit",
+      "class": "gold-miss",
+      "note": "This is a real explicit rule forbidding commits of local secret files, but gold does not list that file-specific prohibition."
+    },
+    {
+      "output_rule": "no-https-remote-switch",
+      "class": "gold-miss",
+      "note": "This is a real explicit SSH-failure rule against changing remotes to HTTPS or other auth workarounds."
+    },
+    {
+      "output_rule": "ssh-preflight-before-force-push",
+      "class": "gold-miss",
+      "note": "This is a real action-bindable preference before force pushes or stack rebases that may hydrate objects."
+    },
+    {
+      "output_rule": "no-ai-footer-in-commit",
+      "class": "gold-miss",
+      "note": "This is a real explicit prohibition on AI-generated or co-author footers in commits."
+    },
+    {
+      "output_rule": "commit-message-style",
+      "class": "gold-miss",
+      "note": "This is a real action-bindable commit-message style rule."
+    },
+    {
+      "output_rule": "pre-validate-before-commit",
+      "class": "gold-miss",
+      "note": "This is a real explicit requirement to pre-validate changed files before committing."
+    },
+    {
+      "output_rule": "pr-description-focus",
+      "class": "gold-miss",
+      "note": "This is a real action-bindable requirement for PR description content beyond the footer covered by g32."
+    },
+    {
+      "output_rule": "no-pr-ready",
+      "class": "gold-miss",
+      "note": "This is a real explicit prohibition on marking PRs ready for review."
+    },
+    {
+      "output_rule": "rebuild-before-integration-tests",
+      "class": "gold-miss",
+      "note": "This is a real explicit precondition for integration tests after source changes, distinct from choosing the focused test mode."
+    },
+    {
+      "output_rule": "flags-config-shared-wiring",
+      "class": "gold-miss",
+      "note": "This is a real multi-file feature-flag wiring requirement when editing new flags."
+    },
+    {
+      "output_rule": "edge-define-env-flags",
+      "class": "gold-miss",
+      "note": "This is a real edit rule requiring Node-only feature flags to be false in edge builds."
+    },
+    {
+      "output_rule": "react-server-dom-webpack-import-scope",
+      "class": "gold-miss",
+      "note": "This is a real import-boundary rule for react-server-dom-webpack modules."
+    },
+    {
+      "output_rule": "app-page-template-require-constraint",
+      "class": "gold-miss",
+      "note": "This is a real restriction on relative internal requires in the app-page build template."
+    },
+    {
+      "output_rule": "router-act-no-browser-back",
+      "class": "gold-miss",
+      "note": "This is a real explicit test-edit prohibition against browser.back() in the described router-act scenario."
+    },
+    {
+      "output_rule": "rust-avoid-super-imports",
+      "class": "gold-miss",
+      "note": "This is a real Rust import-style rule with a stated inline-module exception."
+    },
+    {
+      "output_rule": "docs-highlight-line-count",
+      "class": "gold-miss",
+      "note": "This is a real documentation-edit rule requiring accurate highlight line counts."
+    },
+    {
+      "output_rule": "security-review-nonstandard-headers",
+      "class": "gold-miss",
+      "note": "This is a real review-time rule to flag new nonstandard request-header reads for security review."
+    }
+  ],
+  "gold_amendments": [
+    {
+      "gold_id": "g41",
+      "reason": "매칭 판정 중 gold 누락 발견 — 추출 룰 'no-secret-files-commit'이 실재 룰인데 정답에 없음 (판정 세션 제안 p1)"
+    },
+    {
+      "gold_id": "g42",
+      "reason": "매칭 판정 중 gold 누락 발견 — 추출 룰 'no-https-remote-switch'이 실재 룰인데 정답에 없음 (판정 세션 제안 p2)"
+    },
+    {
+      "gold_id": "g43",
+      "reason": "매칭 판정 중 gold 누락 발견 — 추출 룰 'ssh-preflight-before-force-push'이 실재 룰인데 정답에 없음 (판정 세션 제안 p3)"
+    },
+    {
+      "gold_id": "g44",
+      "reason": "매칭 판정 중 gold 누락 발견 — 추출 룰 'no-ai-footer-in-commit'이 실재 룰인데 정답에 없음 (판정 세션 제안 p4)"
+    },
+    {
+      "gold_id": "g45",
+      "reason": "매칭 판정 중 gold 누락 발견 — 추출 룰 'commit-message-style'이 실재 룰인데 정답에 없음 (판정 세션 제안 p5)"
+    },
+    {
+      "gold_id": "g46",
+      "reason": "매칭 판정 중 gold 누락 발견 — 추출 룰 'pre-validate-before-commit'이 실재 룰인데 정답에 없음 (판정 세션 제안 p6)"
+    },
+    {
+      "gold_id": "g47",
+      "reason": "매칭 판정 중 gold 누락 발견 — 추출 룰 'pr-description-focus'이 실재 룰인데 정답에 없음 (판정 세션 제안 p7)"
+    },
+    {
+      "gold_id": "g48",
+      "reason": "매칭 판정 중 gold 누락 발견 — 추출 룰 'no-pr-ready'이 실재 룰인데 정답에 없음 (판정 세션 제안 p8)"
+    },
+    {
+      "gold_id": "g49",
+      "reason": "매칭 판정 중 gold 누락 발견 — 추출 룰 'rebuild-before-integration-tests'이 실재 룰인데 정답에 없음 (판정 세션 제안 p9)"
+    },
+    {
+      "gold_id": "g50",
+      "reason": "매칭 판정 중 gold 누락 발견 — 추출 룰 'flags-config-shared-wiring'이 실재 룰인데 정답에 없음 (판정 세션 제안 p10)"
+    },
+    {
+      "gold_id": "g51",
+      "reason": "매칭 판정 중 gold 누락 발견 — 추출 룰 'edge-define-env-flags'이 실재 룰인데 정답에 없음 (판정 세션 제안 p11)"
+    },
+    {
+      "gold_id": "g52",
+      "reason": "매칭 판정 중 gold 누락 발견 — 추출 룰 'react-server-dom-webpack-import-scope'이 실재 룰인데 정답에 없음 (판정 세션 제안 p12)"
+    },
+    {
+      "gold_id": "g53",
+      "reason": "매칭 판정 중 gold 누락 발견 — 추출 룰 'app-page-template-require-constraint'이 실재 룰인데 정답에 없음 (판정 세션 제안 p13)"
+    },
+    {
+      "gold_id": "g54",
+      "reason": "매칭 판정 중 gold 누락 발견 — 추출 룰 'router-act-no-browser-back'이 실재 룰인데 정답에 없음 (판정 세션 제안 p14)"
+    },
+    {
+      "gold_id": "g55",
+      "reason": "매칭 판정 중 gold 누락 발견 — 추출 룰 'rust-avoid-super-imports'이 실재 룰인데 정답에 없음 (판정 세션 제안 p15)"
+    },
+    {
+      "gold_id": "g56",
+      "reason": "매칭 판정 중 gold 누락 발견 — 추출 룰 'docs-highlight-line-count'이 실재 룰인데 정답에 없음 (판정 세션 제안 p16)"
+    },
+    {
+      "gold_id": "g57",
+      "reason": "매칭 판정 중 gold 누락 발견 — 추출 룰 'security-review-nonstandard-headers'이 실재 룰인데 정답에 없음 (판정 세션 제안 p17)"
+    }
+  ]
+}

@@ -1,0 +1,120 @@
+{
+  "doc": "supabase",
+  "judge": "llm:codex-0.144.1(GPT-5)",
+  "matches": [
+    {
+      "gold_id": "g12",
+      "output_rule": "ui-primitive-check-before-create",
+      "rationale": "The Write rule targets creation in packages/ui and explicitly requires checking packages/ui/index.tsx before creating primitives."
+    },
+    {
+      "gold_id": "g15",
+      "output_rule": "styling-no-hardcoded-colors",
+      "rationale": "The Edit rule detects literal hex and functional color values in styling-capable files, directly targeting hardcoded colors."
+    },
+    {
+      "gold_id": "g18",
+      "output_rule": "studio-shortcut-registry",
+      "rationale": "The Edit rule detects one-off keyboard listeners in Studio files and its evidence directs authors toward registered shortcuts."
+    },
+    {
+      "gold_id": "g21",
+      "output_rule": "studio-avoid-barrel-exports",
+      "rationale": "The Write rule detects re-exports in Studio index files, the concrete form of a barrel re-export file."
+    }
+  ],
+  "misses": [
+    {
+      "gold_id": "g1",
+      "category": "implicit",
+      "note": "The pnpm version appears as a terse repository-description fact rather than an explicit command instruction."
+    },
+    {
+      "gold_id": "g2",
+      "category": "implicit",
+      "note": "The Node version is stated as an environment requirement, without an extracted Bash trigger."
+    },
+    {
+      "gold_id": "g3",
+      "category": "structure",
+      "note": "The dependency-install command appears inside the Common Commands fenced code block."
+    },
+    {
+      "gold_id": "g4",
+      "category": "structure",
+      "note": "The Studio development command appears inside the Common Commands fenced code block."
+    },
+    {
+      "gold_id": "g5",
+      "category": "structure",
+      "note": "The Studio unit-test command appears inside the Common Commands fenced code block."
+    },
+    {
+      "gold_id": "g6",
+      "category": "structure",
+      "note": "The Studio end-to-end test command appears inside the Common Commands fenced code block."
+    },
+    {
+      "gold_id": "g7",
+      "category": "structure",
+      "note": "The Studio build command appears inside the Common Commands fenced code block."
+    },
+    {
+      "gold_id": "g8",
+      "category": "structure",
+      "note": "The Studio lint command appears inside the Common Commands fenced code block."
+    },
+    {
+      "gold_id": "g9",
+      "category": "structure",
+      "note": "The repository type-check command appears inside the Common Commands fenced code block."
+    },
+    {
+      "gold_id": "g10",
+      "category": "other",
+      "note": "The compiler deliberately reported this as uncompilable: \"UI — import from 'ui', use `_Shadcn_` suffixed variants for form primitives (correct-vs-incorrect variant usage can't be distinguished by a simple regex).\""
+    },
+    {
+      "gold_id": "g11",
+      "category": "other",
+      "note": "The compiler deliberately reported this as uncompilable: \"UI — import from 'ui', use `_Shadcn_` suffixed variants for form primitives (correct-vs-incorrect variant usage can't be distinguished by a simple regex).\""
+    },
+    {
+      "gold_id": "g13",
+      "category": "other",
+      "note": "The extracted styling rule detects hardcoded color literals only; it does not target non-Tailwind styling generally."
+    },
+    {
+      "gold_id": "g14",
+      "category": "other",
+      "note": "The extracted styling rule does not detect non-semantic Tailwind color classes or otherwise enforce semantic tokens."
+    },
+    {
+      "gold_id": "g16",
+      "category": "other",
+      "note": "The compiler deliberately reported this as uncompilable: \"Language — Use U.S. English everywhere (tone/general guidance, not tied to a specific action).\""
+    },
+    {
+      "gold_id": "g17",
+      "category": "other",
+      "note": "The shortcut extraction is limited to keyboard-listener syntax and does not target repeated Studio UI actions or shared Shortcut primitives broadly."
+    },
+    {
+      "gold_id": "g19",
+      "category": "other",
+      "note": "Although mentioned in the extracted rule's evidence, its trigger detects generic keyboard listeners and cannot identify G-then-key chords or whether they are used for navigation."
+    },
+    {
+      "gold_id": "g20",
+      "category": "other",
+      "note": "The compiler deliberately reported this as uncompilable: \"Studio — Co-locate sub-components with parent (file-placement guidance, not expressible as a content/path regex trigger).\""
+    },
+    {
+      "gold_id": "g22",
+      "category": "reference-depth",
+      "note": "The detailed actionable conventions require consulting the referenced studio-* skills, and no extracted Bash rule covers that consultation."
+    }
+  ],
+  "unmatched_extracted": [],
+  "gold_amendments": []
+}

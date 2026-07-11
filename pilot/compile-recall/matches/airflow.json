@@ -1,0 +1,490 @@
+{
+  "doc": "airflow",
+  "judge": "llm:codex-cli(gpt-5)",
+  "matches": [
+    {
+      "gold_id": "g6",
+      "output_rule": "no-direct-host-commands",
+      "rationale": "Both prohibit direct host execution of pytest, python, or airflow commands."
+    },
+    {
+      "gold_id": "g40",
+      "output_rule": "no-assert-production",
+      "rationale": "The rule targets assertions in non-test Python production code."
+    },
+    {
+      "gold_id": "g42",
+      "output_rule": "time-monotonic-not-time",
+      "rationale": "Both require time.monotonic rather than time.time for durations."
+    },
+    {
+      "gold_id": "g43",
+      "output_rule": "no-session-commit",
+      "rationale": "Both target session.commit in airflow-core functions that receive a session."
+    },
+    {
+      "gold_id": "g45",
+      "output_rule": "guard-kubernetes-client-import",
+      "rationale": "Both require TYPE_CHECKING guards for heavy type-only imports in multiprocess paths."
+    },
+    {
+      "gold_id": "g46",
+      "output_rule": "no-new-airflow-exception",
+      "rationale": "Both prohibit adding direct AirflowException raises and direct authors toward specific exceptions."
+    },
+    {
+      "gold_id": "g47",
+      "output_rule": "fastapi-exception-translation",
+      "rationale": "Both require translating domain errors to appropriate HTTPException statuses at core API route boundaries."
+    },
+    {
+      "gold_id": "g50",
+      "output_rule": "license-header-new-files",
+      "rationale": "Both require an Apache license header when creating a new file; the extracted path narrows enforcement to Python files."
+    },
+    {
+      "gold_id": "g51",
+      "output_rule": "selective-checks-sync",
+      "rationale": "Both require selective-checks decision changes to be accompanied by documentation and test updates."
+    },
+    {
+      "gold_id": "g52",
+      "output_rule": "newsfragment-golden-rule",
+      "rationale": "Both gate newsfragment creation on certainty that the change is user-facing."
+    },
+    {
+      "gold_id": "g53",
+      "output_rule": "newsfragment-no-providers-ctl",
+      "rationale": "Both prohibit newsfragments under providers and airflow-ctl."
+    },
+    {
+      "gold_id": "g56",
+      "output_rule": "pytest-not-unittest",
+      "rationale": "Both prohibit unittest.TestCase in favor of pytest patterns."
+    },
+    {
+      "gold_id": "g57",
+      "output_rule": "mock-patch-spec",
+      "rationale": "Both require spec or autospec when creating mocks in tests."
+    },
+    {
+      "gold_id": "g58",
+      "output_rule": "mock-patch-decorator-pref",
+      "rationale": "The extracted rule exactly covers the patch-decorator portion of this gold rule."
+    },
+    {
+      "gold_id": "g59",
+      "output_rule": "no-datetime-now-in-tests",
+      "rationale": "Both prohibit datetime.now in time-dependent tests and prescribe time_machine."
+    },
+    {
+      "gold_id": "g63",
+      "output_rule": "no-caplog-in-tests",
+      "rationale": "Both prohibit caplog and direct tests toward behavior rather than log output."
+    },
+    {
+      "gold_id": "g65",
+      "output_rule": "commit-message-no-conventional",
+      "rationale": "Both require imperative plain commit subjects without Conventional Commit prefixes."
+    },
+    {
+      "gold_id": "g68",
+      "output_rule": "commit-no-self-coauthor",
+      "rationale": "Both prohibit adding the agent itself as a Co-Authored-By author."
+    },
+    {
+      "gold_id": "g69",
+      "output_rule": "no-push-upstream-or-main",
+      "rationale": "Both require branch pushes to origin and prohibit pushes to upstream or main."
+    },
+    {
+      "gold_id": "g70",
+      "output_rule": "check-remote-before-remote-cmd",
+      "rationale": "Both require inspecting and validating remote naming before remote-based commands."
+    },
+    {
+      "gold_id": "g73",
+      "output_rule": "check-existing-pr-before-create",
+      "rationale": "Both require searching for an existing PR before starting issue work or creating another PR."
+    },
+    {
+      "gold_id": "g75",
+      "output_rule": "pr-self-review-checklist",
+      "rationale": "Both require consulting the referenced review instructions and checklist before pushing."
+    },
+    {
+      "gold_id": "g77",
+      "output_rule": "rebase-before-push",
+      "rationale": "Both require rebasing onto the latest target branch before pushing."
+    },
+    {
+      "gold_id": "g81",
+      "output_rule": "avoid-issue-when-pr-imminent",
+      "rationale": "Both prohibit filing a redundant issue when a fix and PR are imminent."
+    },
+    {
+      "gold_id": "g87",
+      "output_rule": "github-comment-attribution-footer",
+      "rationale": "Both require an attribution footer on agent-drafted GitHub messages."
+    },
+    {
+      "gold_id": "g89",
+      "output_rule": "no-tagging-individuals",
+      "rationale": "Both prohibit tagging individual GitHub users without explicit authorization."
+    },
+    {
+      "gold_id": "g93",
+      "output_rule": "migration-ask-first",
+      "rationale": "The extracted rule covers the destructive migration case of the gold rule's ask-first trigger."
+    },
+    {
+      "gold_id": "g95",
+      "output_rule": "no-hand-edit-uv-lock",
+      "rationale": "Both prohibit hand-editing a generated file when its generation workflow exists; uv.lock is the explicit target."
+    },
+    {
+      "gold_id": "g96",
+      "output_rule": "no-destructive-git-ops",
+      "rationale": "Both prohibit destructive git operations unless explicitly requested."
+    }
+  ],
+  "misses": [
+    {
+      "gold_id": "g1",
+      "category": "other",
+      "note": "Self-reported uncompilable: \"Dag/DAG 대소문자 표기 규칙 — 산문과 리터럴 코드 토큰을 구분해야 해서 정규식으로 안정적으로 탐지 불가\"."
+    },
+    {
+      "gold_id": "g2",
+      "category": "other",
+      "note": "No extracted Edit rule targets spelling out Directed Acyclic Graph; this semantic prose rule was not compiled."
+    },
+    {
+      "gold_id": "g3",
+      "category": "other",
+      "note": "Self-reported uncompilable with the one-time setup rules: \"prek/breeze 설치 등 1회성 환경 설정 단계 — 반복되는 액션 전 규칙이 아님\"."
+    },
+    {
+      "gold_id": "g4",
+      "category": "other",
+      "note": "Self-reported uncompilable with the one-time setup rules: \"prek/breeze 설치 등 1회성 환경 설정 단계 — 반복되는 액션 전 규칙이 아님\"."
+    },
+    {
+      "gold_id": "g5",
+      "category": "other",
+      "note": "Self-reported uncompilable with the one-time setup rules: \"prek/breeze 설치 등 1회성 환경 설정 단계 — 반복되는 액션 전 규칙이 아님\"."
+    },
+    {
+      "gold_id": "g7",
+      "category": "other",
+      "note": "Self-reported uncompilable: \"임시 스크립트를 dev/ 아래 두라는 규칙 — 식별 가능한 파일 패턴/확장자가 없음\"."
+    },
+    {
+      "gold_id": "g8",
+      "category": "structure",
+      "note": "The command is in the generated Commands list; the compiler self-reported that command table as informational and skipped it."
+    },
+    {
+      "gold_id": "g9",
+      "category": "structure",
+      "note": "The command is in the generated Commands list; the compiler self-reported that command table as informational and skipped it."
+    },
+    {
+      "gold_id": "g10",
+      "category": "structure",
+      "note": "The command is in the generated Commands list; the compiler self-reported that command table as informational and skipped it."
+    },
+    {
+      "gold_id": "g11",
+      "category": "structure",
+      "note": "The fallback command is embedded in the generated Commands list and was skipped with that command table."
+    },
+    {
+      "gold_id": "g12",
+      "category": "structure",
+      "note": "The Python-script command is in the generated Commands list and was skipped with that command table."
+    },
+    {
+      "gold_id": "g13",
+      "category": "structure",
+      "note": "The parallel-suite command is in the generated Commands list and was skipped with that command table."
+    },
+    {
+      "gold_id": "g14",
+      "category": "structure",
+      "note": "The db-only command is in the generated Commands list and was skipped with that command table."
+    },
+    {
+      "gold_id": "g15",
+      "category": "structure",
+      "note": "The non-db command is in the generated Commands list and was skipped with that command table."
+    },
+    {
+      "gold_id": "g16",
+      "category": "structure",
+      "note": "The provider-suite command is in the generated Commands list and was skipped with that command table."
+    },
+    {
+      "gold_id": "g17",
+      "category": "structure",
+      "note": "The Helm command is in the generated Commands list and was skipped with that command table."
+    },
+    {
+      "gold_id": "g18",
+      "category": "structure",
+      "note": "The Kubernetes-version variant is in the generated Commands list and was skipped with that command table."
+    },
+    {
+      "gold_id": "g19",
+      "category": "structure",
+      "note": "The Helm test-type variant is in the generated Commands list and was skipped with that command table."
+    },
+    {
+      "gold_id": "g20",
+      "category": "structure",
+      "note": "The named-suite command is in the generated Commands list and was skipped with that command table."
+    },
+    {
+      "gold_id": "g21",
+      "category": "structure",
+      "note": "The scripts-test command is in the generated Commands list and was skipped with that command table."
+    },
+    {
+      "gold_id": "g22",
+      "category": "structure",
+      "note": "The Airflow CLI command is in the generated Commands list and was skipped with that command table."
+    },
+    {
+      "gold_id": "g23",
+      "category": "structure",
+      "note": "The non-provider mypy command is in the generated Commands list and was skipped with that command table."
+    },
+    {
+      "gold_id": "g24",
+      "category": "structure",
+      "note": "The provider mypy command is in the generated Commands list and was skipped with that command table."
+    },
+    {
+      "gold_id": "g25",
+      "category": "structure",
+      "note": "The ruff lint command is in the generated Commands list and was skipped with that command table."
+    },
+    {
+      "gold_id": "g26",
+      "category": "structure",
+      "note": "The ruff format command is in the generated Commands list and was skipped with that command table."
+    },
+    {
+      "gold_id": "g27",
+      "category": "structure",
+      "note": "The fast-check command is in the generated Commands list and was skipped with that command table."
+    },
+    {
+      "gold_id": "g28",
+      "category": "structure",
+      "note": "The manual-check command is in the generated Commands list and was skipped with that command table."
+    },
+    {
+      "gold_id": "g29",
+      "category": "structure",
+      "note": "The docs-build command is in the generated Commands list and was skipped with that command table."
+    },
+    {
+      "gold_id": "g30",
+      "category": "structure",
+      "note": "The selective-checks command is in the generated Commands list and was skipped with that command table."
+    },
+    {
+      "gold_id": "g31",
+      "category": "other",
+      "note": "No extracted Bash rule targets database backend selection for integration tests."
+    },
+    {
+      "gold_id": "g32",
+      "category": "other",
+      "note": "No extracted Bash rule targets Docker network pruning after a networking failure."
+    },
+    {
+      "gold_id": "g33",
+      "category": "other",
+      "note": "The uv.lock output rule is an Edit prohibition, not the Bash recovery workflow of deleting a conflicted lockfile and regenerating it."
+    },
+    {
+      "gold_id": "g34",
+      "category": "other",
+      "note": "Self-reported uncompilable under \"Architecture Boundaries 서술 — 시스템 설계 설명이며 에이전트가 수행하는 액션이 아님\"."
+    },
+    {
+      "gold_id": "g35",
+      "category": "other",
+      "note": "Self-reported uncompilable under \"Architecture Boundaries 서술 — 시스템 설계 설명이며 에이전트가 수행하는 액션이 아님\"."
+    },
+    {
+      "gold_id": "g36",
+      "category": "other",
+      "note": "Self-reported uncompilable under \"Architecture Boundaries 서술 — 시스템 설계 설명이며 에이전트가 수행하는 액션이 아님\"."
+    },
+    {
+      "gold_id": "g37",
+      "category": "other",
+      "note": "Self-reported uncompilable: \"보안 취약점 분류(실제 취약점/알려진 한계/배포 강화) 가이드 — 분석적 판단이 필요해 툴콜 트리거로 매핑 불가\"."
+    },
+    {
+      "gold_id": "g38",
+      "category": "other",
+      "note": "Self-reported uncompilable with the security classification guidance because it requires analytical judgment."
+    },
+    {
+      "gold_id": "g39",
+      "category": "other",
+      "note": "No extracted Bash rule requires immediate ruff formatting and fix-checking after each Python edit."
+    },
+    {
+      "gold_id": "g41",
+      "category": "other",
+      "note": "Self-reported uncompilable: \"코드 주석은 절제해서 '왜'만 남기라는 가이드 — 서술형 comment인지 판단은 의미론적 작업\"."
+    },
+    {
+      "gold_id": "g44",
+      "category": "other",
+      "note": "Self-reported uncompilable: \"임포트는 파일 상단에 두되 예외 허용 — 스니펫 단위 regex로는 파일 전체 구조 판단 불가\"."
+    },
+    {
+      "gold_id": "g48",
+      "category": "other",
+      "note": "Self-reported uncompilable: \"벌크 DELETE/UPDATE 배치 처리 및 LIMIT 커밋 규칙 — '무제한 벌크 쓰기'인지 정규식으로 판별 불가\"."
+    },
+    {
+      "gold_id": "g49",
+      "category": "other",
+      "note": "Self-reported uncompilable: \"함수/메서드 동사형 네이밍 규칙 — 명사형인지 동사형인지 의미론적 판단이 필요해 정규식 탐지 불가\"."
+    },
+    {
+      "gold_id": "g54",
+      "category": "other",
+      "note": "No extracted Write rule targets task-sdk user-visible notes specifically."
+    },
+    {
+      "gold_id": "g55",
+      "category": "other",
+      "note": "Self-reported uncompilable: \"PR 변경분 100% 커버리지 목표 — 특정 액션이 아닌 PR 전체 정책\"."
+    },
+    {
+      "gold_id": "g60",
+      "category": "other",
+      "note": "Self-reported uncompilable: \"@pytest.mark.parametrize로 유사 테스트 통합 규칙 — '유사한 테스트'인지 의미론적 판단 필요\"."
+    },
+    {
+      "gold_id": "g61",
+      "category": "other",
+      "note": "Self-reported uncompilable: \"@pytest.mark.db_test 사용 규칙 — DB 접근 여부가 정규식으로 판단 불가\"."
+    },
+    {
+      "gold_id": "g62",
+      "category": "structure",
+      "note": "The source-to-test path mirroring rule appears in the structured testing standards list, but no Write rule captures it."
+    },
+    {
+      "gold_id": "g64",
+      "category": "other",
+      "note": "Self-reported uncompilable: \"생성 파일(리포트/스크래치 산출물)을 files/ 아래 두라는 규칙 — 식별 가능한 경로/확장자 패턴 없음\"."
+    },
+    {
+      "gold_id": "g66",
+      "category": "other",
+      "note": "No extracted Bash rule requires prek install before committing; the commit rule only checks message style."
+    },
+    {
+      "gold_id": "g67",
+      "category": "other",
+      "note": "No extracted Bash rule checks that a commit body explains why rather than what."
+    },
+    {
+      "gold_id": "g71",
+      "category": "other",
+      "note": "The remote-check rule covers checks before remote commands, not the distinct recheck required immediately after changing remotes."
+    },
+    {
+      "gold_id": "g72",
+      "category": "other",
+      "note": "No extracted Bash rule targets translation and reporting of stale remote names in documented commands."
+    },
+    {
+      "gold_id": "g74",
+      "category": "reference-depth",
+      "note": "The extracted self-review rule is used for g75; this distinct full-diff and unrelated-change requirement depends on the referenced review guidance."
+    },
+    {
+      "gold_id": "g76",
+      "category": "structure",
+      "note": "The multi-part pre-push verification checklist is not represented by any single extracted Bash rule."
+    },
+    {
+      "gold_id": "g78",
+      "category": "other",
+      "note": "No extracted Bash rule targets browser-based PR creation with a prefilled disclosure."
+    },
+    {
+      "gold_id": "g79",
+      "category": "other",
+      "note": "No extracted Bash rule checks PR title length, mood, or user-impact focus."
+    },
+    {
+      "gold_id": "g80",
+      "category": "other",
+      "note": "No extracted Bash rule checks PR body description and issue references."
+    },
+    {
+      "gold_id": "g82",
+      "category": "other",
+      "note": "Self-reported uncompilable with the workaround tracking workflow because identifying a workaround requires semantic judgment."
+    },
+    {
+      "gold_id": "g83",
+      "category": "other",
+      "note": "Self-reported uncompilable with the workaround tracking workflow; no Edit rule checks for a full tracking URL."
+    },
+    {
+      "gold_id": "g84",
+      "category": "other",
+      "note": "Self-reported uncompilable with the workaround tracking workflow; no Edit rule catches promises of a future issue."
+    },
+    {
+      "gold_id": "g85",
+      "category": "structure",
+      "note": "The tracking-issue content requirements are a multi-part nested workflow and have no extracted Bash rule."
+    },
+    {
+      "gold_id": "g86",
+      "category": "structure",
+      "note": "The already-open-PR repair workflow is multi-step and has no extracted Bash rule."
+    },
+    {
+      "gold_id": "g88",
+      "category": "other",
+      "note": "The single attribution output rule is already matched to g87 and does not encode the distinct human-approval condition for choosing the footer."
+    },
+    {
+      "gold_id": "g90",
+      "category": "reference-depth",
+      "note": "The snapshot population requirement becomes actionable through the referenced apache-magpie framework setup."
+    },
+    {
+      "gold_id": "g91",
+      "category": "reference-depth",
+      "note": "The snapshot-versus-overrides editing rule is specific to the referenced apache-magpie framework and was not extracted."
+    },
+    {
+      "gold_id": "g92",
+      "category": "reference-depth",
+      "note": "Self-reported uncompilable: \"PR 리뷰 시 magpie-pr-management-code-review 스킬 사용 선호 — Bash/Edit/Write 툴콜 액션이 아님\"."
+    },
+    {
+      "gold_id": "g94",
+      "category": "other",
+      "note": "Self-reported uncompilable: \"비밀정보·자격증명·토큰 커밋 금지 — 문서에 특정 탐지 패턴이 없어 범용 시크릿 스캐닝이 필요\"."
+    }
+  ],
+  "unmatched_extracted": [],
+  "gold_amendments": []
+}
