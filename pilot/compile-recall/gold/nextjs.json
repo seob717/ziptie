@@ -1,0 +1,326 @@
+{
+  "doc": "nextjs",
+  "author": "llm:codex-0.144.1(GPT-5)",
+  "rules": [
+    {
+      "id": "g1",
+      "summary": "Before editing a file in a subdirectory, read every README.md on the path from the repository root through the target directory.",
+      "tool": "Edit",
+      "trigger_intent": "edit an existing file in a repository subdirectory",
+      "strength": "require-read",
+      "evidence": "Before editing or creating files in any subdirectory (e.g., `packages/*`, `crates/*`), read all `README.md` files in the directory path from the repo root up to and including the target file's directory."
+    },
+    {
+      "id": "g2",
+      "summary": "Before creating a file in a subdirectory, read every README.md on the path from the repository root through the target directory.",
+      "tool": "Write",
+      "trigger_intent": "create a new file in a repository subdirectory",
+      "strength": "require-read",
+      "evidence": "Before editing or creating files in any subdirectory (e.g., `packages/*`, `crates/*`), read all `README.md` files in the directory path from the repo root up to and including the target file's directory."
+    },
+    {
+      "id": "g3",
+      "summary": "When changing Next.js source or integration tests, start the Next.js watch-mode dev process before editing unless it is already running, or explicitly explain why it was skipped.",
+      "tool": "Edit",
+      "trigger_intent": "edit Next.js source code or an integration test",
+      "strength": "require-read",
+      "evidence": "If you are changing Next.js source or integration tests, start `pnpm --filter=next dev` in a separate terminal session before making edits (unless it is already running)."
+    },
+    {
+      "id": "g4",
+      "summary": "When creating Next.js source or integration-test files, start the Next.js watch-mode dev process first unless it is already running, or explicitly explain why it was skipped.",
+      "tool": "Write",
+      "trigger_intent": "create a Next.js source file or integration-test file",
+      "strength": "require-read",
+      "evidence": "If you skip this, explicitly state why (for example: docs-only, read-only investigation, or CI-only analysis)."
+    },
+    {
+      "id": "g5",
+      "summary": "Keep the Next.js watch build running while iterating on code.",
+      "tool": "Bash",
+      "trigger_intent": "run iterative development commands after starting the Next.js watch build",
+      "strength": "inject",
+      "evidence": "Keep this running while you iterate on code"
+    },
+    {
+      "id": "g6",
+      "summary": "Use the focused test script matching the development/production mode and Turbopack/Webpack bundler being verified.",
+      "tool": "Bash",
+      "trigger_intent": "run a focused Next.js integration test",
+      "strength": "require-read",
+      "evidence": "Run focused tests with the matching mode script:"
+    },
+    {
+      "id": "g7",
+      "summary": "After finishing, terminate the background watch process if you started it.",
+      "tool": "Bash",
+      "trigger_intent": "finish an iterative development session that started a background watch process",
+      "strength": "require-read",
+      "evidence": "When done, kill the background watch process (if you started it)."
+    },
+    {
+      "id": "g8",
+      "summary": "For type errors only, run the fast types command instead of building Next.js.",
+      "tool": "Bash",
+      "trigger_intent": "check only for type errors",
+      "strength": "require-read",
+      "evidence": "Use `pnpm --filter=next types` (~10s) instead of `pnpm --filter=next build` (~60s)."
+    },
+    {
+      "id": "g9",
+      "summary": "After bootstrap, prefer the filtered Next.js build when edits are limited to core Next.js files.",
+      "tool": "Bash",
+      "trigger_intent": "build after edits limited to core Next.js files in an already-bootstrapped workspace",
+      "strength": "inject",
+      "evidence": "prefer `pnpm --filter=next build` when edits are limited to core Next.js files"
+    },
+    {
+      "id": "g10",
+      "summary": "Run the full build for branch switches or bootstrap, before a CI push, or when changes span packages.",
+      "tool": "Bash",
+      "trigger_intent": "build after switching branches or bootstrapping, before pushing to CI, or after changing multiple packages",
+      "strength": "require-read",
+      "evidence": "Use full `pnpm build-all` for branch switches/bootstrap, before CI push, or when changes span multiple packages."
+    },
+    {
+      "id": "g11",
+      "summary": "Always run a full bootstrap build after switching branches.",
+      "tool": "Bash",
+      "trigger_intent": "switch git branches",
+      "strength": "require-read",
+      "evidence": "Always run a full bootstrap build after switching branches:"
+    },
+    {
+      "id": "g12",
+      "summary": "Use --webpack to force Webpack for next build or next dev.",
+      "tool": "Bash",
+      "trigger_intent": "run next build or next dev with Webpack rather than the default Turbopack",
+      "strength": "require-read",
+      "evidence": "To force webpack:"
+    },
+    {
+      "id": "g13",
+      "summary": "Do not pass the nonexistent --no-turbopack flag.",
+      "tool": "Bash",
+      "trigger_intent": "disable Turbopack for a Next.js command",
+      "strength": "block",
+      "evidence": "There is no `--no-turbopack` flag."
+    },
+    {
+      "id": "g14",
+      "summary": "Generate every new test using pnpm new-test.",
+      "tool": "Bash",
+      "trigger_intent": "generate a new test file or test suite",
+      "strength": "require-read",
+      "evidence": "Generating tests using `pnpm new-test` is mandatory."
+    },
+    {
+      "id": "g15",
+      "summary": "Do not manually create a new test suite; use pnpm new-test so its structure and fixture files come from the template.",
+      "tool": "Write",
+      "trigger_intent": "create a new test suite file",
+      "strength": "require-read",
+      "evidence": "Use `pnpm new-test` to generate new test suites"
+    },
+    {
+      "id": "g16",
+      "summary": "AI agents should generate tests non-interactively by forwarding --args in the documented appDir/name/type format.",
+      "tool": "Bash",
+      "trigger_intent": "run pnpm new-test as an AI coding agent",
+      "strength": "require-read",
+      "evidence": "Use --args for non-interactive mode (forward args to the script using `--`)"
+    },
+    {
+      "id": "g17",
+      "summary": "Never rerun the same test suite merely with different grep filters; capture its full output once and analyze the saved file.",
+      "tool": "Bash",
+      "trigger_intent": "analyze test output using multiple grep filters",
+      "strength": "block",
+      "evidence": "Never re-run the same test suite with different grep filters. Capture output once to a file, then read from it:"
+    },
+    {
+      "id": "g18",
+      "summary": "In tests, wait by polling with retry() from next-test-utils instead of setTimeout.",
+      "tool": "Edit",
+      "trigger_intent": "edit test code that waits for an asynchronous condition",
+      "strength": "require-read",
+      "evidence": "Use `retry()` from `next-test-utils` instead of `setTimeout` for waiting"
+    },
+    {
+      "id": "g19",
+      "summary": "Do not use deprecated check(); use retry() with expect() instead.",
+      "tool": "Edit",
+      "trigger_intent": "edit test code that polls or checks for an expected value",
+      "strength": "block",
+      "evidence": "Do NOT use `check()` - it is deprecated. Use `retry()` + `expect()` instead"
+    },
+    {
+      "id": "g20",
+      "summary": "Prefer real fixture directories over inline files objects in tests.",
+      "tool": "Edit",
+      "trigger_intent": "edit nextTestSetup fixture configuration in a test",
+      "strength": "inject",
+      "evidence": "Prefer real fixture directories over inline `files` objects"
+    },
+    {
+      "id": "g21",
+      "summary": "When asked about PR status, reviews, or CI failures, run scripts/pr-status.js, optionally with the requested PR number.",
+      "tool": "Bash",
+      "trigger_intent": "investigate CI failures, PR reviews, or the status of a pull request",
+      "strength": "require-read",
+      "evidence": "When the user asks about CI failures, PR reviews, or the status of a PR, run the pr-status script:"
+    },
+    {
+      "id": "g22",
+      "summary": "In PR triage, prioritize blocking failures in build, lint, types, then tests order.",
+      "tool": "Bash",
+      "trigger_intent": "choose which CI failure to investigate or reproduce first",
+      "strength": "require-read",
+      "evidence": "Prioritize blocking failures first: build, lint, types, then tests."
+    },
+    {
+      "id": "g23",
+      "summary": "Treat CI failures as real until disproven and do not automatically dismiss failures listed as known flaky tests.",
+      "tool": "Bash",
+      "trigger_intent": "triage or decide whether to reproduce a CI failure",
+      "strength": "require-read",
+      "evidence": "Assume failures are real until disproven; use \"Known Flaky Tests\" as context, not auto-dismissal."
+    },
+    {
+      "id": "g24",
+      "summary": "Reproduce failures with the same CI mode and environment variables, especially IS_WEBPACK_TEST=1 when present.",
+      "tool": "Bash",
+      "trigger_intent": "run a local reproduction of a CI failure",
+      "strength": "require-read",
+      "evidence": "Reproduce with the same CI mode/env vars (especially `IS_WEBPACK_TEST=1` when present)."
+    },
+    {
+      "id": "g25",
+      "summary": "For module-resolution or build-graph fixes, use the normal mode-specific test command so package resolution is exercised.",
+      "tool": "Bash",
+      "trigger_intent": "test a module-resolution or build-graph fix",
+      "strength": "require-read",
+      "evidence": "For module-resolution/build-graph fixes, use the normal mode-specific test command so package resolution is exercised."
+    },
+    {
+      "id": "g26",
+      "summary": "Use the pr-status-triage skill for automated PR or CI analysis.",
+      "tool": "Bash",
+      "trigger_intent": "perform automated PR status or CI failure analysis",
+      "strength": "require-read",
+      "evidence": "Use `$pr-status-triage` for automated analysis"
+    },
+    {
+      "id": "g27",
+      "summary": "Prioritize CI failures over review comments during PR analysis.",
+      "tool": "Bash",
+      "trigger_intent": "choose between investigating CI failures and addressing PR review comments",
+      "strength": "require-read",
+      "evidence": "Prioritize CI failures over review comments"
+    },
+    {
+      "id": "g28",
+      "summary": "For a rust check/build CI failure, run cargo fmt -- --check, then cargo fmt.",
+      "tool": "Bash",
+      "trigger_intent": "triage a rust check or rust build CI failure",
+      "strength": "require-read",
+      "evidence": "`rust check / build` → Run `cargo fmt -- --check`, then `cargo fmt`"
+    },
+    {
+      "id": "g29",
+      "summary": "For a lint/build Prettier failure, run pnpm prettier --write on the affected file.",
+      "tool": "Bash",
+      "trigger_intent": "fix a Prettier error reported by the lint/build CI job",
+      "strength": "require-read",
+      "evidence": "`lint / build` → Run `pnpm prettier --write <file>` for prettier errors"
+    },
+    {
+      "id": "g30",
+      "summary": "For a test failure, run the specific failing test path locally.",
+      "tool": "Bash",
+      "trigger_intent": "reproduce a test failure from CI",
+      "strength": "require-read",
+      "evidence": "test failures → Run the specific failing test path locally"
+    },
+    {
+      "id": "g31",
+      "summary": "Run tests in the development or production script matching the failing mode.",
+      "tool": "Bash",
+      "trigger_intent": "choose a command to reproduce a mode-specific test failure",
+      "strength": "require-read",
+      "evidence": "Run tests in the right mode:"
+    },
+    {
+      "id": "g32",
+      "summary": "Every PR description must end with the NEXT_JS_LLM_PR HTML comment.",
+      "tool": "Bash",
+      "trigger_intent": "create or update a pull request description",
+      "strength": "require-read",
+      "evidence": "When writing PR descriptions, you MUST include the following HTML comment at the bottom of the description:"
+    },
+    {
+      "id": "g33",
+      "summary": "Use DEBUG=next:* when enabling Next.js debug logging.",
+      "tool": "Bash",
+      "trigger_intent": "run Next.js with debug logging enabled",
+      "strength": "inject",
+      "evidence": "Use `DEBUG=next:*` for debug logging"
+    },
+    {
+      "id": "g34",
+      "summary": "Set NEXT_TELEMETRY_DISABLED=1 when testing locally.",
+      "tool": "Bash",
+      "trigger_intent": "run tests locally",
+      "strength": "inject",
+      "evidence": "Use `NEXT_TELEMETRY_DISABLED=1` when testing locally"
+    },
+    {
+      "id": "g35",
+      "summary": "Use NODE_ENV != production only for code that belongs in development bundles but must be eliminated from production bundles.",
+      "tool": "Edit",
+      "trigger_intent": "edit a build-time environment guard for code included in development bundles",
+      "strength": "require-read",
+      "evidence": "code that should exist in dev bundles but be eliminated from prod bundles. This is a build-time check."
+    },
+    {
+      "id": "g36",
+      "summary": "Use __NEXT_DEV_SERVER for code that should run only under next dev, not debug-prerender builds or next start.",
+      "tool": "Edit",
+      "trigger_intent": "edit an environment guard for code that should execute only in the development server",
+      "strength": "require-read",
+      "evidence": "code that should only run with the dev server (`next dev`), not during `next build --debug-prerender` or `next start`."
+    },
+    {
+      "id": "g37",
+      "summary": "Treat environment variable values as sensitive unless they are known test-mode flags.",
+      "tool": "Bash",
+      "trigger_intent": "run a command that accesses, expands, logs, or forwards environment variable values",
+      "strength": "require-read",
+      "evidence": "Always treat environment variable values as sensitive unless they are known test-mode flags."
+    },
+    {
+      "id": "g38",
+      "summary": "Never print or paste secret values into commits or shared logs.",
+      "tool": "Bash",
+      "trigger_intent": "run a command that prints logs, creates a commit, or otherwise emits secret values",
+      "strength": "block",
+      "evidence": "Never print or paste secret values (tokens, API keys, cookies) in chat responses, commits, or shared logs."
+    },
+    {
+      "id": "g39",
+      "summary": "Mirror CI environment names and modes exactly, without putting literal secret values into commands.",
+      "tool": "Bash",
+      "trigger_intent": "construct a local command reproducing CI environment settings",
+      "strength": "require-read",
+      "evidence": "Mirror CI env **names and modes** exactly, but do not inline literal secret values in commands."
+    },
+    {
+      "id": "g40",
+      "summary": "If a required secret is unavailable locally, stop and ask the user instead of inventing placeholder credentials.",
+      "tool": "Bash",
+      "trigger_intent": "run a command that requires a secret missing from the local environment",
+      "strength": "block",
+      "evidence": "If a required secret is missing locally, stop and ask the user rather than inventing placeholder credentials."
+    }
+  ]
+}

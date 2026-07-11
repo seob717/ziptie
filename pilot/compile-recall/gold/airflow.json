@@ -1,0 +1,774 @@
+{
+  "doc": "airflow",
+  "author": "llm:codex-0.144.1(gpt-5)",
+  "rules": [
+    {
+      "id": "g1",
+      "summary": "Use “Dag” in prose, preserving literal code-token spellings.",
+      "tool": "Edit",
+      "trigger_intent": "editing prose that refers to Airflow Dags",
+      "strength": "require-read",
+      "evidence": "Write **Dag** (title case) in all prose."
+    },
+    {
+      "id": "g2",
+      "summary": "Do not spell out Directed Acyclic Graph except in historical context.",
+      "tool": "Edit",
+      "trigger_intent": "writing prose that might expand the Dag acronym",
+      "strength": "require-read",
+      "evidence": "Don't spell out **Directed Acyclic Graph** except for historical context."
+    },
+    {
+      "id": "g3",
+      "summary": "Install prek with uv.",
+      "tool": "Bash",
+      "trigger_intent": "setting up the development environment",
+      "strength": "require-read",
+      "evidence": "Install prek: `uv tool install prek`"
+    },
+    {
+      "id": "g4",
+      "summary": "Enable commit hooks with prek install.",
+      "tool": "Bash",
+      "trigger_intent": "setting up commit hooks",
+      "strength": "require-read",
+      "evidence": "Enable commit hooks: `prek install`"
+    },
+    {
+      "id": "g5",
+      "summary": "Install the Breeze shim using the repository setup script.",
+      "tool": "Bash",
+      "trigger_intent": "installing Breeze on a development machine",
+      "strength": "require-read",
+      "evidence": "Install breeze shim (one-time, per machine): `scripts/tools/setup_breeze`"
+    },
+    {
+      "id": "g6",
+      "summary": "Never run pytest, Python, or Airflow commands directly on the host; use Breeze.",
+      "tool": "Bash",
+      "trigger_intent": "running pytest, python, or airflow commands",
+      "strength": "block",
+      "evidence": "**Never run pytest, python, or airflow commands directly on the host** — always use `breeze`."
+    },
+    {
+      "id": "g7",
+      "summary": "Place temporary scripts under dev/.",
+      "tool": "Write",
+      "trigger_intent": "creating a temporary script",
+      "strength": "require-read",
+      "evidence": "Place temporary scripts in `dev/`"
+    },
+    {
+      "id": "g8",
+      "summary": "Run a single test with the documented uv project pytest command.",
+      "tool": "Bash",
+      "trigger_intent": "running one pytest test method",
+      "strength": "require-read",
+      "evidence": "`uv run --project <PROJECT> pytest path/to/test.py::TestClass::test_method -xvs`"
+    },
+    {
+      "id": "g9",
+      "summary": "Run a test file with the documented uv project pytest command.",
+      "tool": "Bash",
+      "trigger_intent": "running one pytest test file",
+      "strength": "require-read",
+      "evidence": "`uv run --project <PROJECT> pytest path/to/test.py -xvs`"
+    },
+    {
+      "id": "g10",
+      "summary": "Run all tests in a package with the documented uv project command.",
+      "tool": "Bash",
+      "trigger_intent": "running all pytest tests in a package",
+      "strength": "require-read",
+      "evidence": "`uv run --project <PROJECT> pytest path/to/package -xvs`"
+    },
+    {
+      "id": "g11",
+      "summary": "If uv tests lack system dependencies, rerun them with Breeze.",
+      "tool": "Bash",
+      "trigger_intent": "rerunning uv tests after missing-system-dependency failures",
+      "strength": "require-read",
+      "evidence": "**If uv tests fail with missing system dependencies, run the tests with breeze**"
+    },
+    {
+      "id": "g12",
+      "summary": "Run Python scripts with uv and the relevant project.",
+      "tool": "Bash",
+      "trigger_intent": "running a Python script in the repository",
+      "strength": "require-read",
+      "evidence": "`uv run --project <PROJECT> python dev/my_script.py`"
+    },
+    {
+      "id": "g13",
+      "summary": "Run core or provider test suites in parallel with Breeze.",
+      "tool": "Bash",
+      "trigger_intent": "running the core or providers test suite in parallel",
+      "strength": "require-read",
+      "evidence": "`breeze testing <test_group> --run-in-parallel`"
+    },
+    {
+      "id": "g14",
+      "summary": "Use the db-only parallel Breeze command for core/provider database suites.",
+      "tool": "Bash",
+      "trigger_intent": "running only database tests for core or providers in parallel",
+      "strength": "require-read",
+      "evidence": "`breeze testing <test_group> --run-db-tests-only --run-in-parallel`"
+    },
+    {
+      "id": "g15",
+      "summary": "Use the skip-db xdist Breeze command for core/provider non-database suites.",
+      "tool": "Bash",
+      "trigger_intent": "running only non-database tests for core or providers in parallel",
+      "strength": "require-read",
+      "evidence": "`breeze testing <test_group> --skip-db-tests --use-xdist`"
+    },
+    {
+      "id": "g16",
+      "summary": "Use Providers[...] test type for a complete provider suite.",
+      "tool": "Bash",
+      "trigger_intent": "running a complete test suite for one or more providers",
+      "strength": "require-read",
+      "evidence": "`breeze testing providers-tests --test-type \"Providers[PROVIDERS_LIST]\"`"
+    },
+    {
+      "id": "g17",
+      "summary": "Run Helm tests in parallel with xdist.",
+      "tool": "Bash",
+      "trigger_intent": "running Helm tests",
+      "strength": "require-read",
+      "evidence": "`breeze testing helm-tests --use-xdist`"
+    },
+    {
+      "id": "g18",
+      "summary": "Pass kubernetes-version when running Helm tests for a specific Kubernetes version.",
+      "tool": "Bash",
+      "trigger_intent": "running Helm tests for a specific Kubernetes version",
+      "strength": "require-read",
+      "evidence": "`breeze testing helm-tests --use-xdist --kubernetes-version 1.35.0`"
+    },
+    {
+      "id": "g19",
+      "summary": "Pass test-type when running a specific Helm test category.",
+      "tool": "Bash",
+      "trigger_intent": "running a specific Helm test type",
+      "strength": "require-read",
+      "evidence": "`breeze testing helm-tests --use-xdist --test-type <type>`"
+    },
+    {
+      "id": "g20",
+      "summary": "Run other named test suites with breeze testing.",
+      "tool": "Bash",
+      "trigger_intent": "running airflow-ctl, docker-compose, or task-sdk test suites",
+      "strength": "require-read",
+      "evidence": "`breeze testing <test_group>`"
+    },
+    {
+      "id": "g21",
+      "summary": "Run scripts tests using the scripts uv project.",
+      "tool": "Bash",
+      "trigger_intent": "running tests for repository scripts",
+      "strength": "require-read",
+      "evidence": "`uv run --project scripts pytest scripts/tests/ -xvs`"
+    },
+    {
+      "id": "g22",
+      "summary": "Run the Airflow CLI through Breeze.",
+      "tool": "Bash",
+      "trigger_intent": "running an Airflow CLI command",
+      "strength": "require-read",
+      "evidence": "`breeze run airflow dags list`"
+    },
+    {
+      "id": "g23",
+      "summary": "Type-check non-provider projects through their prek mypy hook.",
+      "tool": "Bash",
+      "trigger_intent": "type-checking a non-provider project",
+      "strength": "require-read",
+      "evidence": "`prek run mypy-<project> --all-files`"
+    },
+    {
+      "id": "g24",
+      "summary": "Type-check providers with Breeze mypy.",
+      "tool": "Bash",
+      "trigger_intent": "type-checking provider code",
+      "strength": "require-read",
+      "evidence": "`breeze run mypy path/to/code`"
+    },
+    {
+      "id": "g25",
+      "summary": "Run ruff lint through prek from the target branch.",
+      "tool": "Bash",
+      "trigger_intent": "linting changed files with ruff only",
+      "strength": "require-read",
+      "evidence": "`prek run ruff --from-ref <target_branch>`"
+    },
+    {
+      "id": "g26",
+      "summary": "Run ruff formatting through prek from the target branch.",
+      "tool": "Bash",
+      "trigger_intent": "formatting changed files with ruff only",
+      "strength": "require-read",
+      "evidence": "`prek run ruff-format --from-ref <target_branch>`"
+    },
+    {
+      "id": "g27",
+      "summary": "Run fast static checks through the pre-commit stage.",
+      "tool": "Bash",
+      "trigger_intent": "running regular static checks",
+      "strength": "require-read",
+      "evidence": "`prek run --from-ref <target_branch> --stage pre-commit`"
+    },
+    {
+      "id": "g28",
+      "summary": "Run slower checks through the manual stage.",
+      "tool": "Bash",
+      "trigger_intent": "running manual static checks",
+      "strength": "require-read",
+      "evidence": "`prek run --from-ref <target_branch> --stage manual`"
+    },
+    {
+      "id": "g29",
+      "summary": "Build documentation with Breeze.",
+      "tool": "Bash",
+      "trigger_intent": "building project documentation",
+      "strength": "require-read",
+      "evidence": "`breeze build-docs`"
+    },
+    {
+      "id": "g30",
+      "summary": "Use selective-checks to determine tests from changed files.",
+      "tool": "Bash",
+      "trigger_intent": "determining which tests changed files require",
+      "strength": "require-read",
+      "evidence": "`breeze selective-checks --commit-ref <commit_with_squashed_changes>`"
+    },
+    {
+      "id": "g31",
+      "summary": "Select postgres or mysql backend for integration tests needing those databases.",
+      "tool": "Bash",
+      "trigger_intent": "running an integration test that needs PostgreSQL or MySQL",
+      "strength": "require-read",
+      "evidence": "Use `--backend postgres` or `--backend mysql` for integration tests that need those databases."
+    },
+    {
+      "id": "g32",
+      "summary": "Prune Docker networks if Docker networking fails.",
+      "tool": "Bash",
+      "trigger_intent": "recovering from Docker networking failure",
+      "strength": "require-read",
+      "evidence": "If Docker networking fails, run `docker network prune`."
+    },
+    {
+      "id": "g33",
+      "summary": "Regenerate a conflicted uv.lock by deleting it and running uv lock.",
+      "tool": "Bash",
+      "trigger_intent": "resolving a merge conflict in uv.lock",
+      "strength": "require-read",
+      "evidence": "simply delete it and run `uv lock` to regenerate it"
+    },
+    {
+      "id": "g34",
+      "summary": "Do not make the scheduler execute user code.",
+      "tool": "Edit",
+      "trigger_intent": "editing scheduler execution behavior",
+      "strength": "block",
+      "evidence": "Scheduler reads serialized Dags — **never runs user code**"
+    },
+    {
+      "id": "g35",
+      "summary": "Workers must communicate through the Execution API and never access the metadata DB directly.",
+      "tool": "Edit",
+      "trigger_intent": "editing worker database or API access",
+      "strength": "block",
+      "evidence": "**never access the metadata DB directly**"
+    },
+    {
+      "id": "g36",
+      "summary": "Declare each distribution's required peer distributions.",
+      "tool": "Edit",
+      "trigger_intent": "editing a distribution's dependency declarations",
+      "strength": "require-read",
+      "evidence": "Each of the distributions should declare other needed distributions"
+    },
+    {
+      "id": "g37",
+      "summary": "Do not report documented security-model limitations as new vulnerabilities.",
+      "tool": "Write",
+      "trigger_intent": "writing a security finding or report",
+      "strength": "require-read",
+      "evidence": "should not be reported as new findings"
+    },
+    {
+      "id": "g38",
+      "summary": "Put deployment hardening opportunities in deployment guidance, not code-level findings.",
+      "tool": "Write",
+      "trigger_intent": "writing about deployment hardening during security review",
+      "strength": "require-read",
+      "evidence": "These belong in deployment guidance, not as code-level issues."
+    },
+    {
+      "id": "g39",
+      "summary": "Immediately format and fix-check every created or modified Python file with ruff.",
+      "tool": "Bash",
+      "trigger_intent": "finishing creation or modification of a Python file",
+      "strength": "require-read",
+      "evidence": "Always format and check Python files with ruff immediately after writing or editing them"
+    },
+    {
+      "id": "g40",
+      "summary": "Do not use assert in production code.",
+      "tool": "Edit",
+      "trigger_intent": "editing production code that uses assertions",
+      "strength": "block",
+      "evidence": "No `assert` in production code."
+    },
+    {
+      "id": "g41",
+      "summary": "Add comments only for non-obvious reasoning and avoid narrating or duplicated comments.",
+      "tool": "Edit",
+      "trigger_intent": "adding or editing a code comment",
+      "strength": "inject",
+      "evidence": "Add a comment only when the reasoning is non-obvious"
+    },
+    {
+      "id": "g42",
+      "summary": "Use time.monotonic, not time.time, for durations.",
+      "tool": "Edit",
+      "trigger_intent": "implementing elapsed-time or duration measurement",
+      "strength": "require-read",
+      "evidence": "`time.monotonic()` for durations, not `time.time()`."
+    },
+    {
+      "id": "g43",
+      "summary": "In airflow-core, session-parameter functions must not commit and session must be keyword-only.",
+      "tool": "Edit",
+      "trigger_intent": "editing an airflow-core function with a session parameter",
+      "strength": "require-read",
+      "evidence": "functions with a `session` parameter must not call `session.commit()`. Use keyword-only `session` parameters."
+    },
+    {
+      "id": "g44",
+      "summary": "Keep imports at the top except for circular imports, worker-isolation lazy loading, or TYPE_CHECKING.",
+      "tool": "Edit",
+      "trigger_intent": "adding or moving a Python import",
+      "strength": "require-read",
+      "evidence": "Imports at top of file. Valid exceptions: circular imports, lazy loading for worker isolation, `TYPE_CHECKING` blocks."
+    },
+    {
+      "id": "g45",
+      "summary": "Guard heavy type-only imports with TYPE_CHECKING in multiprocess paths.",
+      "tool": "Edit",
+      "trigger_intent": "adding a heavy type-only import in multi-process code",
+      "strength": "require-read",
+      "evidence": "Guard heavy type-only imports (e.g., `kubernetes.client`) with `TYPE_CHECKING`"
+    },
+    {
+      "id": "g46",
+      "summary": "Raise specific built-in or dedicated exceptions, never add direct AirflowException raises.",
+      "tool": "Edit",
+      "trigger_intent": "adding or modifying exception-raising code",
+      "strength": "block",
+      "evidence": "**Never add new direct `raise AirflowException(...)` usages**"
+    },
+    {
+      "id": "g47",
+      "summary": "Translate domain errors to correct HTTPException statuses at FastAPI route boundaries.",
+      "tool": "Edit",
+      "trigger_intent": "editing an airflow-core core API route handler",
+      "strength": "require-read",
+      "evidence": "Translate domain-layer exceptions to `HTTPException` at FastAPI route boundaries."
+    },
+    {
+      "id": "g48",
+      "summary": "Batch synchronous-loop bulk writes with limits and commits, and index cleanup filters.",
+      "tool": "Edit",
+      "trigger_intent": "adding bulk DELETE or UPDATE in a scheduler loop or synchronous interval task",
+      "strength": "require-read",
+      "evidence": "must be batched with `LIMIT` and committed between batches"
+    },
+    {
+      "id": "g49",
+      "summary": "Name functions and methods with action verbs, except is_/has_ predicates.",
+      "tool": "Edit",
+      "trigger_intent": "naming or renaming a function or method",
+      "strength": "inject",
+      "evidence": "Name functions and methods with action verbs"
+    },
+    {
+      "id": "g50",
+      "summary": "Add an Apache License header to every new file.",
+      "tool": "Write",
+      "trigger_intent": "creating any new repository file",
+      "strength": "require-read",
+      "evidence": "Apache License header on all new files"
+    },
+    {
+      "id": "g51",
+      "summary": "When selective-checks rules change, update its documentation and tests in the same PR.",
+      "tool": "Edit",
+      "trigger_intent": "changing selective_checks.py decision logic",
+      "strength": "require-read",
+      "evidence": "update `dev/breeze/doc/ci/04_selective_checks.md` in the same PR"
+    },
+    {
+      "id": "g52",
+      "summary": "Create newsfragments only for certainly user-facing major or breaking changes in consuming distributions.",
+      "tool": "Write",
+      "trigger_intent": "creating a newsfragment",
+      "strength": "require-read",
+      "evidence": "never create a newsfragment unless you are certain the change is user-facing"
+    },
+    {
+      "id": "g53",
+      "summary": "Never create provider or airflow-ctl newsfragments; update their changelogs directly.",
+      "tool": "Write",
+      "trigger_intent": "creating a newsfragment for providers or airflow-ctl",
+      "strength": "block",
+      "evidence": "**Never add newsfragments for `providers/` or `airflow-ctl/`**"
+    },
+    {
+      "id": "g54",
+      "summary": "Use airflow-core newsfragments for task-sdk changes.",
+      "tool": "Write",
+      "trigger_intent": "creating a user-visible note for task-sdk changes",
+      "strength": "require-read",
+      "evidence": "Changes to `task-sdk/` ship in `airflow-core` — use `airflow-core/newsfragments/`."
+    },
+    {
+      "id": "g55",
+      "summary": "Tests must cover exactly changed behavior and fail without the change.",
+      "tool": "Write",
+      "trigger_intent": "creating tests for a pull request change",
+      "strength": "require-read",
+      "evidence": "Every changed or added behaviour must have a test; every test must fail without the PR's change."
+    },
+    {
+      "id": "g56",
+      "summary": "Use pytest patterns instead of unittest.TestCase.",
+      "tool": "Edit",
+      "trigger_intent": "writing or modifying Python tests",
+      "strength": "require-read",
+      "evidence": "Use pytest patterns, not `unittest.TestCase`."
+    },
+    {
+      "id": "g57",
+      "summary": "Use spec or autospec for mocks.",
+      "tool": "Edit",
+      "trigger_intent": "creating a mock in a test",
+      "strength": "require-read",
+      "evidence": "Use `spec`/`autospec` when mocking."
+    },
+    {
+      "id": "g58",
+      "summary": "Prefer patch decorators and use conf_vars appropriately for config overrides.",
+      "tool": "Edit",
+      "trigger_intent": "patching dependencies or overriding Airflow configuration in tests",
+      "strength": "inject",
+      "evidence": "Prefer `@mock.patch` decorators over `with mock.patch(...)` context managers"
+    },
+    {
+      "id": "g59",
+      "summary": "Use time_machine, never datetime.now, in time-dependent tests.",
+      "tool": "Edit",
+      "trigger_intent": "writing a time-dependent test",
+      "strength": "require-read",
+      "evidence": "Use `time_machine` for time-dependent tests. Do not use `datetime.now()`"
+    },
+    {
+      "id": "g60",
+      "summary": "Parametrize tests that differ only by input and expected output.",
+      "tool": "Edit",
+      "trigger_intent": "writing multiple tests for similar input cases",
+      "strength": "require-read",
+      "evidence": "Use `@pytest.mark.parametrize` for multiple similar inputs"
+    },
+    {
+      "id": "g61",
+      "summary": "Mark database-access tests with pytest.mark.db_test.",
+      "tool": "Edit",
+      "trigger_intent": "writing a test that requires database access",
+      "strength": "require-read",
+      "evidence": "Use `@pytest.mark.db_test` for tests that require database access."
+    },
+    {
+      "id": "g62",
+      "summary": "Place tests in a path mirroring the source path.",
+      "tool": "Write",
+      "trigger_intent": "creating a test file",
+      "strength": "require-read",
+      "evidence": "Test location mirrors source"
+    },
+    {
+      "id": "g63",
+      "summary": "Do not use caplog; test logic instead of log output.",
+      "tool": "Edit",
+      "trigger_intent": "writing a test that checks logs",
+      "strength": "require-read",
+      "evidence": "Do not use `caplog` in tests"
+    },
+    {
+      "id": "g64",
+      "summary": "Generate reports and scratch output under files/, creating it if needed.",
+      "tool": "Write",
+      "trigger_intent": "creating a PR review, report, or scratch-output file",
+      "strength": "require-read",
+      "evidence": "Put any files you generate (PR reviews, reports, scratch output) under `files/`."
+    },
+    {
+      "id": "g65",
+      "summary": "Write commit subjects in imperative plain prose focused on user impact, without Conventional Commit prefixes.",
+      "tool": "Bash",
+      "trigger_intent": "creating a git commit",
+      "strength": "require-read",
+      "evidence": "Use the **imperative mood** and a plain message — do **not** use Conventional Commits prefixes"
+    },
+    {
+      "id": "g66",
+      "summary": "Run prek install before committing code.",
+      "tool": "Bash",
+      "trigger_intent": "committing code changes",
+      "strength": "require-read",
+      "evidence": "**Always run `prek install` before committing any code.**"
+    },
+    {
+      "id": "g67",
+      "summary": "Commit bodies must explain why, never what changed.",
+      "tool": "Bash",
+      "trigger_intent": "writing a git commit message body",
+      "strength": "block",
+      "evidence": "should describe **why** the change is made — the motivation and context — and **never what** the change is"
+    },
+    {
+      "id": "g68",
+      "summary": "Never add the agent as a Co-Authored-By commit author.",
+      "tool": "Bash",
+      "trigger_intent": "creating a git commit message",
+      "strength": "block",
+      "evidence": "NEVER add Co-Authored-By with yourself as co-author of the commit."
+    },
+    {
+      "id": "g69",
+      "summary": "Push branches only to origin, never upstream or main.",
+      "tool": "Bash",
+      "trigger_intent": "pushing a git branch",
+      "strength": "block",
+      "evidence": "Always push branches to `origin`. Never push directly to `upstream` (and never push directly to `main` on either remote)."
+    },
+    {
+      "id": "g70",
+      "summary": "Before remote commands, inspect remotes and stop for user confirmation if naming is wrong.",
+      "tool": "Bash",
+      "trigger_intent": "running any command that uses a git remote",
+      "strength": "require-read",
+      "evidence": "**Before running any remote-based command, run `git remote -v` and verify the names match this convention.**"
+    },
+    {
+      "id": "g71",
+      "summary": "After changing remotes, inspect them again before continuing.",
+      "tool": "Bash",
+      "trigger_intent": "continuing after renaming or adding a git remote",
+      "strength": "require-read",
+      "evidence": "After any rename/add, re-run `git remote -v`"
+    },
+    {
+      "id": "g72",
+      "summary": "Translate stale remote names to upstream when proposing commands and flag stale docs.",
+      "tool": "Bash",
+      "trigger_intent": "proposing or running a documented command using a nonstandard remote name",
+      "strength": "require-read",
+      "evidence": "**translate it to the `upstream` convention**"
+    },
+    {
+      "id": "g73",
+      "summary": "Before issue work, search for existing PRs and avoid a near-identical new PR.",
+      "tool": "Bash",
+      "trigger_intent": "starting work on an issue or creating a pull request for it",
+      "strength": "require-read",
+      "evidence": "Before working on an issue, check for open PRs already addressing it"
+    },
+    {
+      "id": "g74",
+      "summary": "Before pushing, self-review the full diff and remove unrelated changes.",
+      "tool": "Bash",
+      "trigger_intent": "pushing a pull request branch",
+      "strength": "require-read",
+      "evidence": "Review the full diff (`git diff main...HEAD`)"
+    },
+    {
+      "id": "g75",
+      "summary": "Before pushing, read the code-review instructions and fix every violation.",
+      "tool": "Bash",
+      "trigger_intent": "pushing a pull request branch",
+      "strength": "require-read",
+      "evidence": "Read `.github/instructions/code-review.instructions.md` and check your diff against every rule"
+    },
+    {
+      "id": "g76",
+      "summary": "Before pushing, run and fix fast and manual checks, relevant tests, selective checks, and security review.",
+      "tool": "Bash",
+      "trigger_intent": "pushing a pull request branch",
+      "strength": "require-read",
+      "evidence": "Run relevant individual tests and confirm they pass."
+    },
+    {
+      "id": "g77",
+      "summary": "Before pushing, rebase onto the latest target branch and ask for guidance if conflicts are too complex.",
+      "tool": "Bash",
+      "trigger_intent": "pushing a pull request branch",
+      "strength": "require-read",
+      "evidence": "always rebase your branch onto the latest target branch"
+    },
+    {
+      "id": "g78",
+      "summary": "Open PR creation in the browser with a prefilled body and checked generative-AI disclosure.",
+      "tool": "Bash",
+      "trigger_intent": "creating a pull request",
+      "strength": "require-read",
+      "evidence": "open the PR creation page in the browser with the body pre-filled"
+    },
+    {
+      "id": "g79",
+      "summary": "PR titles must be under 70 characters, imperative, user-impact focused, and not Conventional Commits.",
+      "tool": "Bash",
+      "trigger_intent": "writing a pull request title",
+      "strength": "require-read",
+      "evidence": "keep it short (under 70 chars), in the imperative mood, and focused on user impact"
+    },
+    {
+      "id": "g80",
+      "summary": "PR bodies need a brief description and applicable issue references.",
+      "tool": "Bash",
+      "trigger_intent": "writing a pull request body",
+      "strength": "require-read",
+      "evidence": "Add a brief description of the changes at the top of the body."
+    },
+    {
+      "id": "g81",
+      "summary": "When a fix and PR are imminent, do not open a redundant GitHub issue.",
+      "tool": "Bash",
+      "trigger_intent": "creating a GitHub issue for a problem whose fix will shortly be a PR",
+      "strength": "block",
+      "evidence": "**do not file a GitHub issue first**"
+    },
+    {
+      "id": "g82",
+      "summary": "For workaround or partial-fix PRs, first create a tracking issue and link it in PR and code.",
+      "tool": "Bash",
+      "trigger_intent": "creating a pull request containing a workaround, mitigation, version cap, or partial fix",
+      "strength": "require-read",
+      "evidence": "the deferred work must be captured in a GitHub tracking issue **and** the tracking issue URL must appear as a comment"
+    },
+    {
+      "id": "g83",
+      "summary": "Use a full tracking-issue URL in the code comment, not a bare issue number.",
+      "tool": "Edit",
+      "trigger_intent": "adding a code comment at a workaround site",
+      "strength": "require-read",
+      "evidence": "Use the **full issue URL**, not bare `#NNNNN`"
+    },
+    {
+      "id": "g84",
+      "summary": "Do not promise a future tracking issue; create and link it before PR submission.",
+      "tool": "Edit",
+      "trigger_intent": "writing a PR body or code comment for deferred work",
+      "strength": "block",
+      "evidence": "**Do not** write vague forward-looking phrases like \"will open a tracking issue\""
+    },
+    {
+      "id": "g85",
+      "summary": "Tracking issues must describe the workaround, rationale, follow-up work, and removal criteria.",
+      "tool": "Bash",
+      "trigger_intent": "creating a tracking issue for deferred work",
+      "strength": "require-read",
+      "evidence": "The tracking issue should describe: what the workaround is, why it was chosen, the concrete follow-up work needed"
+    },
+    {
+      "id": "g86",
+      "summary": "If an open PR promises a later issue, create it, comment its URL, and add the URL at the workaround site.",
+      "tool": "Bash",
+      "trigger_intent": "repairing an already-open PR with forward-looking tracking-issue language",
+      "strength": "require-read",
+      "evidence": "open the tracking issue, add a PR comment referencing the issue URL, and push a follow-up commit"
+    },
+    {
+      "id": "g87",
+      "summary": "End every agent-drafted GitHub message with the appropriate attribution footer.",
+      "tool": "Bash",
+      "trigger_intent": "posting an agent-drafted GitHub comment, review, or reply",
+      "strength": "require-read",
+      "evidence": "must end with an attribution footer"
+    },
+    {
+      "id": "g88",
+      "summary": "Use the no-human-review footer unless an actual human approved the exact draft.",
+      "tool": "Bash",
+      "trigger_intent": "posting an agent-drafted GitHub message without prior human approval",
+      "strength": "require-read",
+      "evidence": "Drafted-by: <Agent Name and Version> (no human review before posting)"
+    },
+    {
+      "id": "g89",
+      "summary": "Do not tag individuals unless explicitly authorized or replying to active participants.",
+      "tool": "Bash",
+      "trigger_intent": "posting an agent-authored GitHub message that mentions a person",
+      "strength": "block",
+      "evidence": "AI agents MUST NOT mention or tag individual contributors"
+    },
+    {
+      "id": "g90",
+      "summary": "Populate the apache-magpie snapshot before invoking its framework skills.",
+      "tool": "Bash",
+      "trigger_intent": "invoking a pr-management framework skill in a fresh clone",
+      "strength": "require-read",
+      "evidence": "A fresh clone needs the snapshot populated before any framework skill is invocable."
+    },
+    {
+      "id": "g91",
+      "summary": "Never edit the apache-magpie snapshot directly; put adopter changes in overrides.",
+      "tool": "Edit",
+      "trigger_intent": "modifying an apache-magpie framework workflow",
+      "strength": "block",
+      "evidence": "never edit the snapshot directly"
+    },
+    {
+      "id": "g92",
+      "summary": "Use magpie-pr-management-code-review for PR reviews, with inline findings unless opted out.",
+      "tool": "Bash",
+      "trigger_intent": "reviewing a pull request with apache-magpie installed",
+      "strength": "require-read",
+      "evidence": "use the `magpie-pr-management-code-review` skill for PR code review"
+    },
+    {
+      "id": "g93",
+      "summary": "Ask before large cross-package refactors, broad-impact dependencies, or destructive data/migrations.",
+      "tool": "Edit",
+      "trigger_intent": "starting a large cross-package refactor, broad dependency change, or destructive data/migration change",
+      "strength": "require-read",
+      "evidence": "**Ask first**"
+    },
+    {
+      "id": "g94",
+      "summary": "Never commit secrets, credentials, or tokens.",
+      "tool": "Bash",
+      "trigger_intent": "committing changes containing sensitive values",
+      "strength": "block",
+      "evidence": "Commit secrets, credentials, or tokens."
+    },
+    {
+      "id": "g95",
+      "summary": "Never hand-edit generated files when a generation workflow exists.",
+      "tool": "Edit",
+      "trigger_intent": "editing a generated file with an available generation workflow",
+      "strength": "block",
+      "evidence": "Edit generated files by hand when a generation workflow exists."
+    },
+    {
+      "id": "g96",
+      "summary": "Never use destructive git operations unless explicitly requested.",
+      "tool": "Bash",
+      "trigger_intent": "running a destructive git operation",
+      "strength": "block",
+      "evidence": "Use destructive git operations unless explicitly requested."
+    }
+  ]
+}

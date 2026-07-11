@@ -1,0 +1,182 @@
+{
+  "doc": "supabase",
+  "author": "llm:codex-0.144.1(GPT-5)",
+  "rules": [
+    {
+      "id": "g1",
+      "summary": "Use pnpm 10 for monorepo package and script commands.",
+      "tool": "Bash",
+      "trigger_intent": "run package-management or monorepo script commands",
+      "strength": "require-read",
+      "evidence": "pnpm 10 + Turborepo monorepo."
+    },
+    {
+      "id": "g2",
+      "summary": "Use Node.js 22 or newer for repository commands.",
+      "tool": "Bash",
+      "trigger_intent": "run Node.js-based repository commands",
+      "strength": "require-read",
+      "evidence": "Requires Node >= 22."
+    },
+    {
+      "id": "g3",
+      "summary": "Install dependencies with pnpm install.",
+      "tool": "Bash",
+      "trigger_intent": "install repository dependencies",
+      "strength": "require-read",
+      "evidence": "pnpm install                          # install dependencies"
+    },
+    {
+      "id": "g4",
+      "summary": "Start the Studio development server with pnpm dev:studio.",
+      "tool": "Bash",
+      "trigger_intent": "run the Studio development server",
+      "strength": "require-read",
+      "evidence": "pnpm dev:studio                       # run Studio dev server"
+    },
+    {
+      "id": "g5",
+      "summary": "Run Studio unit tests with pnpm test:studio.",
+      "tool": "Bash",
+      "trigger_intent": "run Studio unit tests",
+      "strength": "require-read",
+      "evidence": "pnpm test:studio                      # run Studio unit tests (vitest)"
+    },
+    {
+      "id": "g6",
+      "summary": "Run Studio end-to-end tests through the e2e/studio prefix.",
+      "tool": "Bash",
+      "trigger_intent": "run Studio end-to-end tests",
+      "strength": "require-read",
+      "evidence": "pnpm --prefix e2e/studio run e2e       # run Studio E2E tests (playwright)"
+    },
+    {
+      "id": "g7",
+      "summary": "Build Studio with the studio filter.",
+      "tool": "Bash",
+      "trigger_intent": "build Studio",
+      "strength": "require-read",
+      "evidence": "pnpm build --filter=studio             # build Studio"
+    },
+    {
+      "id": "g8",
+      "summary": "Lint Studio with the studio filter.",
+      "tool": "Bash",
+      "trigger_intent": "lint Studio",
+      "strength": "require-read",
+      "evidence": "pnpm lint --filter=studio              # lint Studio"
+    },
+    {
+      "id": "g9",
+      "summary": "Type-check all packages with pnpm typecheck.",
+      "tool": "Bash",
+      "trigger_intent": "type-check repository packages",
+      "strength": "require-read",
+      "evidence": "pnpm typecheck                        # typecheck all packages"
+    },
+    {
+      "id": "g10",
+      "summary": "Import shared UI components from the ui package.",
+      "tool": "Edit",
+      "trigger_intent": "add or change an import of a shared UI component",
+      "strength": "require-read",
+      "evidence": "import from 'ui'"
+    },
+    {
+      "id": "g11",
+      "summary": "Use _Shadcn_-suffixed variants for form primitives.",
+      "tool": "Edit",
+      "trigger_intent": "add or change usage of a form primitive",
+      "strength": "require-read",
+      "evidence": "use `_Shadcn_` suffixed variants for form primitives."
+    },
+    {
+      "id": "g12",
+      "summary": "Check packages/ui/index.tsx before creating a UI primitive.",
+      "tool": "Write",
+      "trigger_intent": "create a new UI primitive",
+      "strength": "require-read",
+      "evidence": "Check `packages/ui/index.tsx` before creating new primitives."
+    },
+    {
+      "id": "g13",
+      "summary": "Use only Tailwind for styling.",
+      "tool": "Edit",
+      "trigger_intent": "add or change component styling",
+      "strength": "block",
+      "evidence": "Tailwind only"
+    },
+    {
+      "id": "g14",
+      "summary": "Use semantic design tokens in Tailwind styles.",
+      "tool": "Edit",
+      "trigger_intent": "add or change Tailwind color styling",
+      "strength": "inject",
+      "evidence": "semantic tokens (`bg-muted`, `text-foreground-light`)"
+    },
+    {
+      "id": "g15",
+      "summary": "Do not use hardcoded colors.",
+      "tool": "Edit",
+      "trigger_intent": "add or change a color value in styling",
+      "strength": "block",
+      "evidence": "no hardcoded colors."
+    },
+    {
+      "id": "g16",
+      "summary": "Write user-facing and repository language in U.S. English.",
+      "tool": "Edit",
+      "trigger_intent": "edit English-language text in the repository",
+      "strength": "inject",
+      "evidence": "Use U.S. English everywhere."
+    },
+    {
+      "id": "g17",
+      "summary": "Use the shared Studio shortcut registry and primitives for repeated UI actions.",
+      "tool": "Edit",
+      "trigger_intent": "add or change a repeated Studio UI action",
+      "strength": "require-read",
+      "evidence": "use the shared shortcut registry and primitives in `apps/studio/state/shortcuts/` and `apps/studio/components/ui/Shortcut*.tsx`."
+    },
+    {
+      "id": "g18",
+      "summary": "Prefer registered, discoverable shortcuts to one-off keyboard listeners.",
+      "tool": "Edit",
+      "trigger_intent": "add or change keyboard shortcut handling in Studio",
+      "strength": "inject",
+      "evidence": "Prefer registered, discoverable shortcuts over one-off keyboard listeners"
+    },
+    {
+      "id": "g19",
+      "summary": "Reserve G-then-key shortcut chords for navigation.",
+      "tool": "Edit",
+      "trigger_intent": "add or change a G-then-key Studio shortcut chord",
+      "strength": "require-read",
+      "evidence": "keep `G then ...` chords for navigation."
+    },
+    {
+      "id": "g20",
+      "summary": "Co-locate Studio sub-components with their parent.",
+      "tool": "Write",
+      "trigger_intent": "create a Studio sub-component file",
+      "strength": "require-read",
+      "evidence": "Co-locate sub-components with parent."
+    },
+    {
+      "id": "g21",
+      "summary": "Avoid creating barrel re-export files.",
+      "tool": "Write",
+      "trigger_intent": "create a barrel re-export file",
+      "strength": "inject",
+      "evidence": "Avoid barrel re-export files."
+    },
+    {
+      "id": "g22",
+      "summary": "Consult the studio-* skills for detailed Studio conventions.",
+      "tool": "Bash",
+      "trigger_intent": "begin implementation work in Studio that needs detailed conventions",
+      "strength": "require-read",
+      "evidence": "See studio-* skills for detailed studio conventions."
+    }
+  ]
+}

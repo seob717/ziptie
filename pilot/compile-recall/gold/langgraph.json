@@ -1,0 +1,54 @@
+{
+  "doc": "langgraph",
+  "author": "llm:codex-0.144.1(GPT-5)",
+  "rules": [
+    {
+      "id": "g1",
+      "summary": "After modifying code in a library, run `make format` from that library's directory before creating a pull request.",
+      "tool": "Bash",
+      "trigger_intent": "formatting a library's modified code before creating a pull request",
+      "strength": "require-read",
+      "evidence": "When you modify code in any library, run the following commands in that library's directory before creating a pull request:\n\n- `make format` – run code formatters"
+    },
+    {
+      "id": "g2",
+      "summary": "After modifying code in a library, run `make lint` from that library's directory before creating a pull request.",
+      "tool": "Bash",
+      "trigger_intent": "linting a library's modified code before creating a pull request",
+      "strength": "require-read",
+      "evidence": "When you modify code in any library, run the following commands in that library's directory before creating a pull request:\n\n- `make lint` – run the linter"
+    },
+    {
+      "id": "g3",
+      "summary": "After modifying code in a library, run `make test` from that library's directory before creating a pull request.",
+      "tool": "Bash",
+      "trigger_intent": "testing a library's modified code before creating a pull request",
+      "strength": "require-read",
+      "evidence": "When you modify code in any library, run the following commands in that library's directory before creating a pull request:\n\n- `make test` – execute the test suite"
+    },
+    {
+      "id": "g4",
+      "summary": "Possibly action-bindable: use the `TEST` variable to select a particular test file or pass additional pytest options to `make test`.",
+      "tool": "Bash",
+      "trigger_intent": "running a particular test file or passing additional pytest options with make test",
+      "strength": "inject",
+      "evidence": "To run a particular test file or to pass additional pytest options you can specify the `TEST` variable"
+    },
+    {
+      "id": "g5",
+      "summary": "Do not use Sphinx-style double backticks for inline code references in docstrings or comments.",
+      "tool": "Edit",
+      "trigger_intent": "adding or changing an inline code reference in a docstring or comment using double backticks",
+      "strength": "block",
+      "evidence": "Do NOT use Sphinx-style double backtick formatting (` ``code`` `)."
+    },
+    {
+      "id": "g6",
+      "summary": "Use single backticks for inline code references in docstrings and comments.",
+      "tool": "Edit",
+      "trigger_intent": "adding or changing an inline code reference in a docstring or comment",
+      "strength": "require-read",
+      "evidence": "Use single backticks (`` `code` ``) for inline code references in docstrings and comments."
+    }
+  ]
+}
