@@ -6,8 +6,10 @@
 stdlib 전용.
 
 사용: python3 pilot/grade_compile_recall.py
+     [--matches-dir DIR] [--outputs-dir DIR]  # v2 재측정용, 기본값은 v1 경로
 """
 
+import argparse
 import json
 import sys
 from collections import Counter
@@ -105,6 +107,13 @@ def grade_doc(doc: str, errors: list) -> dict | None:
 
 
 def main() -> int:
+    global MATCHES_DIR, OUTPUTS_DIR
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--matches-dir", type=Path, default=MATCHES_DIR)
+    parser.add_argument("--outputs-dir", type=Path, default=OUTPUTS_DIR)
+    args = parser.parse_args()
+    MATCHES_DIR, OUTPUTS_DIR = args.matches_dir, args.outputs_dir
+
     if not GOLD_DIR.exists():
         print(f"gold 디렉터리 없음: {GOLD_DIR} — DESIGN-compile-recall.md §3부터 진행")
         return 1

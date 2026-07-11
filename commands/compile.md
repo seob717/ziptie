@@ -15,6 +15,8 @@ Compile rules with the following procedure.
 From each document, extract only rules that "are effective when recalled right before a specific action." Criteria:
 - Can it be tied to a specific tool call? (creating a PR, committing, editing a specific file, running a specific command)
 - General guidance that can't be tied to an action (tone, coding style at large) is **not a compilation target** — skip it and report it at the end as a list of "uncompilable rules."
+- **Tables, fenced code blocks, and list items are rule candidates on equal footing with prose.** A constraint doesn't stop being a rule because it sits in a table row or next to a code sample. But distinguish usage catalogs from constraints: a commands table that only lists what you *can* run is documentation, not a rule — it becomes a rule only when the document attaches an obligation, prohibition, or ordering to the action (must / never / before / after / only).
+- **One rule per trigger**: when one sentence bundles requirements aimed at *different* triggers ("run X after editing A; run Y before pushing"), split them so each rule carries its own trigger and strength. Do NOT split an enumeration that shares one trigger, one strength, and one source ("run `make format`, `make lint`, `make test` before creating a PR" stays a single rule) — same-trigger copies would deliver the same source document multiple times for nothing.
 
 ## 3. Infer triggers
 For each rule, set a `tool` (Bash|Edit|Write) and a `pattern` (Python regex). Examples:
