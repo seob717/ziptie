@@ -6,3 +6,4 @@ pilot/runs/
 .state/
 /docs/
 pilot/compile-bench/corpus/
+pilot/compile-wild/corpus/
