@@ -1,0 +1,28 @@
+{
+  "doc": "langgraph.es",
+  "rules": [
+    {
+      "name": "pre-pr-lib-checks",
+      "tool": "Bash",
+      "pattern": "gh\\s+pr\\s+create",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "ejecuta los siguientes comandos en el directorio de esa biblioteca antes de crear una solicitud de incorporación de cambios: `make format` ... `make lint` ... `make test`"
+    },
+    {
+      "name": "no-sphinx-double-backtick",
+      "tool": "Edit",
+      "pattern": "``[^`\\n]+``",
+      "field": "new_string",
+      "path": "\\.py$",
+      "strength": "require-read",
+      "evidence": "NO uses el formato de doble acento grave propio de Sphinx (` ``code`` `). Usa acentos graves simples (`` `code` ``) para las referencias a código en línea dentro de docstrings y comentarios."
+    }
+  ],
+  "uncompilable": [
+    "라이브러리별 개요(checkpoint, checkpoint-postgres, cli, langgraph 등) — 단순 정보 나열, 특정 액션과 연결되지 않음",
+    "의존성 맵 다이어그램 및 '한 라이브러리 변경이 의존하는 라이브러리들에 영향을 줄 수 있다'는 설명 — 의무·금지·순서가 없는 일반 안내",
+    "TEST=path/to/test.py make test 로 특정 테스트 파일·pytest 옵션을 지정하는 방법 안내 — 사용법 문서일 뿐 의무가 부여되지 않음"
+  ]
+}

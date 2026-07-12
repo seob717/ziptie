@@ -1,0 +1,41 @@
+{
+  "doc": "langgraph",
+  "lang": "ko",
+  "judge": "llm:codex-0.144.1(GPT-5)",
+  "matches": [
+    {
+      "gold_id": "g1",
+      "output_rule": "lib-pr-precommands",
+      "rationale": "The Bash rule is triggered when creating a pull request after modifying a library and requires consulting the library pre-command instruction. This is the same pre-PR action context as running make format, although the extracted evidence omits the actual make format command (and the sibling lint/test commands); under the partial-coverage rule it is assigned to this single closest gold rule only."
+    },
+    {
+      "gold_id": "g5",
+      "output_rule": "no-sphinx-double-backtick",
+      "rationale": "The Edit rule targets double-backtick inline-code text in Python source, and its Korean evidence explicitly prohibits Sphinx-style double backticks in docstrings and comments, matching the gold trigger."
+    }
+  ],
+  "misses": [
+    {
+      "gold_id": "g2",
+      "category": "structure",
+      "note": "The compiler collapsed the shared pre-PR list into lib-pr-precommands. That extracted rule is already consumed by g1 under the 1:1 constraint, and there is no separate rule targeting make lint."
+    },
+    {
+      "gold_id": "g3",
+      "category": "structure",
+      "note": "The compiler collapsed the shared pre-PR list into lib-pr-precommands. That extracted rule is already consumed by g1 under the 1:1 constraint, and there is no separate rule targeting make test."
+    },
+    {
+      "gold_id": "g4",
+      "category": "other",
+      "note": "No extracted Bash rule targets setting the TEST variable to select a test file or pass pytest options."
+    },
+    {
+      "gold_id": "g6",
+      "category": "structure",
+      "note": "The single-backtick requirement was merged into no-sphinx-double-backtick's evidence. That extracted rule is already consumed by the closer prohibition rule g5 under the 1:1 constraint, leaving no separate Edit rule for using single backticks."
+    }
+  ],
+  "unmatched_extracted": [],
+  "gold_amendments": []
+}

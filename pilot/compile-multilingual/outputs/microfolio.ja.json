@@ -1,0 +1,23 @@
+{
+  "doc": "microfolio.ja",
+  "rules": [
+    {
+      "name": "project-index-frontmatter-schema",
+      "tool": "Write",
+      "pattern": "content/projects/[^/]+/index\\.md$",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "coordinates: [latitude, longitude]  # For map display / type: 'architecture'  # Used for filtering / featured: true  # Shows on homepage"
+    }
+  ],
+  "uncompilable": [
+    "Dev commands table (pnpm dev/build/deploy/preview/lint/format/optimize-images/clean-images) is a usage catalog with no attached obligation, prohibition, or ordering",
+    "Package manager pinned to pnpm 9.12.0 and Node.js 20+ requirement is environment documentation, not tied to a specific tool call",
+    "Custom component 'Ak' prefix naming convention is a general coding-style/naming rule not scoped to a specific location or enforceable action",
+    "Content system directory layout and server-side data-loading architecture (+page.server.js files, projects.js loader) is descriptive documentation, not an actionable rule",
+    "Styling conventions (Tailwind 4 config, theme.css custom properties, dark mode via prefers-color-scheme, IBM Plex Sans font) are general style guidance",
+    "i18n conventions (locale files under src/lib/locales, default locale in config, RTL auto-detection) are descriptive, not obligation-bound",
+    "Build/deploy pipeline description (adapter-static output, vite-plugin-static-copy content copy at build time only, CUSTOM_DOMAIN env var, prerender/trailingSlash settings) documents existing config rather than prescribing an action to take"
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "doc": "langgraph",
+  "lang": "ko",
+  "judge": "llm:codex-0.144.1(GPT-5)",
+  "matches": [
+    {
+      "gold_id": "g1",
+      "output_rule": "lib-pr-precommands",
+      "rationale": "The Bash rule triggers on pull-request creation after library code changes and requires reading the library pre-command guidance, so it covers the same pre-PR formatting obligation. Its extracted pattern/evidence does not specifically identify `make format`, and the same umbrella rule also covers linting and testing; under the 1:1 rule it is assigned only to g1, with those command-specific clauses omitted."
+    },
+    {
+      "gold_id": "g5",
+      "output_rule": "no-sphinx-double-backtick",
+      "rationale": "The Edit rule detects Sphinx-style double-backtick inline-code text in Python edits, exactly targeting the prohibited formatting in docstrings and comments. Its path/pattern approximation does not itself distinguish those syntactic contexts, but the evidence states the same target."
+    }
+  ],
+  "misses": [
+    {
+      "gold_id": "g2",
+      "category": "structure",
+      "note": "The only library pre-PR Bash extraction is the umbrella rule `lib-pr-precommands`, already consumed by the closest available 1:1 match; no separate extracted rule targets `make lint`."
+    },
+    {
+      "gold_id": "g3",
+      "category": "structure",
+      "note": "The only library pre-PR Bash extraction is the umbrella rule `lib-pr-precommands`, already consumed by the closest available 1:1 match; no separate extracted rule targets `make test`."
+    },
+    {
+      "gold_id": "g4",
+      "category": "structure",
+      "note": "No extracted Bash rule targets use of the `TEST` variable to select a test file or pass additional pytest arguments."
+    },
+    {
+      "gold_id": "g6",
+      "category": "structure",
+      "note": "The sole Edit extraction combines the double-backtick prohibition with the single-backtick recommendation and is already matched to the more direct double-backtick rule g5; 1:1 matching leaves no distinct extracted rule for the positive single-backtick requirement."
+    }
+  ],
+  "unmatched_extracted": [],
+  "gold_amendments": []
+}

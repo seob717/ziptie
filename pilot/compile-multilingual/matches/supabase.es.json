@@ -1,0 +1,121 @@
+{
+  "doc": "supabase.es",
+  "lang": "es",
+  "judge": "llm:codex-0.144.1(GPT-5)",
+  "matches": [
+    {
+      "gold_id": "g10",
+      "output_rule": "ui-import-shadcn-suffix",
+      "rationale": "The Edit trigger matches imports from the shared 'ui' package. The extracted evidence also mentions _Shadcn_ form variants, but the single rule is assigned to the closer, pattern-bound import rule; that additional clause cannot separately match g11 under the 1:1 rule."
+    },
+    {
+      "gold_id": "g12",
+      "output_rule": "consult-ui-index-before-new-component",
+      "rationale": "The Write rule targets creation of files under packages/ui, and its evidence explicitly requires consulting packages/ui/index.tsx before creating a new primitive."
+    },
+    {
+      "gold_id": "g15",
+      "output_rule": "no-hardcoded-colors",
+      "rationale": "The Edit trigger detects literal CSS color values and the evidence prohibits hardcoded colors. Its broader evidence also mentions Tailwind and semantic tokens, but its actionable pattern is specifically the hardcoded-color prohibition."
+    },
+    {
+      "gold_id": "g18",
+      "output_rule": "studio-shortcuts-prefer-registry",
+      "rationale": "The Edit rule targets Studio keyboard-listener and shortcut APIs, and its evidence directs authors to prefer registered, discoverable shortcuts over one-off listeners."
+    },
+    {
+      "gold_id": "g20",
+      "output_rule": "studio-colocate-subcomponents",
+      "rationale": "The Write rule targets Studio component files and its evidence requires sub-components to be co-located with their parent."
+    },
+    {
+      "gold_id": "g21",
+      "output_rule": "studio-avoid-barrel-files",
+      "rationale": "The Write trigger targets Studio index files and its evidence explicitly says to avoid barrel re-export files."
+    }
+  ],
+  "misses": [
+    {
+      "gold_id": "g1",
+      "category": "implicit",
+      "note": "No Bash rule was extracted for using pnpm 10 for package-management or monorepo script commands."
+    },
+    {
+      "gold_id": "g2",
+      "category": "implicit",
+      "note": "No Bash rule was extracted for the Node.js >= 22 repository-command requirement."
+    },
+    {
+      "gold_id": "g3",
+      "category": "structure",
+      "note": "The dependency-install command appears in a fenced command list, but no Bash rule was extracted for pnpm install."
+    },
+    {
+      "gold_id": "g4",
+      "category": "structure",
+      "note": "The Studio development-server command appears in a fenced command list, but no Bash rule was extracted for pnpm dev:studio."
+    },
+    {
+      "gold_id": "g5",
+      "category": "structure",
+      "note": "The Studio unit-test command appears in a fenced command list, but no Bash rule was extracted for pnpm test:studio."
+    },
+    {
+      "gold_id": "g6",
+      "category": "structure",
+      "note": "The Studio E2E command appears in a fenced command list, but no Bash rule was extracted for the e2e/studio prefix invocation."
+    },
+    {
+      "gold_id": "g7",
+      "category": "structure",
+      "note": "The Studio build command appears in a fenced command list, but no Bash rule was extracted for the studio-filtered build."
+    },
+    {
+      "gold_id": "g8",
+      "category": "structure",
+      "note": "The Studio lint command appears in a fenced command list, but no Bash rule was extracted for the studio-filtered lint."
+    },
+    {
+      "gold_id": "g9",
+      "category": "structure",
+      "note": "The repository type-check command appears in a fenced command list, but no Bash rule was extracted for pnpm typecheck."
+    },
+    {
+      "gold_id": "g11",
+      "category": "structure",
+      "note": "The _Shadcn_ form-primitive clause was folded into ui-import-shadcn-suffix, whose actual Edit trigger is an import-from-'ui' pattern and is already assigned to g10; 1:1 matching leaves no separate rule for form-primitive usage."
+    },
+    {
+      "gold_id": "g13",
+      "category": "structure",
+      "note": "The Tailwind-only clause was folded into no-hardcoded-colors, whose Edit trigger only detects literal color values and is assigned to g15; there is no separate styling trigger for enforcing Tailwind generally."
+    },
+    {
+      "gold_id": "g14",
+      "category": "structure",
+      "note": "The semantic-token clause was folded into no-hardcoded-colors, whose Edit trigger only detects literal color values and is assigned to g15; there is no separate trigger for changes to Tailwind color styling."
+    },
+    {
+      "gold_id": "g16",
+      "category": "other",
+      "note": "Compiler-reported uncompilable entry: \"Usa inglés estadounidense en todas partes — convención general de idioma/estilo, no ligada a una acción concreta.\""
+    },
+    {
+      "gold_id": "g17",
+      "category": "structure",
+      "note": "The compound Studio-shortcuts paragraph yielded only a keyboard-listener trigger matched to g18; no extracted Edit rule targets repeated UI actions or requires both the shared registry and Shortcut primitives."
+    },
+    {
+      "gold_id": "g19",
+      "category": "structure",
+      "note": "The G-then-key navigation reservation is a separate clause in the compound shortcuts paragraph, but no extracted Edit trigger targets G-then-key chords."
+    },
+    {
+      "gold_id": "g22",
+      "category": "other",
+      "note": "Compiler-reported uncompilable entry: \"Consulta las skills studio-* para conocer en detalle las convenciones de Studio — referencia cruzada a otra documentación, no es una regla accionable en sí misma.\""
+    }
+  ],
+  "unmatched_extracted": [],
+  "gold_amendments": []
+}

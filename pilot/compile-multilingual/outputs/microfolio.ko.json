@@ -1,0 +1,17 @@
+{
+  "doc": "microfolio.ko",
+  "rules": [],
+  "uncompilable": [
+    "프로젝트 개요(SvelteKit 2, Svelte 5, Tailwind CSS 4 기반 정적 포트폴리오 생성기, 파일 기반 CMS) — 특정 액션에 결부되지 않는 배경 설명",
+    "개발 명령어 표(pnpm dev/build/deploy/preview/lint/format/optimize-images/clean-images) — 의무·순서 표현 없이 사용 가능한 명령을 나열한 카탈로그",
+    "패키지 매니저(pnpm 9.12.0 고정) 및 Node.js 20+ 요구사항 — 프로젝트 환경 정보이며 특정 tool call 트리거에 결부되지 않음",
+    "콘텐츠 시스템 구조(content/projects/{slug}/ 하위 파일 구성) — 디렉터리 구조 설명, 의무 표현 없음",
+    "데이터 로딩 아키텍처(+page.server.js 각 라우트의 역할) — 코드 동작 설명, 액션 트리거 없음",
+    "주요 유틸리티 함수 설명(getBasePath, loadProjects, imageMetadata 등) — API 문서, 의무 표현 없음",
+    "스타일링 구성(Tailwind CSS 4, theme.css, 다크모드, 폰트) — 일반 스타일 설명, 코딩 스타일 전반이라 컴파일 대상 아님",
+    "컴포넌트 명명 규칙(Ak 접두사) 서술 — 강제 표현 없이 현황 설명",
+    "빌드 및 배포 구성(adapter-static, svelte.config.js 프리렌더링, vite-plugin-static-copy, base path 로직) — 빌드 시스템 동작 설명, 액션 의무 없음",
+    "국제화 설정 설명(locales, siteConfig.locale, RTL 지원) — 구성 설명, 의무 표현 없음",
+    "프로젝트 메타데이터 YAML 스키마 블록 — 필드를 나열하고 주석으로 설명할 뿐 '반드시 이 스키마를 따라야 한다'는 명시적 의무·금지 표현이 없어 문서화 성격의 카탈로그로 판단"
+  ]
+}

@@ -1,0 +1,284 @@
+{
+  "doc": "nextjs.ja",
+  "rules": [
+    {
+      "name": "read-readme-before-edit",
+      "tool": "Edit",
+      "pattern": "^(packages|turbopack|crates)/",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "対象ファイルのディレクトリまでのパス上（対象ディレクトリを含む）にあるすべての `README.md` ファイルを読んでください"
+    },
+    {
+      "name": "read-readme-before-write",
+      "tool": "Write",
+      "pattern": "^(packages|turbopack|crates)/",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "編集または作成する前に...すべての `README.md` ファイルを読んでください"
+    },
+    {
+      "name": "start-dev-watch-before-editing-source",
+      "tool": "Edit",
+      "pattern": "^(packages/next/src|test)/.*\\.(ts|tsx|js|jsx)$",
+      "field": null,
+      "path": null,
+      "strength": "inject",
+      "evidence": "編集を始める前に別のターミナルセッションで `pnpm --filter=next dev` を起動してください（すでに実行中の場合を除く）"
+    },
+    {
+      "name": "rebuild-all-after-branch-switch",
+      "tool": "Bash",
+      "pattern": "git(\\s+-\\S+(\\s+\\S+)?)*\\s+(checkout|switch)",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "ブランチを切り替えた後は、必ず完全なブートストラップビルドを実行してください"
+    },
+    {
+      "name": "use-new-test-for-new-tests",
+      "tool": "Write",
+      "pattern": "^test/.*\\.(ts|tsx|js)$",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "テストの生成には `pnpm new-test` の使用が必須です。"
+    },
+    {
+      "name": "save-test-output-before-analyzing",
+      "tool": "Bash",
+      "pattern": "pnpm\\s+(test-dev-turbo|test-dev-webpack|test-start-turbo|test-start-webpack|test-unit)",
+      "field": null,
+      "path": null,
+      "strength": "inject",
+      "evidence": "同じテストスイートを異なる grep フィルターで再実行してはいけません。出力を一度ファイルに保存してから、そのファイルを読み取ります。"
+    },
+    {
+      "name": "save-build-output-before-analyzing",
+      "tool": "Bash",
+      "pattern": "pnpm\\s+(build(-all)?|--filter=next\\s+build)",
+      "field": null,
+      "path": null,
+      "strength": "inject",
+      "evidence": "一度ファイルに保存してから分析する。例: `pnpm build 2>&1 | tee /tmp/build.log`"
+    },
+    {
+      "name": "save-external-api-output-before-analyzing",
+      "tool": "Bash",
+      "pattern": "\\b(gh|curl)\\b",
+      "field": null,
+      "path": null,
+      "strength": "inject",
+      "evidence": "異なる観点から分析するために、同じ API データを再取得してはいけない"
+    },
+    {
+      "name": "no-check-use-retry-in-tests",
+      "tool": "Edit",
+      "pattern": "\\bcheck\\(",
+      "field": "new_string",
+      "path": "test/.*\\.(ts|tsx)$",
+      "strength": "require-read",
+      "evidence": "`check()` は非推奨なので使用してはいけない。代わりに `retry()` と `expect()` を使用する"
+    },
+    {
+      "name": "no-settimeout-use-retry-in-tests",
+      "tool": "Edit",
+      "pattern": "setTimeout\\(",
+      "field": "new_string",
+      "path": "test/.*\\.(ts|tsx)$",
+      "strength": "require-read",
+      "evidence": "待機には `setTimeout` ではなく、`next-test-utils` の `retry()` を使用する"
+    },
+    {
+      "name": "prefer-fixture-dir-over-inline-files",
+      "tool": "Edit",
+      "pattern": "files:\\s*\\{",
+      "field": "new_string",
+      "path": "test/.*\\.(ts|tsx)$",
+      "strength": "inject",
+      "evidence": "インラインの `files` オブジェクトより、実際のフィクスチャディレクトリを優先する"
+    },
+    {
+      "name": "pr-description-requires-llm-marker",
+      "tool": "Bash",
+      "pattern": "gh\\s+pr\\s+create",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "説明の末尾に次の HTML コメントを必ず含めなければなりません。`<!-- NEXT_JS_LLM_PR -->`"
+    },
+    {
+      "name": "no-claude-footer-in-commit",
+      "tool": "Bash",
+      "pattern": "git(\\s+-\\S+(\\s+\\S+)?)*\\s+commit",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "コミットや PR に「Generated with Claude Code」または co-author フッターを追加してはいけない"
+    },
+    {
+      "name": "no-claude-footer-in-pr",
+      "tool": "Bash",
+      "pattern": "gh\\s+pr\\s+create",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "コミットや PR に「Generated with Claude Code」または co-author フッターを追加してはいけない"
+    },
+    {
+      "name": "no-gh-pr-ready",
+      "tool": "Bash",
+      "pattern": "gh\\s+pr\\s+ready",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "PR を「ready for review」にしてはいけない（`gh pr ready`）。ドラフトのままにし、いつレビュー可能にするかはユーザーの判断に委ねる"
+    },
+    {
+      "name": "no-secret-values-in-commit",
+      "tool": "Bash",
+      "pattern": "git(\\s+-\\S+(\\s+\\S+)?)*\\s+commit",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "シークレット値（トークン、API キー、Cookie）を、チャットの応答、コミット、共有ログに表示したり貼り付けたりしてはいけません。"
+    },
+    {
+      "name": "no-secret-files-in-commit",
+      "tool": "Bash",
+      "pattern": "git(\\s+-\\S+(\\s+\\S+)?)*\\s+commit",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "ローカルのシークレットファイルをコミットしてはいけません。"
+    },
+    {
+      "name": "no-literal-secrets-in-remote-url-switch",
+      "tool": "Bash",
+      "pattern": "git(\\s+-\\S+(\\s+\\S+)?)*\\s+remote\\s+set-url",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "ユーザーから明示的に依頼されない限り、リモートを HTTPS に切り替えたり、リモート URL を変更したり...してはいけません。"
+    },
+    {
+      "name": "ssh-precheck-before-force-push-or-rebase",
+      "tool": "Bash",
+      "pattern": "git(\\s+-\\S+(\\s+\\S+)?)*\\s+(push\\s+.*(--force|-f\\b)|rebase)",
+      "field": null,
+      "path": null,
+      "strength": "inject",
+      "evidence": "force-push またはスタックのリベースを行う前には、軽量な SSH の事前チェックを優先してください。"
+    },
+    {
+      "name": "precommit-format-and-lint",
+      "tool": "Bash",
+      "pattern": "git(\\s+-\\S+(\\s+\\S+)?)*\\s+commit",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "時間のかかる lint-staged の失敗（1 回約 2 分）を避けるため、コミット前に事前検証する"
+    },
+    {
+      "name": "rebuild-before-integration-tests",
+      "tool": "Bash",
+      "pattern": "pnpm\\s+(test-dev-turbo|test-dev-webpack|test-start-turbo|test-start-webpack)",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Next.js の統合テストを実行する際、ソースファイルが変更されている場合は再ビルドしなければなりません。"
+    },
+    {
+      "name": "config-flag-needs-schema-sync",
+      "tool": "Edit",
+      "pattern": "config-shared\\.ts$",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "新しいフラグ: `config-shared.ts` に型を追加し、`config-schema.ts` にスキーマを追加する。"
+    },
+    {
+      "name": "define-env-force-false-for-edge",
+      "tool": "Edit",
+      "pattern": "define-env\\.ts$",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "edge ビルドでは、Node 専用の import を制御する機能フラグを `define-env.ts` で強制的に `false` にする。"
+    },
+    {
+      "name": "dce-require-in-conditional-branch",
+      "tool": "Edit",
+      "pattern": "\\brequire\\(",
+      "field": "new_string",
+      "path": "packages/next/src/.*\\.tsx?$",
+      "strength": "require-read",
+      "evidence": "DCE のため、`require()` はコンパイル時の `if/else` 分岐の中に置く（早期 return／throw のパターンは避ける）。"
+    },
+    {
+      "name": "react-server-dom-webpack-import-scope",
+      "tool": "Edit",
+      "pattern": "react-server-dom-webpack",
+      "field": "new_string",
+      "path": "^(?!.*entry-base\\.ts$).*\\.(ts|tsx)$",
+      "strength": "require-read",
+      "evidence": "`react-server-dom-webpack/*` の import は `entry-base.ts` 内に留めなければならない。"
+    },
+    {
+      "name": "rust-avoid-new-super-imports",
+      "tool": "Edit",
+      "pattern": "use\\s+super::",
+      "field": "new_string",
+      "path": "\\.rs$",
+      "strength": "inject",
+      "evidence": "新しい `super::` import の追加を避ける。`crate::` をルートとするパスを優先してください。"
+    },
+    {
+      "name": "docs-highlight-line-count-check",
+      "tool": "Edit",
+      "pattern": "highlight=\\{",
+      "field": "new_string",
+      "path": "docs/.*\\.(mdx?|tsx?|jsx?)$",
+      "strength": "inject",
+      "evidence": "コードブロックに `highlight={...}` 属性を追加する際は、コードブロック内の実際の行番号を注意深く数える"
+    },
+    {
+      "name": "flag-nonstandard-header-read-for-security-review",
+      "tool": "Edit",
+      "pattern": "headers\\s*(\\.get\\(|\\[)",
+      "field": "new_string",
+      "path": "packages/next/src/server/.*\\.(ts|tsx)$",
+      "strength": "require-read",
+      "evidence": "新しいコードが標準 HTTP ヘッダー...ではないリクエストヘッダーを読み取る場合は、セキュリティレビューが必要であることを指摘してください。"
+    }
+  ],
+  "uncompilable": [
+    "Choosing `pnpm --filter=next types` vs the full build depends on developer intent (type-check only), not detectable from a tool call",
+    "Terminating the background watch process after finishing work depends on session-level state, not a specific tool call",
+    "`--no-turbopack` flag does not exist — informational fact, not an actionable rule",
+    "General CI triage priority ordering (build/lint/types before tests) — a reasoning heuristic, not bound to one tool call",
+    "Treating CI failures as real until disproven and not auto-ignoring 'Known Flaky Tests' — general reasoning stance",
+    "Reproducing CI failures with the same mode/env vars — general judgment, superseded by the more specific local-repro guidance",
+    "Using mode-specific test commands when fixing module resolution/build graph issues — general debugging judgment, no single trigger",
+    "Prioritizing CI failures over review comments, and blocking jobs first — general triage priorities, not action-bound",
+    "Mapping specific CI job failures (rust check, lint/build, test) to fix commands — reactive to CI output content, not an input-side trigger",
+    "Running `pr-status.js` when the user asks about CI/PR status — triggered by conversational intent, not a tool call",
+    "Use `DEBUG=next:*` for debug logging — general tip, not an obligation tied to an action",
+    "Use `NEXT_TELEMETRY_DISABLED=1` for local testing — general tip, not an enforced obligation",
+    "Explanation of `NODE_ENV` vs `__NEXT_DEV_SERVER` semantics — informational, no bound action",
+    "Stop and ask the user instead of fabricating placeholder credentials when a secret is missing locally — behavioral halt, not a tool-call trigger",
+    "Summarize and redact command output before sharing it — chat-response formatting guidance, not a tool call",
+    "Batch related file edits before running a single build instead of building per file — workflow habit with no regex-detectable trigger",
+    "Read large files via grep + offset/limit, don't reread the same section, don't read generated directories — all about the Read tool, outside the Bash/Edit/Write trigger set",
+    "Keep commit messages concise/clear and focus PR descriptions on what/why — writing tone/style, not action-bindable",
+    "cargo fmt's ASCII ordering behavior — informational explanation, not a directive",
+    "On internal compiler error (ICE), delete incremental build artifacts and retry — reactive to an error occurring, not a pre-action trigger",
+    "Check for stale `*.node` native binaries after branch switch/pull if Turbopack errors appear — reactive troubleshooting conditioned on an error, not a pre-action trigger",
+    "Use `__NEXT_SHOW_IGNORE_LISTED=true` to see full stack traces — informational tip, not an obligation",
+    "Node.js source map lookup caveats (`--enable-source-maps`, path format differences, `process.cwd()`) — informational, not directive",
+    "Wire flag runtime env values into `next-server.ts`/`export/worker.ts` when used in compiled runtime internals — conditional on usage context, not a simple edit-based trigger",
+    "`define-env.ts` affects user bundles but not compiled runtime internals — explanatory fact, not a rule"
+  ]
+}

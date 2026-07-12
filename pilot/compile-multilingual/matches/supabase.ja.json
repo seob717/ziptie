@@ -1,0 +1,121 @@
+{
+  "doc": "supabase.ja",
+  "lang": "ja",
+  "judge": "llm:codex-0.144.1(GPT-5)",
+  "matches": [
+    {
+      "gold_id": "g12",
+      "output_rule": "check-ui-index-before-new-primitive",
+      "rationale": "Same Write action and new-UI-primitive target; the Japanese evidence explicitly requires checking packages/ui/index.tsx before creating a primitive."
+    },
+    {
+      "gold_id": "g15",
+      "output_rule": "no-hardcoded-colors",
+      "rationale": "Same Edit action and hardcoded-color target. The extraction is narrower than the gold rule because its pattern covers hex colors in TSX, JSX, and CSS, but partial coverage still matches."
+    },
+    {
+      "gold_id": "g18",
+      "output_rule": "use-shared-shortcut-registry",
+      "rationale": "Same Edit action and Studio keyboard-shortcut-handling target; both the key-event-listener pattern and evidence specifically prefer registered shortcuts over one-off listeners. The extraction does not fully encode discoverability or all possible listener forms."
+    },
+    {
+      "gold_id": "g20",
+      "output_rule": "colocate-studio-subcomponents",
+      "rationale": "Same Write action and Studio sub-component-file target; the Japanese evidence requires placing sub-components with their parent."
+    },
+    {
+      "gold_id": "g21",
+      "output_rule": "avoid-barrel-reexport-files",
+      "rationale": "Same Write action and barrel re-export-file target. The extraction is narrower because it detects relative export-star barrels under apps/studio, but partial coverage still matches."
+    }
+  ],
+  "misses": [
+    {
+      "gold_id": "g1",
+      "category": "other",
+      "note": "Compiler self-reported skip: \"Node >= 22 / pnpm 10 monorepo setup requirement — informational environment note, not tied to a tool action\"."
+    },
+    {
+      "gold_id": "g2",
+      "category": "other",
+      "note": "Compiler self-reported skip: \"Node >= 22 / pnpm 10 monorepo setup requirement — informational environment note, not tied to a tool action\"."
+    },
+    {
+      "gold_id": "g3",
+      "category": "structure",
+      "note": "The explicit dependency-install command appears in the fenced command block, but no extracted Bash rule targets it."
+    },
+    {
+      "gold_id": "g4",
+      "category": "structure",
+      "note": "The explicit Studio development-server command appears in the fenced command block, but no extracted Bash rule targets it."
+    },
+    {
+      "gold_id": "g5",
+      "category": "structure",
+      "note": "The explicit Studio unit-test command appears in the fenced command block, but no extracted Bash rule targets it."
+    },
+    {
+      "gold_id": "g6",
+      "category": "structure",
+      "note": "The explicit Studio E2E command appears in the fenced command block, but no extracted Bash rule targets it."
+    },
+    {
+      "gold_id": "g7",
+      "category": "structure",
+      "note": "The explicit Studio build command appears in the fenced command block, but no extracted Bash rule targets it."
+    },
+    {
+      "gold_id": "g8",
+      "category": "structure",
+      "note": "The explicit Studio lint command appears in the fenced command block, but no extracted Bash rule targets it."
+    },
+    {
+      "gold_id": "g9",
+      "category": "structure",
+      "note": "The explicit repository type-check command appears in the fenced command block, but no extracted Bash rule targets it."
+    },
+    {
+      "gold_id": "g10",
+      "category": "other",
+      "note": "Compiler self-reported skip: \"Import UI primitives from 'ui' and use `_Shadcn_`-suffixed variants for form primitives — general coding convention without a crisply detectable content pattern\"."
+    },
+    {
+      "gold_id": "g11",
+      "category": "other",
+      "note": "Compiler self-reported skip: \"Import UI primitives from 'ui' and use `_Shadcn_`-suffixed variants for form primitives — general coding convention without a crisply detectable content pattern\"."
+    },
+    {
+      "gold_id": "g13",
+      "category": "structure",
+      "note": "The Tailwind-only requirement is an explicit clause in a compound styling convention, but no extracted Edit rule targets the styling mechanism."
+    },
+    {
+      "gold_id": "g14",
+      "category": "structure",
+      "note": "The semantic-token requirement is an explicit clause in a compound styling convention, but no extracted Edit rule targets semantic Tailwind colors."
+    },
+    {
+      "gold_id": "g16",
+      "category": "other",
+      "note": "Compiler self-reported skip: \"Use American English everywhere — too broad/tone-like to bind to a specific file or action\"."
+    },
+    {
+      "gold_id": "g17",
+      "category": "structure",
+      "note": "No extracted Edit rule targets repeated Studio UI actions generally or requires both the shared registry and Shortcut primitives; the listener-specific extraction is reserved for the closer g18."
+    },
+    {
+      "gold_id": "g19",
+      "category": "structure",
+      "note": "The navigation-only restriction for G-then-key sequences is an explicit shortcut clause, but no extracted Edit rule targets that chord."
+    },
+    {
+      "gold_id": "g22",
+      "category": "other",
+      "note": "Compiler self-reported skip: \"Refer to studio-* skills for detailed Studio conventions — a pointer to other docs, not itself an actionable rule\"."
+    }
+  ],
+  "unmatched_extracted": [],
+  "gold_amendments": []
+}

@@ -1,0 +1,30 @@
+{
+  "doc": "supabase",
+  "lang": "es",
+  "reviewer": "llm:codex-0.144.1(GPT-5)",
+  "verdicts": [
+    {"gold_id": "g1", "preserved": true},
+    {"gold_id": "g2", "preserved": true},
+    {"gold_id": "g3", "preserved": true},
+    {"gold_id": "g4", "preserved": true},
+    {"gold_id": "g5", "preserved": true},
+    {"gold_id": "g6", "preserved": true},
+    {"gold_id": "g7", "preserved": true},
+    {"gold_id": "g8", "preserved": true},
+    {"gold_id": "g9", "preserved": true},
+    {"gold_id": "g10", "preserved": true},
+    {"gold_id": "g11", "preserved": true},
+    {"gold_id": "g12", "preserved": true},
+    {"gold_id": "g13", "preserved": true},
+    {"gold_id": "g14", "preserved": true},
+    {"gold_id": "g15", "preserved": true},
+    {"gold_id": "g16", "preserved": true},
+    {"gold_id": "g17", "preserved": true},
+    {"gold_id": "g18", "preserved": true},
+    {"gold_id": "g19", "preserved": true},
+    {"gold_id": "g20", "preserved": true},
+    {"gold_id": "g21", "preserved": true},
+    {"gold_id": "g22", "preserved": true}
+  ],
+  "global_issues": []
+}

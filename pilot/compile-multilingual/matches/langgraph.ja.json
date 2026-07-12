@@ -1,0 +1,41 @@
+{
+  "doc": "langgraph",
+  "lang": "ja",
+  "judge": "llm:codex-0.144.1(GPT-5)",
+  "matches": [
+    {
+      "gold_id": "g1",
+      "output_rule": "run-checks-before-pr",
+      "rationale": "The Bash rule triggers when creating a pull request and its evidence requires running the library's listed commands beforehand, which includes make format after modifying that library. The single extracted rule also covers lint and test, but under the 1:1 rule it is assigned only to g1."
+    },
+    {
+      "gold_id": "g5",
+      "output_rule": "no-sphinx-double-backtick",
+      "rationale": "The Edit rule blocks a double-backtick inline-code pattern in Python content, and its evidence explicitly prohibits Sphinx-style double backticks. This is the same prohibited edit as g5."
+    }
+  ],
+  "misses": [
+    {
+      "gold_id": "g2",
+      "category": "structure",
+      "note": "The document's pre-PR checklist includes make lint, but the compiler collapsed the checklist into run-checks-before-pr; that extracted rule was already assigned to the closest available checklist item g1 and cannot be reused."
+    },
+    {
+      "gold_id": "g3",
+      "category": "structure",
+      "note": "The document's pre-PR checklist includes make test, but the compiler collapsed the checklist into run-checks-before-pr; that extracted rule was already assigned to g1 and cannot be reused."
+    },
+    {
+      "gold_id": "g4",
+      "category": "other",
+      "note": "Compiler-self-reported skip: \"TEST 変数や追加の pytest 引数の指定方法は義務・禁止を伴わない使い方の説明であり、ルールではない\"."
+    },
+    {
+      "gold_id": "g6",
+      "category": "structure",
+      "note": "The compiler represented the document's combined inline-code instruction only as the double-backtick prohibition. That extraction is matched to g5 and cannot also represent the distinct positive requirement to use single backticks."
+    }
+  ],
+  "unmatched_extracted": [],
+  "gold_amendments": []
+}

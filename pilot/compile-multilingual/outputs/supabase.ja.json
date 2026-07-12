@@ -1,0 +1,57 @@
+{
+  "doc": "supabase.ja",
+  "rules": [
+    {
+      "name": "check-ui-index-before-new-primitive",
+      "tool": "Write",
+      "pattern": "packages/ui/.*\\.(tsx|ts)$",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "新しいプリミティブを作成する前に、`packages/ui/index.tsx` を確認してください。"
+    },
+    {
+      "name": "no-hardcoded-colors",
+      "tool": "Edit",
+      "pattern": "#[0-9a-fA-F]{3,6}\\b",
+      "field": "new_string",
+      "path": "\\.(tsx|jsx|css)$",
+      "strength": "require-read",
+      "evidence": "色をハードコードしてはいけません。"
+    },
+    {
+      "name": "use-shared-shortcut-registry",
+      "tool": "Edit",
+      "pattern": "addEventListener\\(\\s*['\\\"]key(down|up|press)['\\\"]",
+      "field": "new_string",
+      "path": "apps/studio/.*\\.(tsx|ts)$",
+      "strength": "require-read",
+      "evidence": "個別のキーボードリスナーよりも、登録済みで見つけやすいショートカットを優先してください。"
+    },
+    {
+      "name": "colocate-studio-subcomponents",
+      "tool": "Write",
+      "pattern": "apps/studio/components/.*\\.tsx$",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "サブコンポーネントは親コンポーネントと同じ場所に配置してください。"
+    },
+    {
+      "name": "avoid-barrel-reexport-files",
+      "tool": "Write",
+      "pattern": "export\\s+\\*\\s+from\\s+['\\\"]\\./",
+      "field": "content",
+      "path": "apps/studio/.*\\.tsx?$",
+      "strength": "require-read",
+      "evidence": "barrel re-export ファイルは避けてください。"
+    }
+  ],
+  "uncompilable": [
+    "Node >= 22 / pnpm 10 monorepo setup requirement — informational environment note, not tied to a tool action",
+    "Use American English everywhere — too broad/tone-like to bind to a specific file or action",
+    "Import UI primitives from 'ui' and use `_Shadcn_`-suffixed variants for form primitives — general coding convention without a crisply detectable content pattern",
+    "Refer to studio-* skills for detailed Studio conventions — a pointer to other docs, not itself an actionable rule",
+    "Studio uses the Pages router — factual/architectural statement, not an instruction tied to an action"
+  ]
+}

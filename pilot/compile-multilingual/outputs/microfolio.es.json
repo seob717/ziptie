@@ -1,0 +1,42 @@
+{
+  "doc": "microfolio.es",
+  "rules": [
+    {
+      "name": "ak-component-prefix",
+      "tool": "Write",
+      "pattern": "/(?!Ak)[A-Z][A-Za-z0-9]*\\.svelte$",
+      "field": null,
+      "path": null,
+      "strength": "inject",
+      "evidence": "Todos los componentes personalizados utilizan el prefijo `Ak` (por ejemplo, `AkHeader`, `AkFooter`, `AkProjectCard`, `AkFilters`, `AkOptimizedImage`)."
+    },
+    {
+      "name": "project-frontmatter-schema-new",
+      "tool": "Write",
+      "pattern": "content/projects/[^/]+/index\\.md$",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "coordinates: [latitude, longitude]  # For map display ... type: 'architecture'                # Used for filtering ... featured: true                      # Shows on homepage"
+    },
+    {
+      "name": "project-frontmatter-schema-edit",
+      "tool": "Edit",
+      "pattern": "content/projects/[^/]+/index\\.md$",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "coordinates: [latitude, longitude]  # For map display ... type: 'architecture'                # Used for filtering ... featured: true                      # Shows on homepage"
+    }
+  ],
+  "uncompilable": [
+    "Descripción general del proyecto: stack tecnológico (SvelteKit 2, Svelte 5, Tailwind CSS 4, CMS basado en archivos) — contexto general, no ligado a una acción específica",
+    "Estructura de contenido por proyecto (thumbnail.jpg/webp opcional, subdirectorios images/videos/documents) — documentación descriptiva sin lenguaje de obligación",
+    "Arquitectura de carga de datos: qué +page.server.js carga qué contenido — descripción arquitectónica, no una regla accionable",
+    "Utilidades principales (paths.js, projects.js, imageMetadata.js, config.js, i18n.js) y su propósito — documentación de referencia, no una obligación",
+    "Convenciones de estilo (Tailwind CSS 4, modo oscuro vía prefers-color-scheme, fuente IBM Plex Sans) — estilo general de código, no ligado a una acción concreta",
+    "Detalles de compilación/despliegue (salida de adapter-static, generación de entradas de prerenderizado, copia de content/ vía vite-plugin-static-copy, unplugin-icons, ruta base y CUSTOM_DOMAIN, prerender/trailingSlash en +layout.js) — hechos arquitectónicos descriptivos sin verbos de obligación",
+    "Configuración de internacionalización (svelte-i18n, ubicación de cadenas de locale, detección automática de RTL) — descripción general del sistema, no una regla por acción",
+    "Gestor de paquetes pnpm 9.12.0, requisito de Node 20+, ausencia de framework de pruebas — información de entorno, no una regla accionable"
+  ]
+}

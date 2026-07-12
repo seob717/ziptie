@@ -1,0 +1,41 @@
+{
+  "doc": "langgraph",
+  "lang": "es",
+  "judge": "llm:codex-0.144.1(GPT-5)",
+  "matches": [
+    {
+      "gold_id": "g1",
+      "output_rule": "pre-pr-lib-checks",
+      "rationale": "Same Bash action and pre-PR library context; the extracted rule explicitly requires `make format` in the modified library's directory. It also bundles lint and test, but under the 1:1 rule it is assigned to this single closest constituent gold rule."
+    },
+    {
+      "gold_id": "g5",
+      "output_rule": "no-sphinx-double-backtick",
+      "rationale": "Same Edit target: the pattern detects Sphinx-style double-backtick inline code in Python edits, and the evidence expressly prohibits it in docstrings and comments."
+    }
+  ],
+  "misses": [
+    {
+      "gold_id": "g2",
+      "category": "structure",
+      "note": "`make lint` is present only inside the bundled `pre-pr-lib-checks` extraction, which is already consumed by g1; strict 1:1 matching leaves g2 unmatched."
+    },
+    {
+      "gold_id": "g3",
+      "category": "structure",
+      "note": "`make test` is present only inside the bundled `pre-pr-lib-checks` extraction, which is already consumed by g1; strict 1:1 matching leaves g3 unmatched."
+    },
+    {
+      "gold_id": "g4",
+      "category": "other",
+      "note": "Compiler self-reported this skip as uncompilable: \"TEST=path/to/test.py make test 로 특정 테스트 파일·pytest 옵션을 지정하는 방법 안내 — 사용법 문서일 뿐 의무가 부여되지 않음\"."
+    },
+    {
+      "gold_id": "g6",
+      "category": "structure",
+      "note": "The single-backtick requirement appears only in the evidence of `no-sphinx-double-backtick`; that extracted rule's trigger pattern targets double backticks and is already consumed by the closer prohibition rule g5."
+    }
+  ],
+  "unmatched_extracted": [],
+  "gold_amendments": []
+}

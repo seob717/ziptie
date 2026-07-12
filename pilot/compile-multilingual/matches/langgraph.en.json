@@ -1,0 +1,47 @@
+{
+  "doc": "langgraph",
+  "lang": "en",
+  "judge": "llm:codex-1(GPT-5)",
+  "matches": [
+    {
+      "gold_id": "g1",
+      "output_rule": "run-checks-before-pr",
+      "rationale": "Same Bash tool and same pre-pull-request library-check target; the extracted rule explicitly includes make format. It also bundles make lint and make test, but 1:1 matching permits assigning it only once."
+    },
+    {
+      "gold_id": "g5",
+      "output_rule": "no-double-backtick-edit",
+      "rationale": "Same Edit tool and same target: edits introducing Sphinx-style double-backtick inline code in source-file docstrings or comments."
+    }
+  ],
+  "misses": [
+    {
+      "gold_id": "g2",
+      "category": "structure",
+      "note": "The compiler bundled make lint, make format, and make test into the single run-checks-before-pr rule. That rule is already assigned to the closest first listed command (g1) and cannot be reused under the 1:1 constraint."
+    },
+    {
+      "gold_id": "g3",
+      "category": "structure",
+      "note": "The compiler bundled make test, make format, and make lint into the single run-checks-before-pr rule. That rule is already assigned to g1 and cannot be reused under the 1:1 constraint."
+    },
+    {
+      "gold_id": "g4",
+      "category": "other",
+      "note": "Compiler-self-reported skip: \"Usage note that the TEST variable can be passed to `make test` to run a specific file or extra pytest options — a usage catalog with no attached obligation/prohibition\"."
+    },
+    {
+      "gold_id": "g6",
+      "category": "structure",
+      "note": "The positive single-backtick instruction was bundled into no-double-backtick-edit with the double-backtick prohibition. That extracted rule is more directly targeted to g5 by its name and pattern and cannot also match g6 under the 1:1 constraint."
+    }
+  ],
+  "unmatched_extracted": [
+    {
+      "output_rule": "no-double-backtick-write",
+      "class": "gold-miss",
+      "note": "This is a real action-bindable Write rule implementing the document's prohibition on double-backtick inline code, but the frozen gold ruleset lists only the Edit-tool counterpart."
+    }
+  ],
+  "gold_amendments": []
+}

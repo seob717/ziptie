@@ -1,0 +1,63 @@
+{
+  "doc": "supabase.es",
+  "rules": [
+    {
+      "name": "ui-import-shadcn-suffix",
+      "tool": "Edit",
+      "pattern": "from\\s+[\"']ui[\"']",
+      "field": "new_string",
+      "path": "\\.(tsx|jsx)$",
+      "strength": "require-read",
+      "evidence": "importa desde `'ui'` y usa las variantes con el sufijo `_Shadcn_` para los componentes básicos de formularios"
+    },
+    {
+      "name": "consult-ui-index-before-new-component",
+      "tool": "Write",
+      "pattern": "packages/ui/.*\\.(tsx|ts)$",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Consulta `packages/ui/index.tsx` antes de crear nuevos componentes básicos."
+    },
+    {
+      "name": "no-hardcoded-colors",
+      "tool": "Edit",
+      "pattern": "#[0-9a-fA-F]{3,8}\\b|rgba?\\(|hsla?\\(",
+      "field": "new_string",
+      "path": "\\.(tsx|jsx|css|scss)$",
+      "strength": "require-read",
+      "evidence": "usa únicamente Tailwind y tokens semánticos (`bg-muted`, `text-foreground-light`); no uses colores codificados de forma fija."
+    },
+    {
+      "name": "studio-shortcuts-prefer-registry",
+      "tool": "Edit",
+      "pattern": "onKeyDown|addEventListener\\(\\s*[\"']keydown|useHotkeys|useKeyboardShortcut",
+      "field": "new_string",
+      "path": "apps/studio/.*\\.(tsx|ts)$",
+      "strength": "inject",
+      "evidence": "Da preferencia a los atajos registrados y fáciles de descubrir frente a los listeners de teclado específicos"
+    },
+    {
+      "name": "studio-colocate-subcomponents",
+      "tool": "Write",
+      "pattern": "apps/studio/components/.*\\.(tsx|ts)$",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Coloca los subcomponentes junto a su componente padre."
+    },
+    {
+      "name": "studio-avoid-barrel-files",
+      "tool": "Write",
+      "pattern": "apps/studio/.*index\\.(ts|tsx)$",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Evita los archivos de reexportación de tipo barrel."
+    }
+  ],
+  "uncompilable": [
+    "Usa inglés estadounidense en todas partes — convención general de idioma/estilo, no ligada a una acción concreta.",
+    "Consulta las skills studio-* para conocer en detalle las convenciones de Studio — referencia cruzada a otra documentación, no es una regla accionable en sí misma."
+  ]
+}

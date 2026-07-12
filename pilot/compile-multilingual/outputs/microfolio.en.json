@@ -1,0 +1,20 @@
+{
+  "doc": "microfolio.en",
+  "rules": [
+    {
+      "name": "project-frontmatter-schema",
+      "tool": "Write",
+      "pattern": "content/projects/[^/]+/index\\.md$",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "title: 'Project Title'\ndate: '2023-01-01'\nlocation: 'City, Country'\ncoordinates: [latitude, longitude]  # For map display\ndescription: 'Project description'\ntype: 'architecture'                # Used for filtering\ntags: ['tag1', 'tag2']\nauthors:\n  - name: 'Author Name'\n    role: 'Role'\nfeatured: true                      # Shows on homepage"
+    }
+  ],
+  "uncompilable": [
+    "Custom component naming convention (Ak prefix, e.g. AkHeader, AkProjectCard) — coding style at large, not a per-action obligation",
+    "Node.js 20+ and pnpm locked to 9.12.0 — environment/toolchain prerequisite, not tied to a specific tool call",
+    "Development Commands list (pnpm dev/build/deploy/preview/lint/format/optimize-images/clean-images) — usage catalog documenting what can be run, with no obligation, prohibition, or ordering attached to any of them",
+    "CUSTOM_DOMAIN=true env var note for removing the base path — conditional how-to documentation for an optional deployment scenario, not a general rule for the deploy action"
+  ]
+}

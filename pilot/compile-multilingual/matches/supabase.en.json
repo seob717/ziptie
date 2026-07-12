@@ -1,0 +1,121 @@
+{
+  "doc": "supabase",
+  "lang": "en",
+  "judge": "llm:codex-0.144.1(GPT-5)",
+  "matches": [
+    {
+      "gold_id": "g12",
+      "output_rule": "check-ui-index-before-new-primitive",
+      "rationale": "Same Write action and target: creating a UI primitive triggers checking packages/ui/index.tsx."
+    },
+    {
+      "gold_id": "g15",
+      "output_rule": "no-hardcoded-colors",
+      "rationale": "Same Edit target: the rule detects insertion of literal CSS color values and its evidence explicitly prohibits hardcoded colors. Although its evidence also mentions Tailwind and semantic tokens, its trigger is closest to g15 and it can be used only once."
+    },
+    {
+      "gold_id": "g18",
+      "output_rule": "prefer-shortcut-registry",
+      "rationale": "Same Edit target: adding a one-off Studio keyboard event listener triggers guidance to prefer the registered shortcut mechanism. The evidence also mentions G-then-key navigation, but the actual trigger does not target such chords, so this rule is closest to g18."
+    },
+    {
+      "gold_id": "g20",
+      "output_rule": "co-locate-studio-components",
+      "rationale": "Same Write target: creating a Studio component file triggers the co-location convention. The extraction is broader than sub-components specifically, but it still targets the same creation action."
+    },
+    {
+      "gold_id": "g21",
+      "output_rule": "avoid-studio-barrel-files",
+      "rationale": "Same Write target: creating an apps/studio index.ts or index.tsx barrel candidate triggers the prohibition on barrel re-export files."
+    }
+  ],
+  "misses": [
+    {
+      "gold_id": "g1",
+      "category": "implicit",
+      "note": "The descriptive repository header identifies pnpm 10 and Turborepo, but no Bash rule was extracted for package or monorepo commands."
+    },
+    {
+      "gold_id": "g2",
+      "category": "implicit",
+      "note": "The repository requirement 'Requires Node >= 22' yielded no Bash rule for Node-based commands."
+    },
+    {
+      "gold_id": "g3",
+      "category": "implicit",
+      "note": "The common-commands example for installing dependencies with pnpm install yielded no Bash rule."
+    },
+    {
+      "gold_id": "g4",
+      "category": "implicit",
+      "note": "The common-commands example for starting Studio with pnpm dev:studio yielded no Bash rule."
+    },
+    {
+      "gold_id": "g5",
+      "category": "implicit",
+      "note": "The common-commands example for Studio unit tests with pnpm test:studio yielded no Bash rule."
+    },
+    {
+      "gold_id": "g6",
+      "category": "implicit",
+      "note": "The common-commands example for Studio E2E tests through e2e/studio yielded no Bash rule."
+    },
+    {
+      "gold_id": "g7",
+      "category": "implicit",
+      "note": "The common-commands example for building Studio with the studio filter yielded no Bash rule."
+    },
+    {
+      "gold_id": "g8",
+      "category": "implicit",
+      "note": "The common-commands example for linting Studio with the studio filter yielded no Bash rule."
+    },
+    {
+      "gold_id": "g9",
+      "category": "implicit",
+      "note": "The common-commands example for type-checking all packages with pnpm typecheck yielded no Bash rule."
+    },
+    {
+      "gold_id": "g10",
+      "category": "other",
+      "note": "Compiler-reported skip: \"Import shared UI components from the 'ui' package rather than underlying libraries directly — no enumerated forbidden import paths to bind a regex to.\""
+    },
+    {
+      "gold_id": "g11",
+      "category": "other",
+      "note": "Compiler-reported skip: \"Use `_Shadcn_`-suffixed variants for form primitives — naming convention without an enumerable component list to detect violations against.\""
+    },
+    {
+      "gold_id": "g13",
+      "category": "other",
+      "note": "No extracted Edit rule targets non-Tailwind styling. The no-hardcoded-colors rule mentions Tailwind in evidence but its trigger only detects literal color syntax and is matched to g15."
+    },
+    {
+      "gold_id": "g14",
+      "category": "other",
+      "note": "No extracted Edit rule targets the choice of semantic Tailwind color tokens. The literal-color detector is closest to, and consumed by, g15."
+    },
+    {
+      "gold_id": "g16",
+      "category": "other",
+      "note": "Compiler-reported skip: \"Use U.S. English everywhere — general language/spelling convention, not tied to a specific checkable action pattern.\""
+    },
+    {
+      "gold_id": "g17",
+      "category": "other",
+      "note": "No extracted Edit rule targets repeated Studio UI actions generally or requires both the shared registry and Shortcut primitives. The keyboard-listener extraction covers only shortcut handling and is closest to g18."
+    },
+    {
+      "gold_id": "g19",
+      "category": "other",
+      "note": "No extracted Edit trigger targets G-then-key chords. The phrase appears only in evidence attached to a one-off event-listener trigger, which is matched to g18 under the 1:1 rule."
+    },
+    {
+      "gold_id": "g22",
+      "category": "other",
+      "note": "Compiler-reported skip: \"See studio-* skills for detailed studio conventions — a pointer to other skills, not itself an actionable rule.\""
+    }
+  ],
+  "unmatched_extracted": [],
+  "gold_amendments": []
+}

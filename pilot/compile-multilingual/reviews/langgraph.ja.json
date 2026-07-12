@@ -1,0 +1,14 @@
+{
+  "doc": "langgraph",
+  "lang": "ja",
+  "reviewer": "llm:codex-1(GPT-5)",
+  "verdicts": [
+    {"gold_id": "g1", "preserved": true},
+    {"gold_id": "g2", "preserved": true},
+    {"gold_id": "g3", "preserved": true},
+    {"gold_id": "g4", "preserved": true},
+    {"gold_id": "g5", "preserved": true},
+    {"gold_id": "g6", "preserved": true}
+  ],
+  "global_issues": []
+}
