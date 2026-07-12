@@ -1,0 +1,70 @@
+{
+  "doc": "pinpoint",
+  "author": "llm:codex-1.0(gpt-5)",
+  "rules": [
+    {
+      "id": "g1",
+      "summary": "Check the current Git branch before committing.",
+      "tool": "Bash",
+      "trigger_intent": "creating a Git commit",
+      "strength": "require-read",
+      "evidence": "커밋 전 반드시 현재 브랜치를 확인하세요"
+    },
+    {
+      "id": "g2",
+      "summary": "Never commit directly to the master branch.",
+      "tool": "Bash",
+      "trigger_intent": "creating a Git commit while the current branch is master",
+      "strength": "block",
+      "evidence": "master에는 절대 직접 커밋하지 않습니다"
+    },
+    {
+      "id": "g3",
+      "summary": "If the current branch is master, stop and create a branch from upstream/master before continuing.",
+      "tool": "Bash",
+      "trigger_intent": "continuing with repository commands after the branch check reports master",
+      "strength": "require-read",
+      "evidence": "결과가 `master`이면 **즉시 중단**하고 브랜치를 먼저 생성하세요"
+    },
+    {
+      "id": "g4",
+      "summary": "Run the /qa-pr skill before committing.",
+      "tool": "Bash",
+      "trigger_intent": "creating a Git commit",
+      "strength": "require-read",
+      "evidence": "커밋/푸시 전에 반드시 `/qa-pr` 스킬을 실행하세요"
+    },
+    {
+      "id": "g5",
+      "summary": "Run the /qa-pr skill before pushing.",
+      "tool": "Bash",
+      "trigger_intent": "pushing Git commits to a remote",
+      "strength": "require-read",
+      "evidence": "커밋/푸시 전에 반드시 `/qa-pr` 스킬을 실행하세요"
+    },
+    {
+      "id": "g6",
+      "summary": "Do not commit when /qa-pr reports FAIL.",
+      "tool": "Bash",
+      "trigger_intent": "creating a Git commit after /qa-pr reports FAIL",
+      "strength": "block",
+      "evidence": "QA 판정이 FAIL이면 커밋하지 마세요"
+    },
+    {
+      "id": "g7",
+      "summary": "Use Node 22.13.1 or newer and Yarn 1.22.22 for project commands.",
+      "tool": "Bash",
+      "trigger_intent": "running Node or Yarn commands for the project",
+      "strength": "require-read",
+      "evidence": "Node >=22.13.1, Yarn 1.22.22 필요."
+    },
+    {
+      "id": "g8",
+      "summary": "When a .claude resource is absent from the current directory, search upward through parent directories.",
+      "tool": "Bash",
+      "trigger_intent": "searching for a .claude resource that was not found under the current working directory",
+      "strength": "require-read",
+      "evidence": "현재 작업 디렉토리에서 찾지 못하면 상위 디렉토리로 올라가며 탐색합니다"
+    }
+  ]
+}

@@ -1,0 +1,158 @@
+{
+  "doc": "3dollars-ios",
+  "author": "llm:codex-1.0(gpt-5)",
+  "rules": [
+    {
+      "id": "g1",
+      "summary": "Run `make project` before building.",
+      "tool": "Bash",
+      "trigger_intent": "running an Xcode build command",
+      "strength": "require-read",
+      "evidence": "빌드 전 반드시 `make project` 실행"
+    },
+    {
+      "id": "g2",
+      "summary": "Use the `three-dollar-in-my-pocket-debug` scheme for Debug builds.",
+      "tool": "Bash",
+      "trigger_intent": "running a Debug build",
+      "strength": "require-read",
+      "evidence": "**three-dollar-in-my-pocket-debug** 스키마 사용 (Debug 빌드)"
+    },
+    {
+      "id": "g3",
+      "summary": "Use the `three-dollar-in-my-pocket` scheme for Release builds.",
+      "tool": "Bash",
+      "trigger_intent": "running a Release build",
+      "strength": "require-read",
+      "evidence": "**three-dollar-in-my-pocket** 스키마 사용 (Release 빌드)"
+    },
+    {
+      "id": "g4",
+      "summary": "Run SwiftLint validation after writing code.",
+      "tool": "Bash",
+      "trigger_intent": "finishing code changes and choosing the validation command to run",
+      "strength": "require-read",
+      "evidence": "코드 작성 후 반드시 SwiftLint 검증 수행"
+    },
+    {
+      "id": "g5",
+      "summary": "Do not edit generated `.xcodeproj` files directly.",
+      "tool": "Edit",
+      "trigger_intent": "editing an `.xcodeproj` file directly",
+      "strength": "block",
+      "evidence": "`.xcodeproj` 파일을 직접 편집하지 마세요"
+    },
+    {
+      "id": "g6",
+      "summary": "Make every screen ViewModel follow the documented Input, Output, Route, Config, Dependency, and State structure.",
+      "tool": "Write",
+      "trigger_intent": "creating a ViewModel for a screen",
+      "strength": "require-read",
+      "evidence": "모든 화면(ViewController)용 ViewModel은 아래 구조를 반드시 따릅니다"
+    },
+    {
+      "id": "g7",
+      "summary": "Make every ViewController inherit from BaseViewController and import Common.",
+      "tool": "Write",
+      "trigger_intent": "creating a ViewController",
+      "strength": "require-read",
+      "evidence": "모든 ViewController는 BaseViewController를 상속합니다 (Common 모듈에서 `import Common` 필요)"
+    },
+    {
+      "id": "g8",
+      "summary": "Connect ViewModels through initializer injection.",
+      "tool": "Edit",
+      "trigger_intent": "wiring a ViewModel into a ViewController",
+      "strength": "inject",
+      "evidence": "ViewModel은 생성자 주입 방식으로 연결"
+    },
+    {
+      "id": "g9",
+      "summary": "Separate route handling into an extension.",
+      "tool": "Edit",
+      "trigger_intent": "implementing route handling in a ViewController",
+      "strength": "inject",
+      "evidence": "Route 처리는 extension으로 분리"
+    },
+    {
+      "id": "g10",
+      "summary": "Build UI only in code and use SnapKit for Auto Layout.",
+      "tool": "Write",
+      "trigger_intent": "creating a user interface or its Auto Layout constraints",
+      "strength": "block",
+      "evidence": "**코드 기반 UI만 사용** - SnapKit으로 Auto Layout 구성"
+    },
+    {
+      "id": "g11",
+      "summary": "Use leading and trailing rather than left and right in SnapKit constraints.",
+      "tool": "Edit",
+      "trigger_intent": "writing or changing SnapKit horizontal constraints",
+      "strength": "require-read",
+      "evidence": "SnapKit 사용 시 left, right 대신 leading, trailing을 사용합니다"
+    },
+    {
+      "id": "g12",
+      "summary": "Use DesignSystem resources exclusively for colors, fonts, icons, buttons, and similar UI elements.",
+      "tool": "Edit",
+      "trigger_intent": "adding or changing colors, fonts, icons, buttons, or other UI resources",
+      "strength": "require-read",
+      "evidence": "색상, 폰트, 아이콘, 버튼 등은 반드시 DesignSystem(Colors, Fonts, Icons 등)으로만 사용합니다"
+    },
+    {
+      "id": "g13",
+      "summary": "Do not use the `then` library in new code; use standard Swift syntax.",
+      "tool": "Write",
+      "trigger_intent": "creating new Swift code that initializes and configures an object",
+      "strength": "block",
+      "evidence": "**신규 코드에서 `then` 라이브러리 사용 금지** - Swift 표준 문법(클로저, var/let 선언 후 속성 설정 등)을 사용합니다"
+    },
+    {
+      "id": "g14",
+      "summary": "Implement every API as an enum extended to conform to RequestType.",
+      "tool": "Write",
+      "trigger_intent": "creating an API definition",
+      "strength": "require-read",
+      "evidence": "모든 API는 enum + RequestType 프로토콜 확장으로 구현합니다"
+    },
+    {
+      "id": "g15",
+      "summary": "Split repositories into Protocol and Impl types.",
+      "tool": "Write",
+      "trigger_intent": "creating a repository",
+      "strength": "require-read",
+      "evidence": "Repository는 Protocol + Impl 구조로 분리합니다"
+    },
+    {
+      "id": "g16",
+      "summary": "Match API, Repository, and Model names to the server-defined names.",
+      "tool": "Edit",
+      "trigger_intent": "naming an API, Repository, or Model declaration",
+      "strength": "require-read",
+      "evidence": "API/Repository/Model 네이밍은 서버에서 정의한 네이밍과 동일하게 정의합니다"
+    },
+    {
+      "id": "g17",
+      "summary": "Make every new UICollectionViewCell inherit from BaseCollectionViewCell.",
+      "tool": "Write",
+      "trigger_intent": "creating a UICollectionViewCell subclass",
+      "strength": "require-read",
+      "evidence": "새로 생성하는 모든 UICollectionViewCell은 반드시 BaseCollectionViewCell을 상속합니다"
+    },
+    {
+      "id": "g18",
+      "summary": "Do not add static registerId or reuseIdentifier properties inside cells.",
+      "tool": "Edit",
+      "trigger_intent": "adding a static registration or reuse identifier property to a collection-view cell",
+      "strength": "block",
+      "evidence": "셀 내부에 registerId(혹은 reuseIdentifier)와 같은 static 프로퍼티를 별도로 생성하지 않습니다 (registerId 사용 금지)"
+    },
+    {
+      "id": "g19",
+      "summary": "Use UIKit only; do not use SwiftUI.",
+      "tool": "Write",
+      "trigger_intent": "creating user-interface code",
+      "strength": "block",
+      "evidence": "SwiftUI 사용 안 함 - UIKit만 사용"
+    }
+  ]
+}

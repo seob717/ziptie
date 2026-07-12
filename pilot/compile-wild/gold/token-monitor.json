@@ -1,0 +1,134 @@
+{
+  "doc": "token-monitor",
+  "author": "llm:codex-1(gpt-5)",
+  "rules": [
+    {
+      "id": "g1",
+      "summary": "When a release keyword is used, commit changes in logical units using Conventional Commits.",
+      "tool": "Bash",
+      "trigger_intent": "committing changes as part of the automatic release pipeline requested by a release keyword",
+      "strength": "require-read",
+      "evidence": "변경사항을 논리적 단위별로 나눠서 커밋 (conventional commit 형식)"
+    },
+    {
+      "id": "g2",
+      "summary": "Create the release PR from the current branch into main.",
+      "tool": "Bash",
+      "trigger_intent": "creating a pull request as part of the automatic release pipeline",
+      "strength": "require-read",
+      "evidence": "현재 브랜치에서 main으로 PR 생성"
+    },
+    {
+      "id": "g3",
+      "summary": "Wait for CI to pass with gh pr checks --watch before continuing the release pipeline.",
+      "tool": "Bash",
+      "trigger_intent": "checking CI after creating the release pull request",
+      "strength": "require-read",
+      "evidence": "`gh pr checks --watch`로 CI 통과 대기"
+    },
+    {
+      "id": "g4",
+      "summary": "Squash-merge the release PR only after CI passes.",
+      "tool": "Bash",
+      "trigger_intent": "merging the release pull request",
+      "strength": "require-read",
+      "evidence": "CI 통과 후 squash merge"
+    },
+    {
+      "id": "g5",
+      "summary": "Launch the Release workflow with the bump matching the requested patch, minor, or major release.",
+      "tool": "Bash",
+      "trigger_intent": "starting the Release workflow in response to a release keyword",
+      "strength": "require-read",
+      "evidence": "`gh workflow run Release -f bump={patch|minor|major}`"
+    },
+    {
+      "id": "g6",
+      "summary": "Do not merge when CI fails.",
+      "tool": "Bash",
+      "trigger_intent": "merging a pull request whose CI has failed",
+      "strength": "block",
+      "evidence": "CI가 실패하면 머지하지 말고"
+    },
+    {
+      "id": "g7",
+      "summary": "After launching the Release workflow, check its status with gh run watch.",
+      "tool": "Bash",
+      "trigger_intent": "checking status after starting the Release workflow",
+      "strength": "require-read",
+      "evidence": "릴리즈 워크플로우 실행 후 `gh run watch`로 상태 확인"
+    },
+    {
+      "id": "g8",
+      "summary": "If already on main with no changes, run only the release step.",
+      "tool": "Bash",
+      "trigger_intent": "executing a requested release while on main with a clean working tree",
+      "strength": "require-read",
+      "evidence": "이미 main 브랜치에 있고 변경사항이 없으면 릴리즈만 실행"
+    },
+    {
+      "id": "g9",
+      "summary": "Before merging a PR, wait for CI Tests to pass or manually cancel them when unnecessary.",
+      "tool": "Bash",
+      "trigger_intent": "merging a pull request after it has been created",
+      "strength": "require-read",
+      "evidence": "CI Tests 통과 대기 (또는 불필요한 경우 수동 취소)"
+    },
+    {
+      "id": "g10",
+      "summary": "Never chain gh pr create and gh pr merge on one command line.",
+      "tool": "Bash",
+      "trigger_intent": "running a shell command that creates and merges a pull request in one chained line",
+      "strength": "block",
+      "evidence": "`gh pr create && gh pr merge`를 한 줄로 연결하지 말 것"
+    },
+    {
+      "id": "g11",
+      "summary": "Never merge immediately after creating a PR; check CI first.",
+      "tool": "Bash",
+      "trigger_intent": "merging a pull request immediately after creating it without first checking CI",
+      "strength": "block",
+      "evidence": "PR 생성 직후 바로 머지하지 말 것 — 항상 CI 상태를 확인한 후 머지"
+    },
+    {
+      "id": "g12",
+      "summary": "Trigger releases only through workflow_dispatch.",
+      "tool": "Edit",
+      "trigger_intent": "editing the Release workflow trigger configuration",
+      "strength": "block",
+      "evidence": "트리거: `workflow_dispatch`만 사용"
+    },
+    {
+      "id": "g13",
+      "summary": "Do not manually change local version files when using the Release workflow.",
+      "tool": "Edit",
+      "trigger_intent": "manually editing local version values as part of a workflow-driven release",
+      "strength": "inject",
+      "evidence": "로컬에서 수동 버전 변경 불필요 — 워크플로우가 전부 처리"
+    },
+    {
+      "id": "g14",
+      "summary": "When changing the version locally, edit package.json as the source of truth.",
+      "tool": "Edit",
+      "trigger_intent": "manually changing the project version in local files",
+      "strength": "require-read",
+      "evidence": "로컬에서 수동 변경 시: `package.json` 수정 후"
+    },
+    {
+      "id": "g15",
+      "summary": "After manually editing package.json's version, run the version synchronization script.",
+      "tool": "Bash",
+      "trigger_intent": "running the required follow-up after manually changing the version in package.json",
+      "strength": "require-read",
+      "evidence": "`package.json` 수정 후 `node scripts/sync-version.mjs` 실행"
+    },
+    {
+      "id": "g16",
+      "summary": "Prefer the Release workflow for automatic version management.",
+      "tool": "Bash",
+      "trigger_intent": "choosing how to perform version management for a release",
+      "strength": "inject",
+      "evidence": "권장: 릴리스 워크플로우를 통한 자동 버전 관리 사용"
+    }
+  ]
+}

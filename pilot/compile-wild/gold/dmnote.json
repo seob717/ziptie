@@ -1,0 +1,102 @@
+{
+  "doc": "dmnote",
+  "author": "llm:codex-1.0(gpt-5)",
+  "rules": [
+    {
+      "id": "g1",
+      "summary": "The main agent must make core code changes directly.",
+      "tool": "Edit",
+      "trigger_intent": "editing core implementation code",
+      "strength": "require-read",
+      "evidence": "핵심 코드 수정은 메인 에이전트가 직접 합니다"
+    },
+    {
+      "id": "g2",
+      "summary": "Before the final commit of mechanically delegated work, the main agent must inspect the diff and pass the TypeScript, lint, and test gates.",
+      "tool": "Bash",
+      "trigger_intent": "creating the final commit after mechanical implementation was delegated to a Sonnet subagent",
+      "strength": "require-read",
+      "evidence": "메인이 diff를 직접 검수하고 tsc/lint/테스트 게이트를 통과시킬 것"
+    },
+    {
+      "id": "g3",
+      "summary": "Do not create the final commit before running /agent-review.",
+      "tool": "Bash",
+      "trigger_intent": "creating the final work-completion commit",
+      "strength": "block",
+      "evidence": "최종 커밋 전 `/agent-review`는 그대로 필수"
+    },
+    {
+      "id": "g4",
+      "summary": "Implement changes in separate logical units instead of making all changes at once.",
+      "tool": "Edit",
+      "trigger_intent": "editing files during a multi-step implementation",
+      "strength": "require-read",
+      "evidence": "한 번에 모든 변경을 하지 않고, 논리적 단위로 분리"
+    },
+    {
+      "id": "g5",
+      "summary": "For complex logic, write a failing test before editing the implementation.",
+      "tool": "Edit",
+      "trigger_intent": "editing complex business logic, algorithms, state management, parsing, or serialization implementation before a failing test exists",
+      "strength": "require-read",
+      "evidence": "Red: 구현 전에 실패하는 테스트를 먼저 작성"
+    },
+    {
+      "id": "g6",
+      "summary": "In the Green TDD phase, write only the minimum implementation needed to pass the test.",
+      "tool": "Edit",
+      "trigger_intent": "editing implementation code during the Green phase for complex logic",
+      "strength": "require-read",
+      "evidence": "Green: 테스트가 통과하는 최소한의 구현 작성"
+    },
+    {
+      "id": "g7",
+      "summary": "During the Refactor TDD phase, preserve passing tests while cleaning up the code.",
+      "tool": "Edit",
+      "trigger_intent": "refactoring complex logic after its tests pass",
+      "strength": "require-read",
+      "evidence": "Refactor: 테스트를 유지하면서 코드 정리"
+    },
+    {
+      "id": "g8",
+      "summary": "Run cargo check and cargo clippy to validate Rust changes.",
+      "tool": "Bash",
+      "trigger_intent": "validating a stage that contains Rust changes",
+      "strength": "require-read",
+      "evidence": "Rust 변경: `cargo check`, `cargo clippy`"
+    },
+    {
+      "id": "g9",
+      "summary": "Run TypeScript type-checking and linting to validate TypeScript changes.",
+      "tool": "Bash",
+      "trigger_intent": "validating a stage that contains TypeScript changes",
+      "strength": "require-read",
+      "evidence": "TypeScript 변경: `npx tsc --noEmit`, `npm run lint`"
+    },
+    {
+      "id": "g10",
+      "summary": "Commit each implementation stage immediately after its validation passes.",
+      "tool": "Bash",
+      "trigger_intent": "finishing a logical implementation stage whose validation has passed",
+      "strength": "require-read",
+      "evidence": "각 단계의 검증이 통과되면 해당 변경사항을 즉시 커밋합니다"
+    },
+    {
+      "id": "g11",
+      "summary": "Use a commit message that matches the changes being committed.",
+      "tool": "Bash",
+      "trigger_intent": "creating a git commit",
+      "strength": "require-read",
+      "evidence": "커밋 메시지는 변경 내용에 맞게 작성"
+    },
+    {
+      "id": "g12",
+      "summary": "The main agent must directly edit the fix after a debugging investigation identifies the cause.",
+      "tool": "Edit",
+      "trigger_intent": "editing code to fix a bug after its cause has been established",
+      "strength": "require-read",
+      "evidence": "원인 확정 → 메인이 직접 수정"
+    }
+  ]
+}
