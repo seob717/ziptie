@@ -25,20 +25,20 @@ def _sanitize_session(session_id: str) -> str:
 
 
 REQUIRE_READ_TEMPLATE = (
-    "[nunchi:{name}] 이 작업 전에 확인할 규칙이 있어. 아래 규칙을 빠짐없이 반영한 뒤 "
-    "같은 작업을 다시 시도해 (재시도는 통과된다).\n\n{content}"
+    "[nunchi:{name}] There are rules to check before this action. Apply every rule "
+    "below, then retry the same action (the retry will pass).\n\n{content}"
 )
 BLOCK_TEMPLATE = (
-    "[nunchi:{name}] 이 작업은 규칙에 의해 차단됐어. 아래 규칙을 읽고 허용된 대안으로 "
-    "진행해.\n\n{content}"
+    "[nunchi:{name}] This action is blocked by a rule. Read the rule below and "
+    "proceed with an allowed alternative.\n\n{content}"
 )
 # 신뢰 프레이밍이 준수를 가른다 (PROBE-inject.md 판정 ③) — 출처 없는 주입은
 # 모델이 프롬프트 인젝션으로 취급해 거부하므로, 프로젝트 소유자 설정·등록
 # 위치·source 경로를 명시한다.
 INJECT_TEMPLATE = (
-    "[nunchi:{name}] 이 프로젝트의 .claude/rules/에 등록된 규칙 배달입니다 "
-    "(프로젝트 소유자가 설정한 nunchi 훅이 이 도구 호출에 매칭되는 규칙을 "
-    "배달합니다{source_note}). 이 작업에 적용되는 규칙:\n\n{content}"
+    "[nunchi:{name}] Rule delivery from this project's .claude/rules/ "
+    "(a nunchi hook configured by the project owner delivers the rules matching "
+    "this tool call{source_note}). Rules that apply to this action:\n\n{content}"
 )
 
 
