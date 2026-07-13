@@ -9,7 +9,7 @@ nunchi is a Claude Code plugin that turns CLAUDE.md rules into event listeners. 
 
 ![A real session: Claude fixes a bug and runs gh pr create; nunchi blocks the first attempt once and delivers docs/pr-rules.md as the reason; the retry passes with the rules in context](assets/nunchi-demo.gif)
 
-*(real session, replayed — the model never saw the rules doc until `gh pr create` triggered the delivery)*
+*(real session, replayed — the first `gh pr create` is denied exactly once, with the full rules doc — read from `docs/pr-rules.md` at that moment — as the deny reason; the retry passes)*
 
 One `/nunchi:compile` turns your CLAUDE.md into trigger-bound rule files; a PreToolUse hook does the delivery from then on. What you get, all [measured](#measured-results):
 
