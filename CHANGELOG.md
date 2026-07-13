@@ -1,5 +1,38 @@
 # Changelog
 
+## [0.7.1](https://github.com/seob717/nunchi/compare/v0.7.0...v0.7.1) (2026-07-13)
+
+
+### Features
+
+* [#16](https://github.com/seob717/nunchi/issues/16) 이중 바인딩 측정 — 쌍 산출 15/15, 게이트 통과, §3 유지 확정 ([cb4e45a](https://github.com/seob717/nunchi/commit/cb4e45af040489e805501d2060475f99ec94427f))
+* §4 화행 판정 개정 효과 측정 — M5 61%→82%, block 하향 38→7 ([#15](https://github.com/seob717/nunchi/issues/15)) ([87de1a1](https://github.com/seob717/nunchi/commit/87de1a1dcd0cbb3704599d336667d08e05e04996))
+* compile §4 화행 기반 strength 판정 + 언어별 예시 — [#15](https://github.com/seob717/nunchi/issues/15) 사전등록 ([f95ee7e](https://github.com/seob717/nunchi/commit/f95ee7ec5e4dbc5053f93833329aae617458ba49))
+* compile 지침 v2 — 구조 승격·트리거별 분리 + recall v2 사전등록 ([#14](https://github.com/seob717/nunchi/issues/14)) ([7f30c01](https://github.com/seob717/nunchi/commit/7f30c01e091dcc27ffe34d40e8da743dc6a7c81c))
+* compile-recall 매칭·집계 완료 — 전체 recall 34%, 과추출 0 ([#11](https://github.com/seob717/nunchi/issues/11)) ([93da52e](https://github.com/seob717/nunchi/commit/93da52e73effb73301e576346253bd38b6891122))
+* compile-recall 정답 룰셋 고정 — Codex 격리 세션 작성 (164룰) ([961925c](https://github.com/seob717/nunchi/commit/961925ccd49312989f7b69611836830bc2b15358))
+* compile.md §3 이중 바인딩 명문화 + [#16](https://github.com/seob717/nunchi/issues/16) 측정 사전등록 ([5208f17](https://github.com/seob717/nunchi/commit/5208f17c7b614a432c08147f725798d9856d63ff))
+* recall v2 재측정 — 게이트 통과, 추출 +21%·과추출 0, 지침 채택 유지 ([#14](https://github.com/seob717/nunchi/issues/14)) ([8a4b6b1](https://github.com/seob717/nunchi/commit/8a4b6b104592b7ebbc737538e77be711f41165fc))
+* 다국어 컴파일 호환성 측정 완료 — 쌍 recall 차이 ±3룰, 과추출 0, 강도 번역이 실질 리스크 ([#13](https://github.com/seob717/nunchi/issues/13)) ([6e5110e](https://github.com/seob717/nunchi/commit/6e5110eb409b3ef3d6c36cc0e10d7cce17069368))
+* 배달 템플릿 영어 기본화 — 한국어 하드코딩은 영어권 설치자에게 그대로 노출 ([d34bfd0](https://github.com/seob717/nunchi/commit/d34bfd03651813d9e4c234a78aa04afcd91b08ae))
+* 야생 ko gold 동결 — 4문서 55룰 + 집계기 ([#15](https://github.com/seob717/nunchi/issues/15)) ([b204ebb](https://github.com/seob717/nunchi/commit/b204ebb4cab654698b97b248d241906cd820ac2a))
+* 야생 ko 측정 결과 — 형식·과추출·날조 0 유지, strength 88% ([#15](https://github.com/seob717/nunchi/issues/15)) ([c722690](https://github.com/seob717/nunchi/commit/c72269056de740519dac33e33ecc93459386e434))
+* 야생 ko 표집 동결 — pinpoint·dmnote·token-monitor·3dollars-ios ([#15](https://github.com/seob717/nunchi/issues/15)) ([e5bf2b7](https://github.com/seob717/nunchi/commit/e5bf2b73807eeaa8033454eb200c6714c0db46a5))
+* 야생 한국어 CLAUDE.md 측정 사전등록 ([#15](https://github.com/seob717/nunchi/issues/15) 후속 항목) ([6481dfa](https://github.com/seob717/nunchi/commit/6481dfa3cab635103347d90ed95a1a56791512ef))
+* 컴파일 recall 집계기 — 수기 판정 검산·M1~M3 집계 (DESIGN-compile-recall §4.2) ([964d913](https://github.com/seob717/nunchi/commit/964d9132f72371f1bfbf542fb0a69ead1c042b63))
+
+
+### Docs
+
+* compile-recall 사전등록 수정 A1 — 정답 작성·매칭을 타 계열 LLM(Codex)으로 변경 ([b9e41d2](https://github.com/seob717/nunchi/commit/b9e41d2bb87a93d930b17340e6dc7041c63690cb))
+* README 최상단 데모 GIF — 실측 세션 리플레이 ([692c5fc](https://github.com/seob717/nunchi/commit/692c5fcbd5c8542d3e1633eeb36638f9b2c9a7e5))
+* README 홍보 준비 — recall 실측치 반영, 야생 ko 결과 추가, prior-art FAQ ([0b52057](https://github.com/seob717/nunchi/commit/0b520571613d88ff2e83e95a161665c3bd6a16ae))
+* recall v2 수정 이력 A1 — 매칭 기준 명확화(부분 커버=매치) 후 재판정 ([b5bcb2e](https://github.com/seob717/nunchi/commit/b5bcb2e11677c0886845a55cd6ea8754c966bafd))
+* 다국어 컴파일 호환성 사전등록 — Codex 설계 검토 9건 반영 ([#13](https://github.com/seob717/nunchi/issues/13)) ([da4dd51](https://github.com/seob717/nunchi/commit/da4dd512f8cb8fa171f721d43393e0df8b44b103))
+* 데모 GIF를 영어 배달 버전으로 교체 + 캡션 사실 정정 ([204d901](https://github.com/seob717/nunchi/commit/204d901f7fe15a818e5b3d3f15e4b19c9be60c16))
+* 컴파일 recall 실험 사전등록 + 정답·매칭 템플릿 ([#11](https://github.com/seob717/nunchi/issues/11)) ([ec279fb](https://github.com/seob717/nunchi/commit/ec279fb0be4ab0ae5741bd9c3b5d8d97a5f02dd1))
+* 한국어 CLAUDE.md 작성 가이드 + README 다국어 측정 결과 반영 ([#15](https://github.com/seob717/nunchi/issues/15)) ([e9c0f8b](https://github.com/seob717/nunchi/commit/e9c0f8b92a8ba8f978480605cff27238bc0dcf7e))
+
 ## [0.7.0](https://github.com/seob717/nunchi/compare/v0.6.0...v0.7.0) (2026-07-10)
 
 
