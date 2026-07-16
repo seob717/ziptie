@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.4](https://github.com/seob717/nunchi/compare/v0.7.3...v0.7.4) (2026-07-16)
+
+
+### Docs
+
+* README.ko.md 스냅숏을 v0.7.3(376e4cc)으로 재동기화 ([#40](https://github.com/seob717/nunchi/issues/40)) ([073b2a0](https://github.com/seob717/nunchi/commit/073b2a01e264c5bad4dade977959054c387e07d3))
+
 ## [0.7.3](https://github.com/seob717/nunchi/compare/v0.7.2...v0.7.3) (2026-07-16)
 
 
