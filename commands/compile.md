@@ -14,7 +14,9 @@ Compile rules with the following procedure.
 ## 2. Extract rules
 From each document, extract only rules that "are effective when recalled right before a specific action." Criteria:
 - Can it be tied to a specific tool call? (creating a PR, committing, editing a specific file, running a specific command)
-- General guidance that can't be tied to an action (tone, coding style at large) is **not a compilation target** — skip it and report it at the end as a list of "uncompilable rules."
+- Content that can't be tied to an action is **not a compilation target** — skip it, but classify what you skip into two lists for the final report (§6):
+  - **Procedure** — an ordered, multi-step how-to or workflow (release steps, migration order, environment setup). The right home is a Claude Code *skill*: a skill loads only its description at session start and its body on invocation — the same context economics as a nunchi rule, for content that is a *how* rather than a *before*. Report it as a **skill candidate**, quoting the passage that makes it procedural. Boundary: a checklist to run **before one specific action** ("before pushing, review the diff and run the checks") is a rule bound to that action, not a skill candidate — being multi-step doesn't disqualify it (measured misroute: `pilot/RESULTS-compile-bench-skillroute.md`); skill candidates are only for how-tos with no single triggering tool call.
+  - **Always-on guidance** — tone, general coding style, facts that must color every turn: stays in CLAUDE.md. **When unsure, classify here** — never propose moving content out of CLAUDE.md on a guess, and never route anything action-bindable into a skill candidate (an action rule compiles; a skill candidate is only for what step 1 of this section already rejected).
 - **Tables, fenced code blocks, and list items are rule candidates on equal footing with prose.** A constraint doesn't stop being a rule because it sits in a table row or next to a code sample. But distinguish usage catalogs from constraints: a commands table that only lists what you *can* run is documentation, not a rule — it becomes a rule only when the document attaches an obligation, prohibition, or ordering to the action (must / never / before / after / only).
 - **One rule per trigger**: when one sentence bundles requirements aimed at *different* triggers ("run X after editing A; run Y before pushing"), split them so each rule carries its own trigger and strength. Do NOT split an enumeration that shares one trigger, one strength, and one source ("run `make format`, `make lint`, `make test` before creating a PR" stays a single rule) — same-trigger copies would deliver the same source document multiple times for nothing.
 
@@ -77,7 +79,9 @@ New rule document — run /nunchi:compile <its path> to compile it into trigger-
 ```
 
 ## 6. User review
-Show the list of generated rule files as a table (name / trigger / strength / source), and along with the list of uncompilable rules, ask "is there anything to fix?" An overly broad regex becomes a false positive, so scoping it conservatively narrow is the default.
+Show the list of generated rule files as a table (name / trigger / strength / source), and along with the two skip lists from §2 — **skill candidates** (each with its quoted procedural passage) and **always-on guidance** — ask "is there anything to fix?" An overly broad regex becomes a false positive, so scoping it conservatively narrow is the default.
+
+Skill candidates are proposals only — create nothing unless the user approves one. On approval, scaffold `.claude/skills/<kebab-case-name>/SKILL.md` with a one-line `description` (what it does + when to use it) and the quoted procedure as the body, and note that the passage can then be removed from the source document. A document left with only compiled action rules and accepted skill candidates (no always-on guidance) qualifies for the §5.5 `@reference` removal.
 
 If the user requests a change, edit only the affected rule file(s) and show the table again for another round of review. If the user requests no changes, treat the compilation as complete.
 

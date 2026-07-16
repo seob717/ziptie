@@ -1,0 +1,62 @@
+{
+  "doc": "awm-developer-2-coder_claudecode.nvim",
+  "rules": [
+    {
+      "name": "run-mise-all-before-commit",
+      "tool": "Bash",
+      "pattern": "git(\\s+-\\S+(\\s+\\S+)?)*\\s+commit",
+      "field": null,
+      "path": null,
+      "strength": "block",
+      "evidence": "ALWAYS run `mise run all` before committing any changes. This runs code quality checks and formatting that must pass for CI to succeed. Never skip this step - many PRs fail CI because contributors don't run the build commands before committing."
+    },
+    {
+      "name": "mcp-tool-format-edit",
+      "tool": "Edit",
+      "pattern": "lua/claudecode/tools/",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "MCP Compliance: All tools must return proper MCP format with JSON-stringified content"
+    },
+    {
+      "name": "mcp-tool-format-write",
+      "tool": "Write",
+      "pattern": "lua/claudecode/tools/",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "MCP Compliance: All tools must return proper MCP format with JSON-stringified content"
+    }
+  ],
+  "skill_candidates": [
+    {
+      "summary": "Release version bump procedure: update the version number across four locations (init.lua version table, three references in claude_interactive.sh, lib_claude.sh, CHANGELOG.md) and run PR-list/commit-history/grep verification commands.",
+      "evidence": "When updating the version number for a new release, you must update **ALL** of these files: 1. **`lua/claudecode/init.lua`** - Main version table ... 2. **`scripts/claude_interactive.sh`** - Multiple client version references ... 3. **`scripts/lib_claude.sh`** - ClaudeCodeNvim version ... 4. **`CHANGELOG.md`** - Add new release section"
+    },
+    {
+      "summary": "Recommended development flow: a five-step sequence from understanding the system through making changes, validating, documenting, and committing.",
+      "evidence": "1. **Start Development**: Use existing tests and documentation to understand the system\n2. **Make Changes**: Follow existing patterns and conventions in the codebase\n3. **Validate Work**: Run `mise run all` to ensure formatting, linting, and tests pass\n4. **Document Changes**: Update relevant documentation (this file, PROTOCOL.md, etc.)\n5. **Commit**: Only commit after successful `mise run all` execution"
+    },
+    {
+      "summary": "Adding a new integration (file explorer, terminal, etc.): five ordered steps from implementing the integration through creating a required fixture config, testing, documenting, and running the full test suite.",
+      "evidence": "**Adding New Integrations** (file explorers, terminals, etc.):\n1. **Implement Integration**: Add support in relevant modules ...\n2. **Create Fixture Configuration**: **REQUIRED** - Add a complete Neovim config in `fixtures/[integration-name]/`\n3. **Test Integration**: Use fixture to verify functionality with `vv [integration-name]`\n4. **Update Documentation**: Add integration to fixtures list and relevant tool documentation\n5. **Run Full Test Suite**: Ensure `mise run all` passes with new integration"
+    },
+    {
+      "summary": "Adding a new MCP tool: five ordered steps from studying existing patterns through implementing the handler, adding a JSON schema, creating tests, and updating documentation.",
+      "evidence": "**Adding New Tools**:\n1. **Study Existing Patterns**: Review `lua/claudecode/tools/` for consistent structure\n2. **Implement Handler**: Return MCP format: `{content: [{type: \"text\", text: JSON}]}`\n3. **Add JSON Schema**: Define parameters and expose via MCP (if needed)\n4. **Create Tests**: Both unit tests and integration tests required\n5. **Update Documentation**: Add to this file's MCP tools list"
+    }
+  ],
+  "always_on": [
+    "Best practice: run `mise run all` at the end of editing sessions for complete validation (formatting, linting, tests).",
+    "Test Organization Principles: tests should be isolated, use comprehensive mocking, cover positive/negative/edge cases, run quickly, and have clear descriptive names.",
+    "Logging Best Practices: use DEBUG for routine connection/auth events, WARN for authentication failures, INFO sparingly for user-facing events, ERROR for failures requiring user attention.",
+    "Error Handling Standard: raise errors using a consistent JSON-RPC error format with code, message, and data fields.",
+    "Tool Testing Pattern: MCP tool handlers should be tested by asserting the returned table, its `content` array, and JSON-decoding the text payload against the VS Code-compatible structure.",
+    "Code Quality Standards: maintain comprehensive test coverage, zero luacheck warnings/errors, VS Code extension behavioral compatibility, and use `mise run format` for consistent style; update CLAUDE.md/PROTOCOL.md for architectural/protocol changes.",
+    "Development Troubleshooting guidance: run tests through the mise-activated environment (or `mise run test`) to avoid LUA_PATH issues; ensure MCP tools return `{content: [{type: \"text\", text: \"JSON-string\"}]}` using `vim.json.encode()`; tools with `schema = nil` are internal-only.",
+    "Security Considerations: WebSocket server only accepts local (127.0.0.1) connections; 128-bit CSPRNG-generated hex auth tokens; lock files live at `~/.claude/ide/[port].lock`; all authentication events are logged for auditing.",
+    "Technical Requirements: plugin targets Neovim >= 0.8.0, uses only Neovim built-ins (vim.loop, vim.json, vim.schedule), and has zero external dependencies for core functionality.",
+    "Performance Optimizations guidance: debounce selection tracking, optimize WebSocket frame processing for JSON-RPC payload sizes, and use connection pooling/cleanup to avoid resource leaks."
+  ]
+}

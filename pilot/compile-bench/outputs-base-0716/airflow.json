@@ -1,0 +1,398 @@
+{
+  "doc": "airflow",
+  "rules": [
+    {
+      "name": "no-host-pytest-python-airflow",
+      "tool": "Bash",
+      "pattern": "^\\s*(pytest|python[0-9.]*|airflow)\\b",
+      "field": null,
+      "path": null,
+      "strength": "block",
+      "evidence": "Never run pytest, python, or airflow commands directly on the host — always use breeze."
+    },
+    {
+      "name": "ruff-format-after-edit-py",
+      "tool": "Edit",
+      "pattern": "\\.py$",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Always format and check Python files with ruff immediately after writing or editing them... Do this for every Python file you create or modify, before moving on to the next step."
+    },
+    {
+      "name": "ruff-format-after-write-py",
+      "tool": "Write",
+      "pattern": "\\.py$",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Always format and check Python files with ruff immediately after writing or editing them... Do this for every Python file you create or modify, before moving on to the next step."
+    },
+    {
+      "name": "no-assert-production-edit",
+      "tool": "Edit",
+      "pattern": "\\bassert\\b",
+      "field": "new_string",
+      "path": "^(?!.*/tests?/).*\\.py$",
+      "strength": "block",
+      "evidence": "No `assert` in production code."
+    },
+    {
+      "name": "no-assert-production-write",
+      "tool": "Write",
+      "pattern": "\\bassert\\b",
+      "field": "content",
+      "path": "^(?!.*/tests?/).*\\.py$",
+      "strength": "block",
+      "evidence": "No `assert` in production code."
+    },
+    {
+      "name": "monotonic-not-time-edit",
+      "tool": "Edit",
+      "pattern": "time\\.time\\(\\)",
+      "field": "new_string",
+      "path": "\\.py$",
+      "strength": "require-read",
+      "evidence": "`time.monotonic()` for durations, not `time.time()`."
+    },
+    {
+      "name": "monotonic-not-time-write",
+      "tool": "Write",
+      "pattern": "time\\.time\\(\\)",
+      "field": "content",
+      "path": "\\.py$",
+      "strength": "require-read",
+      "evidence": "`time.monotonic()` for durations, not `time.time()`."
+    },
+    {
+      "name": "no-session-commit-edit",
+      "tool": "Edit",
+      "pattern": "session\\.commit\\(\\)",
+      "field": "new_string",
+      "path": "airflow-core/.*\\.py$",
+      "strength": "block",
+      "evidence": "In `airflow-core`, functions with a `session` parameter must not call `session.commit()`."
+    },
+    {
+      "name": "no-session-commit-write",
+      "tool": "Write",
+      "pattern": "session\\.commit\\(\\)",
+      "field": "content",
+      "path": "airflow-core/.*\\.py$",
+      "strength": "block",
+      "evidence": "In `airflow-core`, functions with a `session` parameter must not call `session.commit()`."
+    },
+    {
+      "name": "no-new-airflow-exception-edit",
+      "tool": "Edit",
+      "pattern": "raise\\s+AirflowException\\(",
+      "field": "new_string",
+      "path": "(airflow-core|airflow-ctl|task-sdk|providers|shared)/.*\\.py$",
+      "strength": "block",
+      "evidence": "Never add new direct `raise AirflowException(...)` usages — the community is actively reducing them, not adding more, and the `check-no-new-airflow-exceptions` prek hook enforces this across `airflow-core`, `airflow-ctl`, `task-sdk`, `providers`, and `shared`."
+    },
+    {
+      "name": "no-new-airflow-exception-write",
+      "tool": "Write",
+      "pattern": "raise\\s+AirflowException\\(",
+      "field": "content",
+      "path": "(airflow-core|airflow-ctl|task-sdk|providers|shared)/.*\\.py$",
+      "strength": "block",
+      "evidence": "Never add new direct `raise AirflowException(...)` usages — the community is actively reducing them, not adding more, and the `check-no-new-airflow-exceptions` prek hook enforces this across `airflow-core`, `airflow-ctl`, `task-sdk`, `providers`, and `shared`."
+    },
+    {
+      "name": "http-exception-at-route-boundary-edit",
+      "tool": "Edit",
+      "pattern": "core_api/",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "In `airflow-core/src/airflow/core_api/` route handlers, catch errors raised by domain code... and re-raise as `HTTPException` with the right status (`404` for not-found, `400` for invalid input). Otherwise they propagate as `500 Internal Server Error`, leaking internals and misleading clients."
+    },
+    {
+      "name": "http-exception-at-route-boundary-write",
+      "tool": "Write",
+      "pattern": "core_api/",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "In `airflow-core/src/airflow/core_api/` route handlers, catch errors raised by domain code... and re-raise as `HTTPException` with the right status (`404` for not-found, `400` for invalid input). Otherwise they propagate as `500 Internal Server Error`, leaking internals and misleading clients."
+    },
+    {
+      "name": "keep-selective-checks-doc-in-sync",
+      "tool": "Edit",
+      "pattern": "selective_checks\\.py",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Keep selective-checks behaviour and its documentation in sync... update `dev/breeze/doc/ci/04_selective_checks.md` in the same PR (the decision-rules list, the diagrams, the outputs table, and the worked examples as applicable) and add/adjust tests in `dev/breeze/tests/test_selective_checks.py`."
+    },
+    {
+      "name": "no-newsfragment-unless-user-facing",
+      "tool": "Write",
+      "pattern": "newsfragments/",
+      "field": null,
+      "path": null,
+      "strength": "block",
+      "evidence": "Golden rule: never create a newsfragment unless you are certain the change is user-facing... Never add newsfragments for providers/ or airflow-ctl/ — those distributions are released from main and their release managers regenerate the changelog from git log."
+    },
+    {
+      "name": "apache-license-header-new-files",
+      "tool": "Write",
+      "pattern": "\\.(py|pyi|ts|tsx|js|jsx)$",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Apache License header on all new files (prek enforces this)."
+    },
+    {
+      "name": "no-unittest-testcase-edit",
+      "tool": "Edit",
+      "pattern": "unittest\\.TestCase",
+      "field": "new_string",
+      "path": "(^|/)tests?/.*\\.py$",
+      "strength": "require-read",
+      "evidence": "Use pytest patterns, not `unittest.TestCase`."
+    },
+    {
+      "name": "no-unittest-testcase-write",
+      "tool": "Write",
+      "pattern": "unittest\\.TestCase",
+      "field": "content",
+      "path": "(^|/)tests?/.*\\.py$",
+      "strength": "require-read",
+      "evidence": "Use pytest patterns, not `unittest.TestCase`."
+    },
+    {
+      "name": "mock-spec-autospec-edit",
+      "tool": "Edit",
+      "pattern": "\\bMock\\(|\\bMagicMock\\(|mock\\.patch\\(",
+      "field": "new_string",
+      "path": "(^|/)tests?/.*\\.py$",
+      "strength": "require-read",
+      "evidence": "Use `spec`/`autospec` when mocking."
+    },
+    {
+      "name": "mock-spec-autospec-write",
+      "tool": "Write",
+      "pattern": "\\bMock\\(|\\bMagicMock\\(|mock\\.patch\\(",
+      "field": "content",
+      "path": "(^|/)tests?/.*\\.py$",
+      "strength": "require-read",
+      "evidence": "Use `spec`/`autospec` when mocking."
+    },
+    {
+      "name": "prefer-mock-patch-decorator-edit",
+      "tool": "Edit",
+      "pattern": "with\\s+mock\\.patch\\(",
+      "field": "new_string",
+      "path": "(^|/)tests?/.*\\.py$",
+      "strength": "inject",
+      "evidence": "Prefer `@mock.patch` decorators over `with mock.patch(...)` context managers for patching."
+    },
+    {
+      "name": "prefer-mock-patch-decorator-write",
+      "tool": "Write",
+      "pattern": "with\\s+mock\\.patch\\(",
+      "field": "content",
+      "path": "(^|/)tests?/.*\\.py$",
+      "strength": "inject",
+      "evidence": "Prefer `@mock.patch` decorators over `with mock.patch(...)` context managers for patching."
+    },
+    {
+      "name": "no-datetime-now-in-tests-edit",
+      "tool": "Edit",
+      "pattern": "datetime\\.now\\(\\)",
+      "field": "new_string",
+      "path": "(^|/)tests?/.*\\.py$",
+      "strength": "block",
+      "evidence": "Use `time_machine` for time-dependent tests. Do not use `datetime.now()`"
+    },
+    {
+      "name": "no-datetime-now-in-tests-write",
+      "tool": "Write",
+      "pattern": "datetime\\.now\\(\\)",
+      "field": "content",
+      "path": "(^|/)tests?/.*\\.py$",
+      "strength": "block",
+      "evidence": "Use `time_machine` for time-dependent tests. Do not use `datetime.now()`"
+    },
+    {
+      "name": "no-caplog-text-edit",
+      "tool": "Edit",
+      "pattern": "caplog\\.text",
+      "field": "new_string",
+      "path": "(^|/)tests?/.*\\.py$",
+      "strength": "block",
+      "evidence": "Do not assert on raw log text (`caplog.text` for example), these are legacy string matching APIs planned for removal."
+    },
+    {
+      "name": "no-caplog-text-write",
+      "tool": "Write",
+      "pattern": "caplog\\.text",
+      "field": "content",
+      "path": "(^|/)tests?/.*\\.py$",
+      "strength": "block",
+      "evidence": "Do not assert on raw log text (`caplog.text` for example), these are legacy string matching APIs planned for removal."
+    },
+    {
+      "name": "no-conventional-commit-prefix-commit",
+      "tool": "Bash",
+      "pattern": "git(\\s+-\\S+(\\s+\\S+)?)*\\s+commit",
+      "field": null,
+      "path": null,
+      "strength": "block",
+      "evidence": "apache/airflow does not use Conventional Commits (`feat:`, `fix:`, `chore:` …). Write the subject as plain prose. A `commit-msg` prek hook (`check-no-conventional-commit-message`) rejects these, and CI checks every commit of the PR."
+    },
+    {
+      "name": "prek-install-before-commit",
+      "tool": "Bash",
+      "pattern": "git(\\s+-\\S+(\\s+\\S+)?)*\\s+commit",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Always run `prek install` before committing any code. It installs the `commit-msg` hook (in addition to `pre-commit`) so the Conventional Commits guard runs locally; a clone that ran `prek install` before this hook existed must re-run it to pick up the new hook type."
+    },
+    {
+      "name": "commit-body-explains-why",
+      "tool": "Bash",
+      "pattern": "git(\\s+-\\S+(\\s+\\S+)?)*\\s+commit",
+      "field": null,
+      "path": null,
+      "strength": "inject",
+      "evidence": "The commit message body should describe why the change is made — the motivation and context — and never what the change is. The diff already shows what changed; restating it in prose adds noise."
+    },
+    {
+      "name": "no-self-coauthor",
+      "tool": "Bash",
+      "pattern": "Co-Authored-By",
+      "field": null,
+      "path": null,
+      "strength": "block",
+      "evidence": "NEVER add Co-Authored-By with yourself as co-author of the commit. Agents cannot be authors, humans can be, Agents are assistants."
+    },
+    {
+      "name": "no-conventional-commit-prefix-pr-title",
+      "tool": "Bash",
+      "pattern": "gh\\s+pr\\s+create",
+      "field": null,
+      "path": null,
+      "strength": "block",
+      "evidence": "Use the imperative mood and a plain message — do not use Conventional Commits prefixes (`fix:`, `feat:`, `chore:`, `docs:`, `refactor:`, …). apache/airflow does not follow that convention... The same rule applies to PR titles."
+    },
+    {
+      "name": "check-existing-pr-before-opening",
+      "tool": "Bash",
+      "pattern": "gh\\s+pr\\s+create",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Before working on an issue, check for open PRs already addressing it (`gh pr list --search \"<issue number or keywords>\"`, and look for `closes:` / `fixes:` references)... Do not blindly open another near-identical PR for an issue that already has one (or several) — that just adds reviewer noise."
+    },
+    {
+      "name": "tracking-issue-for-workaround-before-pr",
+      "tool": "Bash",
+      "pattern": "gh\\s+pr\\s+create",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Open the tracking issue first, before finalising the PR body... Do not write vague forward-looking phrases like \"will open a tracking issue\" or \"to be filed later\" in the PR body or in code comments. Open the issue, link it in both places, then submit the PR."
+    },
+    {
+      "name": "no-push-to-upstream-or-main",
+      "tool": "Bash",
+      "pattern": "git(\\s+-\\S+(\\s+\\S+)?)*\\s+push",
+      "field": null,
+      "path": null,
+      "strength": "block",
+      "evidence": "Always push branches to origin. Never push directly to upstream (and never push directly to main on either remote)."
+    },
+    {
+      "name": "pre-push-checklist",
+      "tool": "Bash",
+      "pattern": "git(\\s+-\\S+(\\s+\\S+)?)*\\s+push",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Before pushing, confirm the remote setup matches the conventions above... Before pushing, perform a self-review of your changes following the Gen-AI review guidelines in `contributing-docs/05_pull_requests.rst` and the code review checklist... Before pushing, always rebase your branch onto the latest target branch (usually `main`) to avoid merge conflicts and ensure CI runs against up-to-date code."
+    },
+    {
+      "name": "pr-not-issue-when-fix-imminent",
+      "tool": "Bash",
+      "pattern": "gh\\s+issue\\s+create",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "If you already know how to fix the problem and you (or the user) are going to open the PR shortly, do not file a GitHub issue first. Go straight to the PR."
+    },
+    {
+      "name": "attribution-footer-on-agent-drafted-github-messages",
+      "tool": "Bash",
+      "pattern": "gh\\s+(pr|issue)\\s+(comment|review)",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Anything an agent drafts that ends up posted to GitHub on the user's account — PR / issue comments, PR-level reviews, line-level review comments, discussion replies — must end with an attribution footer."
+    },
+    {
+      "name": "no-tagging-individuals-in-github-messages",
+      "tool": "Bash",
+      "pattern": "gh\\s+(pr|issue)\\s+(comment|review).*@[A-Za-z0-9_-]+",
+      "field": null,
+      "path": null,
+      "strength": "block",
+      "evidence": "AI agents MUST NOT mention or tag individual contributors, committers, PMC members, or maintainers using GitHub usernames (e.g. `@user`) unless explicitly instructed by a human reviewer."
+    },
+    {
+      "name": "never-edit-apache-magpie-snapshot",
+      "tool": "Edit",
+      "pattern": "\\.apache-magpie/",
+      "field": null,
+      "path": null,
+      "strength": "block",
+      "evidence": "Adopter-specific modifications to framework-skill workflows live in `.apache-magpie-overrides/` — never edit the snapshot directly. Framework changes go via PR to apache/magpie."
+    },
+    {
+      "name": "no-manual-edit-uv-lock",
+      "tool": "Edit",
+      "pattern": "uv\\.lock$",
+      "field": null,
+      "path": null,
+      "strength": "block",
+      "evidence": "Never... Edit generated files by hand when a generation workflow exists. (The `uv.lock` file is generated by `uv lock`, `uv sync`... If at any point in time you have a conflict with `uv.lock`, simply delete it and run `uv lock` to regenerate it.)"
+    },
+    {
+      "name": "no-destructive-git-ops-unless-requested",
+      "tool": "Bash",
+      "pattern": "git(\\s+-\\S+(\\s+\\S+)?)*\\s+(reset\\s+--hard|clean\\s+-\\S*f|push\\s+.*--force|branch\\s+-D)",
+      "field": null,
+      "path": null,
+      "strength": "block",
+      "evidence": "Never... Use destructive git operations unless explicitly requested."
+    }
+  ],
+  "uncompilable": [
+    "Dag naming in prose (title-case 'Dag' vs literal code tokens 'DAG', and spelling out 'Directed Acyclic Graph' except for historical context) — requires distinguishing prose from code tokens/historical context, too semantic for a regex trigger.",
+    "Environment setup one-time install commands (uv tool install prek, prek install, breeze shim setup) — setup documentation, no attached obligation on a recurring action.",
+    "Place temporary scripts in dev/ — placement guidance with no detectable violation pattern (can't express 'not under dev/' as a positive regex trigger).",
+    "Commands table (test/lint/type-check/build command reference) — usage catalog listing what you can run, no attached obligation or prohibition.",
+    "SQLite default backend / `docker network prune` troubleshooting guidance — conditional on a failure state, not tool-pattern detectable.",
+    "uv.lock conflict resolution guidance (delete and regenerate) — conditional troubleshooting instruction, not a standing action trigger.",
+    "Architecture Boundaries (Scheduler never runs user code, Workers never access metadata DB directly, etc.) — describes system invariants, not agent-directed actions tied to a tool call.",
+    "Security Model reporting guidance (distinguishing actual vulnerabilities vs known limitations vs hardening opportunities) — judgment guidance for reviews, no tool trigger.",
+    "Comment sparingly — code says what, comments say why — general coding style/tone, explicitly excluded as a compilation target.",
+    "Keyword-only `session` parameters requirement — can't detect via regex whether a parameter is keyword-only without AST parsing.",
+    "Imports at top of file (with exceptions for circular imports, lazy loading, TYPE_CHECKING) — structural style guidance, not reliably regex-detectable.",
+    "Guard heavy type-only imports with TYPE_CHECKING in multi-process code paths — conditional on semantic 'multi-process code path' context.",
+    "Bulk DELETE/UPDATE batching in the scheduler loop / synchronous interval tasks — too narrow and contextual (detecting 'scheduler loop' membership isn't regex-expressible) for a safe trigger.",
+    "Action-verb function/method naming convention (get_, extract_, avoid noun-only names) — naming/style guidance requiring semantic judgment.",
+    "Target exactly 100% coverage of what the PR changes — testing philosophy, not pattern-triggerable.",
+    "Consolidate similar tests with @pytest.mark.parametrize — requires judging test similarity, too semantic.",
+    "Use @pytest.mark.db_test for tests that require database access — requires knowing whether a test needs DB access, not regex-detectable.",
+    "Test location mirrors source convention — descriptive convention with no explicit obligation word, and mirrored-path correctness isn't verifiable via simple regex.",
+    "Use conf_vars for Airflow config overrides — no reliable 'wrong' pattern to trigger on without knowing the naive alternative being replaced.",
+    "Put generated files (PR reviews, reports, scratch output) under files/ — can't detect 'generated output' intent via a path or content pattern.",
+    "Ask-first list (large cross-package refactors, new dependencies with broad impact, destructive migrations) — requires judgment calls not expressible as a regex trigger.",
+    "Never commit secrets, credentials, or tokens — no safe, generic pattern to detect secrets without significant false positive/negative risk."
+  ]
+}
