@@ -40,6 +40,18 @@ INJECT_TEMPLATE = (
     "(a nunchi hook configured by the project owner delivers the rules matching "
     "this tool call{source_note}). Rules that apply to this action:\n\n{content}"
 )
+# 재컴파일 신호 (#17): 내용 보강은 배달이 원본을 매번 읽어 자동 반영되지만,
+# 규칙 신설·트리거 재바인딩·강도 변경은 재컴파일 없이는 영영 반영되지 않는다
+# — source 문서 편집 시점이 그걸 알릴 유일한 무음 아닌 순간이다.
+RECOMPILE_TEMPLATE = (
+    "[nunchi:recompile] The file being modified is the source document of the "
+    "compiled rule(s) {names} (delivered just-in-time by this project's nunchi "
+    "hook). Content-only refinements need no follow-up — deliveries read this "
+    "document fresh every time. But if this change adds a rule for a new "
+    "action, rebinds a rule to a different action, or changes a prohibition's "
+    "strength, the compiled triggers go stale: after the edit, run "
+    "`/nunchi:compile {source}` or suggest it to the user."
+)
 
 
 def _match_field(rule: Rule, tool_name: str, tool_input: dict):
@@ -85,6 +97,33 @@ def _log(
         print(f"nunchi: log write failed: {e}", file=sys.stderr)
 
 
+def _recompile_notice(
+    rules: List[Rule], tool_name: str, tool_input: dict, project_dir: str
+):
+    """Edit/Write 대상이 컴파일된 룰의 source 문서면 재컴파일 안내를 만든다.
+
+    반환: (안내문, source 경로) 또는 None. 세션 마커 확인·기록은 호출부 몫.
+    이미 로드된 룰 목록만 훑으므로 무매칭 호출에 추가 비용이 없다.
+    """
+    if tool_name not in ("Edit", "Write"):
+        return None
+    file_path = tool_input.get("file_path")
+    if not isinstance(file_path, str) or not file_path:
+        return None
+    # join은 절대경로 file_path를 그대로 통과시킨다 — 상대·절대 모두 처리
+    target = os.path.realpath(os.path.join(project_dir, file_path))
+    hit = [
+        r
+        for r in rules
+        if r.source and os.path.realpath(os.path.join(project_dir, r.source)) == target
+    ]
+    if not hit:
+        return None
+    names = ", ".join(sorted({r.name for r in hit}))
+    source = hit[0].source
+    return RECOMPILE_TEMPLATE.format(names=names, source=source), source
+
+
 def _reason(rule: Rule, content: str) -> str:
     if rule.strength == "block":
         return BLOCK_TEMPLATE.format(name=rule.name, content=content)
@@ -96,29 +135,27 @@ def _reason(rule: Rule, content: str) -> str:
     return REQUIRE_READ_TEMPLATE.format(name=rule.name, content=content)
 
 
-def _deny(deliveries: List[tuple]) -> dict:
-    reason = "\n\n---\n\n".join(_reason(rule, content) for rule, content in deliveries)
+def _deny(reasons: List[str]) -> dict:
     return {
         "hookSpecificOutput": {
             "hookEventName": "PreToolUse",
             "permissionDecision": "deny",
-            "permissionDecisionReason": reason,
+            "permissionDecisionReason": "\n\n---\n\n".join(reasons),
         }
     }
 
 
-def _inject(deliveries: List[tuple]) -> dict:
+def _inject(reasons: List[str]) -> dict:
     """additionalContext 단독 반환 — permissionDecision을 넣지 않는다.
 
     allow를 반환하면 이 도구 호출이 권한 시스템을 우회한다(규칙 매칭 =
     자동 승인이라는 보안 퇴행). additionalContext만으로 주입이 동작함을
     실측 확인했다 (PROBE-inject.md 판정 ②).
     """
-    context = "\n\n---\n\n".join(_reason(rule, content) for rule, content in deliveries)
     return {
         "hookSpecificOutput": {
             "hookEventName": "PreToolUse",
-            "additionalContext": context,
+            "additionalContext": "\n\n---\n\n".join(reasons),
         }
     }
 
@@ -141,7 +178,8 @@ def decide(input_data: dict, project_dir: str) -> dict:
         to_deliver = []
         warnings_buf = io.StringIO()
         with contextlib.redirect_stderr(warnings_buf):
-            for rule in load_rules(project_dir, quiet=quiet):
+            rules = load_rules(project_dir, quiet=quiet)
+            for rule in rules:
                 field = _match_field(rule, tool_name, tool_input)
                 if field is None:
                     continue
@@ -189,16 +227,29 @@ def decide(input_data: dict, project_dir: str) -> dict:
                 except OSError:
                     pass
 
-        if not to_deliver:
+        # 재컴파일 신호 (#17): 편집 대상이 어떤 룰의 source 문서면 세션당
+        # 1회 안내한다. 마커는 "{session}--" 접두라 rearm이 함께 리셋한다.
+        recompile = _recompile_notice(rules, tool_name, tool_input, project_dir)
+        if recompile:
+            recompile_marker = os.path.join(
+                state_dir,
+                f"{session}--recompile--{_SESSION_SAFE_RE.sub('-', recompile[1])}",
+            )
+            if os.path.exists(recompile_marker):
+                recompile = None
+
+        if not to_deliver and not recompile:
             return {}
 
         # 콘텐츠 조립을 마커 기록보다 먼저 수행한다 — 한 룰의 배달 실패가
         # 이미 조립된 다른 룰의 마커 기록(=배달 확정)을 소급 무효화하지 않도록.
-        deliveries = [(rule, _content(rule, project_dir)) for rule in to_deliver]
+        reasons = [_reason(rule, _content(rule, project_dir)) for rule in to_deliver]
+        if recompile:
+            reasons.append(recompile[0])
 
-        # inject 룰만 매칭됐으면 차단 없이 주입한다. deny가 어차피 발생하는
-        # 호출이면 inject 내용도 그 사유에 병합 배달한다 — 한 번의 재시도로
-        # 전부 커버 (병합 배달 철학 유지).
+        # inject 룰만 매칭됐으면(재컴파일 안내 단독 포함) 차단 없이 주입한다.
+        # deny가 어차피 발생하는 호출이면 inject 내용도 그 사유에 병합 배달한다
+        # — 한 번의 재시도로 전부 커버 (병합 배달 철학 유지).
         inject_only = all(rule.strength == "inject" for rule in to_deliver)
         decision = "inject" if inject_only else "deny"
 
@@ -210,7 +261,23 @@ def decide(input_data: dict, project_dir: str) -> dict:
                     f.write("delivered")
             _log(project_dir, session, rule.name, tool_name, decision)
 
-        return _inject(deliveries) if inject_only else _deny(deliveries)
+        if recompile:
+            # 마커 기록 실패는 룰 배달(이미 확정)을 소급 무효화하면 안 된다
+            # — 억제하고 배달은 그대로 나간다 (최악은 안내 재배달).
+            with contextlib.suppress(OSError):
+                os.makedirs(state_dir, exist_ok=True)
+                with open(recompile_marker, "w") as f:
+                    f.write("delivered")
+            _log(
+                project_dir,
+                session,
+                "(recompile)",
+                tool_name,
+                decision,
+                extra={"source": recompile[1]},
+            )
+
+        return _inject(reasons) if inject_only else _deny(reasons)
     except Exception as e:  # 안전 기본값
         print(f"nunchi: engine error: {e}", file=sys.stderr)
         return {}

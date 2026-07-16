@@ -30,6 +30,29 @@ def summarize(project_dir: str) -> dict:
     }
 
 
+def recompile_candidates(project_dir: str) -> list:
+    """source 문서가 룰 파일보다 최신인 룰 — 재컴파일 후보 (#17).
+
+    mtime 휴리스틱이라 후보는 "확인하라"는 신호일 뿐이다: 내용 보강이면
+    재컴파일이 필요 없고(배달이 원본을 매번 읽음), 문서 변경 없이 도구가
+    바뀌는 트리거 드리프트는 여기 안 잡힌다(죽은 룰 통계가 보완).
+    반환: [(source 경로, [룰 이름들])] — source 기준 정렬.
+    """
+    candidates = {}
+    for rule in load_rules(project_dir):
+        if not rule.source:
+            continue
+        try:
+            newer = os.path.getmtime(
+                os.path.join(project_dir, rule.source)
+            ) > os.path.getmtime(rule.path)
+        except OSError:
+            continue  # source 부재 등 — 배달 폴백과 같은 태도로 조용히 건너뜀
+        if newer:
+            candidates.setdefault(rule.source, []).append(rule.name)
+    return sorted(candidates.items())
+
+
 def context_economics(project_dir: str) -> dict:
     """@import 대비 컨텍스트 절약 추정 (PROBE-context-economics 방법의 레포별 산수).
 
@@ -71,6 +94,8 @@ def context_economics(project_dir: str) -> dict:
                         tracked.add(entry["session"])
                 if entry.get("decision") not in ("deny", "inject"):
                     continue
+                if str(entry.get("rule", "")).startswith("("):
+                    continue  # (recompile) 등 메타 항목 — 룰 배달 지출이 아니다
                 deliveries += 1
                 source = rule_doc.get(entry.get("rule", ""))
                 delivered_bytes += doc_sizes.get(source, 0)
@@ -98,14 +123,19 @@ def main():
         if name == "(compact)":
             rearm_count = c.get("rearm", 0)
             continue
-        if name == "(session)":
-            continue  # 세션 관측 기록 — 룰이 아니므로 아래 경제성 요약에서만 쓴다
+        if name in ("(session)", "(recompile)"):
+            continue  # 메타 항목 — 룰 행이 아니다 (세션 관측·재컴파일 안내)
         print(
             f"{name:<24} {c.get('deny', 0):<10} {c.get('inject', 0):<12} "
             f"{c.get('allow-after-delivery', 0):<6}"
         )
     for name in result["never_triggered"]:
         print(f"{name:<24} {'한 번도 트리거되지 않음 (죽은 룰?)'}")
+    for source, names in recompile_candidates(os.getcwd()):
+        print(
+            f"재컴파일 후보: {source} (룰 {', '.join(names)}) — source가 룰 파일보다 "
+            f"최신. 규칙 신설·트리거·강도 변경이었다면 /nunchi:compile {source}"
+        )
     if rearm_count:
         print(f"컴팩션 재무장(rearm): {rearm_count}회")
     eco = context_economics(os.getcwd())

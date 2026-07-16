@@ -200,6 +200,84 @@ def test_context_economics_tracked_sessions():
     assert eco["sessions_tracked"] == 2  # s1, s2 (session-start 기록이 있는 세션)
 
 
+def _make_rule_with_source(d, source_text="rules"):
+    os.makedirs(os.path.join(d, ".claude", "rules"))
+    os.makedirs(os.path.join(d, "docs"))
+    rule_path = os.path.join(d, ".claude", "rules", "pr.md")
+    with open(rule_path, "w") as f:
+        f.write(
+            "---\nname: pr-rules\ntrigger:\n  tool: Bash\n  pattern: x\n"
+            "source: docs/pr.md\n---\nb"
+        )
+    src_path = os.path.join(d, "docs", "pr.md")
+    with open(src_path, "w") as f:
+        f.write(source_text)
+    return rule_path, src_path
+
+
+def test_recompile_candidates_flags_newer_source():
+    from core.report import recompile_candidates
+
+    d = tempfile.mkdtemp()
+    rule_path, src_path = _make_rule_with_source(d)
+    os.utime(rule_path, (1000, 1000))
+    os.utime(src_path, (2000, 2000))
+    assert recompile_candidates(d) == [("docs/pr.md", ["pr-rules"])]
+
+
+def test_recompile_candidates_quiet_when_rule_newer():
+    from core.report import recompile_candidates
+
+    d = tempfile.mkdtemp()
+    rule_path, src_path = _make_rule_with_source(d)
+    os.utime(rule_path, (2000, 2000))
+    os.utime(src_path, (1000, 1000))
+    assert recompile_candidates(d) == []
+
+
+def test_recompile_candidates_skips_missing_source():
+    from core.report import recompile_candidates
+
+    d = tempfile.mkdtemp()
+    _, src_path = _make_rule_with_source(d)
+    os.remove(src_path)
+    assert recompile_candidates(d) == []
+
+
+def test_context_economics_skips_meta_entries():
+    # (recompile) 안내는 룰 배달 지출로 계상하지 않는다
+    from core.report import context_economics
+
+    d = tempfile.mkdtemp()
+    _write_log(d, [("(recompile)", "inject")])
+    assert context_economics(d)["deliveries"] == 0
+
+
+def test_main_output_recompile_candidate_line(capsys, monkeypatch):
+    d = tempfile.mkdtemp()
+    rule_path, src_path = _make_rule_with_source(d)
+    os.utime(rule_path, (1000, 1000))
+    os.utime(src_path, (2000, 2000))
+    monkeypatch.chdir(d)
+    from core.report import main
+
+    main()
+    out = capsys.readouterr().out
+    assert "재컴파일 후보: docs/pr.md" in out
+    assert "/nunchi:compile docs/pr.md" in out
+
+
+def test_main_output_recompile_meta_not_a_rule_row(capsys, monkeypatch):
+    d = tempfile.mkdtemp()
+    _write_log(d, [("pr-rules", "deny"), ("(recompile)", "inject")])
+    monkeypatch.chdir(d)
+    from core.report import main
+
+    main()
+    out = capsys.readouterr().out
+    assert not any(ln.startswith("(recompile)") for ln in out.splitlines())
+
+
 def test_summarize_empty_project():
     d = tempfile.mkdtemp()
     assert summarize(d) == {"rules": {}, "never_triggered": []}

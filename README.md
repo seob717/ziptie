@@ -88,6 +88,16 @@ Claude Code itself (v2.0.64+) also reads `.claude/rules/*.md`: a file without a 
 
 This is why rule bodies must stay at one summary line: a long body would be injected at session start *and* delivered again at trigger time. `/nunchi:compile` generates bodies this way by default.
 
+### Keeping compiled rules fresh
+
+Changes to a rule's *content* need nothing from you — the `source` document is read fresh at every delivery. What can silently go stale is the *trigger structure*: a new rule added to the document, a rule rebound to a different action, or a changed prohibition strength, none of which take effect until `/nunchi:compile <path>` is re-run. Three signals cover this (from [#17](https://github.com/seob717/nunchi/issues/17)):
+
+- **Edit-time reminder** — when a tool call edits a document that is the `source` of a compiled rule, the hook injects a once-per-session note naming the affected rules and the exact recompile command. Non-blocking (`additionalContext` only), and it reuses the rule list already loaded for matching, so calls that touch nothing pay nothing.
+- **`/nunchi:report` candidates** — rules whose `source` document is newer on disk than the compiled rule file are listed as recompile candidates (mtime heuristic; a fresh clone resets mtimes, so treat it as a prompt, not proof).
+- **Convention watcher (opt-in)** — if your rule documents follow a path convention like `docs/*-rules.md`, an ordinary nunchi rule can watch the convention itself and suggest compiling newly created documents (`/nunchi:compile` offers to generate it; see the compile command's §5.6). No extra config surface — the watcher is just another rule file.
+
+The one gap none of these catch is trigger drift with no document change at all (the team switches `gh` → `glab` and the PR rules doc never mentions tooling) — that surfaces as a dead rule in `/nunchi:report` (delivered 0 times), which is why the report flags never-triggered rules.
+
 ## Measured results
 
 Measurement harness: a sandbox repo + a mock `gh` (captures PRs) + 4 machine-gradable PR rules + headless `claude -p` (sonnet), 3 runs per condition. (The full harness is preserved in the `pilot/` directory so it can be re-run.)

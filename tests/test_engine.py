@@ -466,6 +466,99 @@ def test_inject_mixed_with_require_read_merges_into_single_deny():
     assert decide(hook_input(session="i5"), d) == {}
 
 
+def _doc_edit_input(session, file_path="docs/pr-rules.md", tool="Edit"):
+    return {
+        "hook_event_name": "PreToolUse",
+        "session_id": session,
+        "tool_name": tool,
+        "tool_input": {"file_path": file_path, "new_string": "x"},
+    }
+
+
+def test_edit_source_doc_injects_recompile_notice():
+    # #17: source 문서 편집은 트리거 구조가 낡을 수 있는 순간 — inject로 안내
+    d = make_project()
+    out = decide(_doc_edit_input("r1"), d)
+    hso = out["hookSpecificOutput"]
+    assert "permissionDecision" not in hso  # 안내는 inject 전용 — 차단 없음
+    ctx = hso["additionalContext"]
+    assert "recompile" in ctx and "pr-rules" in ctx
+    assert "/nunchi:compile docs/pr-rules.md" in ctx
+
+
+def test_edit_source_doc_second_time_silent():
+    d = make_project()
+    decide(_doc_edit_input("r2"), d)
+    assert decide(_doc_edit_input("r2"), d) == {}
+
+
+def test_write_source_doc_also_notices():
+    d = make_project()
+    out = decide(_doc_edit_input("r3", tool="Write"), d)
+    assert "recompile" in out["hookSpecificOutput"]["additionalContext"]
+
+
+def test_edit_source_doc_absolute_path_matches():
+    d = make_project()
+    abs_path = os.path.join(d, "docs", "pr-rules.md")
+    out = decide(_doc_edit_input("r4", file_path=abs_path), d)
+    assert "recompile" in out["hookSpecificOutput"]["additionalContext"]
+
+
+def test_edit_unrelated_file_no_notice():
+    d = make_project()
+    assert decide(_doc_edit_input("r5", file_path="docs/other.md"), d) == {}
+
+
+def test_recompile_notice_rearmed_after_compaction():
+    d = make_project()
+    decide(_doc_edit_input("r6"), d)
+    assert decide(_doc_edit_input("r6"), d) == {}
+    engine.rearm({"session_id": "r6", "source": "compact"}, d)
+    out = decide(_doc_edit_input("r6"), d)
+    assert "recompile" in out["hookSpecificOutput"]["additionalContext"]
+
+
+def test_recompile_notice_merges_into_deny():
+    # 같은 호출에서 deny 룰이 발동하면 안내도 그 사유에 병합된다 (병합 배달 철학)
+    d = make_project()
+    guard = (
+        "---\nname: docs-guard\ntrigger:\n  tool: Edit\n  pattern: docs/\n"
+        "strength: require-read\n---\n문서 수정 규칙"
+    )
+    with open(os.path.join(d, ".claude", "rules", "docs-guard.md"), "w") as f:
+        f.write(guard)
+    out = decide(_doc_edit_input("r7"), d)
+    hso = out["hookSpecificOutput"]
+    assert hso["permissionDecision"] == "deny"
+    assert "recompile" in hso["permissionDecisionReason"]
+    assert "문서 수정 규칙" in hso["permissionDecisionReason"]
+
+
+def test_recompile_notice_names_all_rules_sharing_source():
+    d = make_project()
+    rule2 = RULE.replace("name: pr-rules", "name: pr-rules-2")  # 같은 source
+    with open(os.path.join(d, ".claude", "rules", "pr2.md"), "w") as f:
+        f.write(rule2)
+    ctx = decide(_doc_edit_input("r8"), d)["hookSpecificOutput"]["additionalContext"]
+    assert "pr-rules" in ctx and "pr-rules-2" in ctx
+
+
+def test_recompile_notice_logged_and_marker_sanitized():
+    d = make_project()
+    decide(_doc_edit_input("r9"), d)
+    state = os.path.join(d, ".claude", "nunchi", "state")
+    assert os.path.exists(os.path.join(state, "r9--recompile--docs-pr-rules.md"))
+    logs = glob.glob(os.path.join(d, ".claude", "nunchi", "logs", "*.jsonl"))
+    entries = [json.loads(ln) for ln in open(logs[0]) if ln.strip()]
+    assert any(
+        e["rule"] == "(recompile)"
+        and e["decision"] == "inject"
+        and e["source"] == "docs/pr-rules.md"
+        for e in entries
+    )
+
+
 class TestRearm(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.mkdtemp()

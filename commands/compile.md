@@ -58,7 +58,23 @@ PR creation rules — title format, required sections, reviewer assignment.
 
 ## 5.5 Propose dropping covered `@references`
 
-If every rule extracted from an `@referenced` document was compiled (nothing from it landed in the uncompilable list), tell the user the `@path` line in CLAUDE.md can be removed: the document will then load just-in-time via the rule's `source` instead of at every session start (measured: `pilot/PROBE-context-economics.md`). If the document also produced uncompilable always-on guidance, do NOT propose removing it — say which part still needs the `@reference`.
+If every rule extracted from an `@referenced` document was compiled (nothing from it landed in the uncompilable list), tell the user the `@path` line in CLAUDE.md can be removed: the document will then load just-in-time via the rule's `source` instead of at every session start (measured: `pilot/PROBE-context-economics.md`). If the document also produced uncompilable always-on guidance, do NOT propose removing it — say which part still needs the `@reference`. Removing the `@reference` does not orphan the document: the delivery engine notices edits to any compiled rule's `source` document and reminds about recompiling, once per session (issue #17).
+
+## 5.6 Offer a rule-document convention watcher (opt-in)
+
+If the user's rule documents follow a path convention (e.g. `docs/*-rules.md`), offer to generate one extra rule that watches the convention itself, so a newly created rule document prompts a compile instead of silently never being compiled. Ask for the convention — never guess it — and skip this step entirely if the user has none (default: don't generate). The watcher is an ordinary rule file, so it rides the existing load/match/session-marker path:
+
+```markdown
+---
+name: rule-doc-convention
+trigger:
+  tool: Write
+  pattern: docs/.*rules.*\.md$
+strength: inject
+enabled: true
+---
+New rule document — run /nunchi:compile <its path> to compile it into trigger-bound rules.
+```
 
 ## 6. User review
 Show the list of generated rule files as a table (name / trigger / strength / source), and along with the list of uncompilable rules, ask "is there anything to fix?" An overly broad regex becomes a false positive, so scoping it conservatively narrow is the default.
