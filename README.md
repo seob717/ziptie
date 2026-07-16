@@ -23,26 +23,46 @@ One `/nunchi:compile` turns your CLAUDE.md into trigger-bound rule files; a PreT
 
 Requires [Claude Code](https://code.claude.com) with plugin support, and Python 3 (the hook engine runs on the standard library only — no external packages).
 
+**Option 1 — install as a plugin** (recommended: a managed bundle that can stay current on its own):
+
+```bash
+claude plugin marketplace add seob717/nunchi
+claude plugin install nunchi@nunchi-marketplace
 ```
-/plugin marketplace add seob717/nunchi
-/plugin install nunchi@nunchi-marketplace
+
+(Inside a session, `/plugin marketplace add seob717/nunchi` and `/plugin install nunchi@nunchi-marketplace` do the same.)
+
+Auto-update is **off by default** for third-party marketplaces. To receive each release automatically: run `/plugin`, open the **Marketplaces** tab, select `nunchi-marketplace`, and choose **Enable auto-update**. Updates ship once per release (release-please bumps the plugin version); Claude Code fetches them in the background after a session starts, and they take effect on the next launch or `/reload-plugins`. If you prefer manual control, `/plugin marketplace update nunchi-marketplace` refreshes on demand.
+
+To set up a whole team, commit this to the project's `.claude/settings.json` — collaborators who trust the repository are prompted to install:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "nunchi-marketplace": {
+      "source": { "source": "github", "repo": "seob717/nunchi" }
+    }
+  },
+  "enabledPlugins": {
+    "nunchi@nunchi-marketplace": true
+  }
+}
 ```
 
-Then, inside your project:
-
-1. **`/nunchi:compile`** — reads CLAUDE.md and the `@referenced` documents inside it, extracts rules, infers a trigger (tool, regex pattern) for each, and writes them to `.claude/rules/*.md`.
-2. **Review the rule files** — they are plain text and the source of truth. Check that each trigger, strength, and source path is right; fix by hand if needed.
-3. **Done.** From now on the PreToolUse hook delivers each rule right before the action it applies to. `/nunchi:report` shows what was delivered, when, and what it saved.
-
-<details>
-<summary>Install from a local directory instead</summary>
+**Option 2 — clone and hack** (an editable local copy: tweak the engine, commands, or triggers directly):
 
 ```bash
 git clone https://github.com/seob717/nunchi.git
 claude --plugin-dir /path/to/nunchi
 ```
 
-</details>
+`--plugin-dir` is per-invocation, so pass it on each launch. Your local edits apply the next time you start — nothing updates underneath you.
+
+Then, inside your project:
+
+1. **`/nunchi:compile`** — reads CLAUDE.md and the `@referenced` documents inside it, extracts rules, infers a trigger (tool, regex pattern) for each, and writes them to `.claude/rules/*.md`.
+2. **Review the rule files** — they are plain text and the source of truth. Check that each trigger, strength, and source path is right; fix by hand if needed.
+3. **Done.** From now on the PreToolUse hook delivers each rule right before the action it applies to. `/nunchi:report` shows what was delivered, when, and what it saved.
 
 ## The problem
 
