@@ -1,0 +1,48 @@
+{
+  "doc": "langgraph",
+  "rules": [
+    {
+      "name": "run-checks-before-pr",
+      "tool": "Bash",
+      "pattern": "gh\\s+pr\\s+create",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "run the following commands in that library's directory before creating a pull request: - `make format` – run code formatters - `make lint` – run the linter - `make test` – execute the test suite"
+    },
+    {
+      "name": "no-sphinx-double-backtick",
+      "tool": "Edit",
+      "pattern": "``[^`]+``",
+      "field": "new_string",
+      "path": "\\.(py|js|jsx|ts|tsx)$",
+      "strength": "block",
+      "evidence": "Do NOT use Sphinx-style double backtick formatting (``code``). Use single backticks (`code`) for inline code references in docstrings and comments."
+    },
+    {
+      "name": "no-sphinx-double-backtick",
+      "tool": "Write",
+      "pattern": "``[^`]+``",
+      "field": "content",
+      "path": "\\.(py|js|jsx|ts|tsx)$",
+      "strength": "block",
+      "evidence": "Do NOT use Sphinx-style double backtick formatting (``code``). Use single backticks (`code`) for inline code references in docstrings and comments."
+    }
+  ],
+  "skill_candidates": [],
+  "always_on": [
+    "TEST 환경변수로 특정 테스트 파일·pytest 옵션을 지정하는 사용법 설명 — 의무나 금지가 아닌 사용 안내",
+    "라이브러리 목록 및 의존성 맵 개요(checkpoint, checkpoint-postgres, checkpoint-sqlite, prebuilt, langgraph, sdk-py, cli, sdk-js) — 특정 액션에 결부되지 않은 배경 정보",
+    "'라이브러리 변경은 의존 라이브러리 전체에 영향을 줄 수 있다'는 인지 안내 — 특정 액션에 대한 의무·금지가 부여되지 않은 일반 정보"
+  ],
+  "low_confidence": [
+    {
+      "rule": "run-checks-before-pr",
+      "category": "trigger",
+      "reason": "문서가 'before creating a pull request'라고만 하고 gh 등 구체적 PR 생성 도구를 언급하지 않아, gh pr create 트리거는 관례로 추정한 것"
+    }
+  ],
+  "questions": [
+    "PR 체크(run-checks-before-pr) 규칙의 트리거를 `gh pr create`로 가정했습니다 — 문서에 PR 생성 도구 언급이 없는데, 이 팀은 실제로 gh CLI로 PR을 만드나요?"
+  ]
+}

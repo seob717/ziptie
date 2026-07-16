@@ -1,0 +1,123 @@
+{
+  "doc": "awm-infrastructure-1-dymensionxyz_dymension",
+  "rules": [
+    {
+      "name": "no-what-comments",
+      "tool": "Edit",
+      "pattern": "//",
+      "field": "new_string",
+      "path": "\\.go$",
+      "strength": "block",
+      "evidence": "**NEVER** comment the WHAT of code (the code itself shows what it does)"
+    },
+    {
+      "name": "no-what-comments",
+      "tool": "Write",
+      "pattern": "//",
+      "field": "content",
+      "path": "\\.go$",
+      "strength": "block",
+      "evidence": "**NEVER** comment the WHAT of code (the code itself shows what it does)"
+    },
+    {
+      "name": "verify-go-changes",
+      "tool": "Edit",
+      "pattern": "\\.go$",
+      "field": null,
+      "path": null,
+      "strength": "inject",
+      "evidence": "`golangci-lint run` - Only if you modified Go code / `gofumpt -w .` - Only if you modified Go code / `go test` - Only for packages you modified"
+    },
+    {
+      "name": "verify-go-changes",
+      "tool": "Write",
+      "pattern": "\\.go$",
+      "field": null,
+      "path": null,
+      "strength": "inject",
+      "evidence": "`golangci-lint run` - Only if you modified Go code / `gofumpt -w .` - Only if you modified Go code / `go test` - Only for packages you modified"
+    },
+    {
+      "name": "verify-proto-changes",
+      "tool": "Edit",
+      "pattern": "\\.proto$",
+      "field": null,
+      "path": null,
+      "strength": "inject",
+      "evidence": "`make proto-format` and `make proto-gen` - Only if you modified .proto files"
+    },
+    {
+      "name": "verify-proto-changes",
+      "tool": "Write",
+      "pattern": "\\.proto$",
+      "field": null,
+      "path": null,
+      "strength": "inject",
+      "evidence": "`make proto-format` and `make proto-gen` - Only if you modified .proto files"
+    },
+    {
+      "name": "full-test-suite-before-push",
+      "tool": "Bash",
+      "pattern": "git(\\s+-\\S+(\\s+\\S+)?)*\\s+push",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Full test suite with `go-acc` - Only before final push or if requested"
+    },
+    {
+      "name": "never-share-keys-or-mnemonics",
+      "tool": "Bash",
+      "pattern": "dymd\\s+keys\\s+(export|mnemonic|unsafe-export-eth-key|unsafe-import-eth-key)",
+      "field": null,
+      "path": null,
+      "strength": "block",
+      "evidence": "Never share private keys or mnemonics"
+    },
+    {
+      "name": "verify-tx-before-broadcast",
+      "tool": "Bash",
+      "pattern": "dymd\\s+tx\\s+(?!.*(--generate-only|--dry-run)).*--from\\s+\\S+",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Always verify transaction details before signing / Use `--dry-run` to simulate transactions first"
+    }
+  ],
+  "skill_candidates": [
+    {
+      "summary": "로컬 Dymension 노드 환경 설정 절차 (setup_local.sh 실행 → 노드 시작 → 유동성 풀 부트스트랩 → 인센티브 스트림 설정)",
+      "evidence": "./scripts/setup_local.sh ... dymd start ... sh scripts/pools/pools_bootstrap.sh ... sh scripts/incentives/fund_incentives.sh"
+    }
+  ],
+  "always_on": [
+    "Repository Overview / Architecture Overview / Module Dependencies — 저장소·모듈 구조 설명, 의무·금지 표현 없는 사실 정보",
+    "FACTS 섹션: Cosmos SDK 단일 스레드 실행, 트랜잭션 원자성(에러 시 전체 롤백), BeginBlocker/EndBlocker는 패닉 시 체인 halt 유발, 모든 검증자는 결정론적으로 동일 결과를 내야 함",
+    "Common Development Commands 및 dymd CLI User Guide 전체(설정/키관리/쿼리/트랜잭션/제네시스/스냅샷/디버그 명령어 카탈로그) — 사용 가능한 명령을 나열한 문서일 뿐 의무·금지·순서가 부여되지 않음",
+    "GitHub Actions CI 워크플로우 설명(test.yml, golangci_lint.yml, proto.yaml, e2e_test.yml, e2e_test_upgrade.yml) — 문서, 규칙 아님",
+    "Important Notes: Go 1.23.0(툴체인 1.24.2), cosmos-sdk/cometbft/ibc-go/osmosis 커스텀 포크, Docker 필요, 기본 chain-id·denom",
+    "Environment Configuration의 기본 포트 목록(RPC/P2P/gRPC/REST/JSON-RPC/WebSocket) — 참고 정보",
+    "Security Best Practices 중 나머지 항목(하드웨어 지갑 사용, 노드 소프트웨어 최신 유지, HTTPS RPC 사용, 키 백업, 멀티시그 사용, 적정 가스 한도 설정, 위임 전 검증인 신원 확인) — 특정 도구 호출에 매이지 않는 일반 운영 보안 권고"
+  ],
+  "low_confidence": [
+    {
+      "rule": "no-what-comments",
+      "category": "trigger",
+      "reason": "문서는 WHAT-주석과 WHY-주석을 구분할 문법적 표지를 제시하지 않아, Go 파일의 모든 주석 추가(`//`)에 걸리는 광범위한 프록시 패턴으로 대체했다 — 정당한 WHY 주석도 함께 걸린다."
+    },
+    {
+      "rule": "never-share-keys-or-mnemonics",
+      "category": "trigger",
+      "reason": "문서는 이 금지 규칙을 특정 명령과 연결하지 않는다 — `dymd keys export/mnemonic/unsafe-*-eth-key` 계열 명령이라는 트리거는 컨벤션에 따른 추론이며, 문서에 명시되지 않았다."
+    },
+    {
+      "rule": "verify-tx-before-broadcast",
+      "category": "trigger",
+      "reason": "문서는 '서명 전 검증'과 'dry-run 우선 사용'을 어떤 명령 패턴에 적용해야 하는지 명시하지 않는다 — `--generate-only`/`--dry-run`이 없는 `dymd tx ... --from` 명령이라는 트리거는 추론된 것으로, 다른 실제 브로드캐스트 경로를 놓치거나 안전한 경로를 오탐할 수 있다."
+    }
+  ],
+  "questions": [
+    "'NEVER 코드의 WHAT을 주석으로 달지 마라'는 규칙을 Go 파일의 모든 주석 추가(`//`)에 걸리도록 컴파일했습니다(WHAT/WHY 구분이 불가능해서). 이 광범위한 트리거를 그대로 유지할까요, 아니면 컴파일 대상에서 제외하고 always-on 안내로만 둘까요? (유지/제외)",
+      "'Never share private keys or mnemonics'를 `dymd keys export|mnemonic|unsafe-*-eth-key` 명령에 매핑했습니다. 이 트리거 범위가 맞습니까, 아니면 다른 명령(예: 로그 출력, 환경변수 노출)까지 포함해야 합니까? (맞음/확장필요)",
+    "'서명 전 항상 검증'과 'dry-run 먼저 사용'을 `--generate-only`/`--dry-run` 없이 `--from`이 붙은 `dymd tx` 명령에 매핑했습니다. 이 트리거 범위가 적절합니까? (적절/부적절)"
+  ]
+}

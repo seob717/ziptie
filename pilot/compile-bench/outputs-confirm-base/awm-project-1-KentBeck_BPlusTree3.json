@@ -1,0 +1,48 @@
+{
+  "doc": "awm-project-1-KentBeck_BPlusTree3",
+  "rules": [
+    {
+      "name": "no-mixed-structural-behavioral-commit",
+      "tool": "Bash",
+      "pattern": "git(\\s+-\\S+(\\s+\\S+)?)*\\s+commit",
+      "field": null,
+      "path": null,
+      "strength": "block",
+      "evidence": "Never mix structural and behavioral changes in the same commit"
+    },
+    {
+      "name": "commit-readiness-checklist",
+      "tool": "Bash",
+      "pattern": "git(\\s+-\\S+(\\s+\\S+)?)*\\s+commit",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Only commit when: 1. ALL tests are passing 2. ALL compiler/linter warnings have been resolved 3. The change represents a single logical unit of work 4. Commit messages clearly state whether the commit contains structural or behavioral changes"
+    },
+    {
+      "name": "small-frequent-commits",
+      "tool": "Bash",
+      "pattern": "git(\\s+-\\S+(\\s+\\S+)?)*\\s+commit",
+      "field": null,
+      "path": null,
+      "strength": "inject",
+      "evidence": "Use small, frequent commits rather than large, infrequent ones"
+    }
+  ],
+  "skill_candidates": [
+    {
+      "summary": "New-feature TDD workflow: write a failing test, implement the minimum to pass, confirm green, make structural (Tidy First) changes, commit structural then behavioral changes separately, repeat",
+      "evidence": "1. Write a simple failing test for a small part of the feature 2. Implement the bare minimum to make it pass 3. Run tests to confirm they pass (Green) 4. Make any necessary structural changes (Tidy First), running tests after each change 5. Commit structural changes separately 6. Add another test for the next small increment of functionality 7. Repeat until the feature is complete, committing behavioral changes separately from structural ones"
+    }
+  ],
+  "always_on": [
+    "Chat-driven workflow: on 'go', follow plan.md to find the next unmarked test, implement it, then implement only enough code to pass it",
+    "Persona: senior engineer following Kent Beck's TDD and Tidy First methodologies precisely",
+    "Core TDD principles: Red-Green-Refactor cycle, simplest failing test first, minimal implementation, refactor only after green, separate structural/behavioral changes, maintain high quality",
+    "TDD methodology guidance: start with a small failing test, use descriptive test names, write just enough code, consider refactoring once green, repeat; for defects write an API-level failing test then the smallest reproducing test before fixing",
+    "Tidy First definitions: structural changes (rearranging without behavior change) vs behavioral changes (adding/modifying functionality); always do structural changes first when both are needed; validate structural changes preserve behavior by running tests before and after",
+    "Code quality standards: eliminate duplication, express intent through naming/structure, make dependencies explicit, keep methods small and focused, minimize state/side effects, use the simplest solution that works",
+    "Refactoring guidelines: refactor only in the Green phase, use named refactoring patterns, one refactoring at a time, run tests after each step, prioritize refactors that remove duplication or improve clarity",
+    "General discipline: always write one test at a time and run all (non-long-running) tests each time"
+  ]
+}

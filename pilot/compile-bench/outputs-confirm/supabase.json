@@ -1,0 +1,120 @@
+{
+  "doc": "supabase",
+  "rules": [
+    {
+      "name": "ui-check-index-before-new-primitive",
+      "tool": "Write",
+      "pattern": "packages/ui/.*\\.(tsx?|jsx?)$",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "use `_Shadcn_` suffixed variants for form primitives. Check `packages/ui/index.tsx` before creating new primitives."
+    },
+    {
+      "name": "ui-import-from-ui-edit",
+      "tool": "Edit",
+      "pattern": "from\\s+['\"]@radix-ui",
+      "field": "new_string",
+      "path": "\\.(tsx|ts)$",
+      "strength": "require-read",
+      "evidence": "import from `'ui'`"
+    },
+    {
+      "name": "ui-import-from-ui-write",
+      "tool": "Write",
+      "pattern": "from\\s+['\"]@radix-ui",
+      "field": "content",
+      "path": "\\.(tsx|ts)$",
+      "strength": "require-read",
+      "evidence": "import from `'ui'`"
+    },
+    {
+      "name": "styling-no-hardcoded-colors-edit",
+      "tool": "Edit",
+      "pattern": "#[0-9a-fA-F]{3,8}\\b|rgba?\\(",
+      "field": "new_string",
+      "path": "\\.(tsx|ts|css)$",
+      "strength": "block",
+      "evidence": "Tailwind only, semantic tokens (`bg-muted`, `text-foreground-light`), no hardcoded colors."
+    },
+    {
+      "name": "styling-no-hardcoded-colors-write",
+      "tool": "Write",
+      "pattern": "#[0-9a-fA-F]{3,8}\\b|rgba?\\(",
+      "field": "content",
+      "path": "\\.(tsx|ts|css)$",
+      "strength": "block",
+      "evidence": "Tailwind only, semantic tokens (`bg-muted`, `text-foreground-light`), no hardcoded colors."
+    },
+    {
+      "name": "studio-shortcuts-use-registry-edit",
+      "tool": "Edit",
+      "pattern": "addEventListener\\(\\s*['\"]keydown|onKeyDown\\s*=",
+      "field": "new_string",
+      "path": "apps/studio/.*\\.(tsx|ts)$",
+      "strength": "inject",
+      "evidence": "Prefer registered, discoverable shortcuts over one-off keyboard listeners; keep `G then ...` chords for navigation."
+    },
+    {
+      "name": "studio-shortcuts-use-registry-write",
+      "tool": "Write",
+      "pattern": "addEventListener\\(\\s*['\"]keydown|onKeyDown\\s*=",
+      "field": "content",
+      "path": "apps/studio/.*\\.(tsx|ts)$",
+      "strength": "inject",
+      "evidence": "Prefer registered, discoverable shortcuts over one-off keyboard listeners; keep `G then ...` chords for navigation."
+    },
+    {
+      "name": "studio-avoid-barrel-files",
+      "tool": "Write",
+      "pattern": "apps/studio/.*/index\\.(ts|tsx)$",
+      "field": null,
+      "path": null,
+      "strength": "inject",
+      "evidence": "Avoid barrel re-export files."
+    },
+    {
+      "name": "studio-colocate-subcomponents",
+      "tool": "Write",
+      "pattern": "apps/studio/.*\\.(tsx|ts)$",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Co-locate sub-components with parent."
+    }
+  ],
+  "skill_candidates": [],
+  "always_on": [
+    "Stack facts: pnpm 10 + Turborepo monorepo, requires Node >= 22.",
+    "Structure table listing directory purposes (apps/studio, apps/docs, apps/www, packages/ui, packages/common, e2e/studio) — pure reference, no obligation attached.",
+    "Common Commands block — a flat list of pnpm/turbo commands with no ordering or obligation attached (install, dev, test, build, lint, typecheck).",
+    "Language convention: use U.S. English everywhere — too universal (comments, UI copy, docs) to bind to a specific file-type trigger."
+  ],
+  "low_confidence": [
+    {
+      "rule": "ui-import-from-ui-edit",
+      "category": "trigger",
+      "reason": "doc says 'import from ui' but never specifies which import path constitutes a violation; a regex targeting direct @radix-ui imports is inferred by convention, not stated in the text"
+    },
+    {
+      "rule": "studio-shortcuts-use-registry-edit",
+      "category": "trigger",
+      "reason": "doc says 'prefer registered shortcuts over one-off keyboard listeners' but never names the API (addEventListener/onKeyDown); the detection pattern is inferred by convention"
+    },
+    {
+      "rule": "studio-avoid-barrel-files",
+      "category": "trigger",
+      "reason": "doc says 'avoid barrel re-export files' but never names the filename convention (index.ts/tsx) used to detect one"
+    },
+    {
+      "rule": "studio-colocate-subcomponents",
+      "category": "trigger",
+      "reason": "doc says 'co-locate sub-components with parent' without naming any directory or file pattern; trigger is broadly scoped to all Write calls under apps/studio"
+    }
+  ],
+  "questions": [
+    "The 'import from ui' rule — should it require-read on every edit to any .ts/.tsx file in the repo, or only within component-consuming code such as apps/studio and packages/ui? Tentative: repo-wide via \\.(tsx|ts)$; alternative: scope to apps/* and packages/ui only.",
+    "'Co-locate sub-components with parent' — should require-read fire on every new file written anywhere under apps/studio, or only within specific component directories (e.g. apps/studio/components/**)? Tentative: all Write under apps/studio; alternative: a narrower path.",
+    "'Prefer registered shortcuts over one-off keyboard listeners' — should the trigger detect addEventListener('keydown', ...) / onKeyDown= specifically, or is a different signal intended? Tentative: that pattern; alternative: drop the rule as too hard to detect reliably."
+  ]
+}

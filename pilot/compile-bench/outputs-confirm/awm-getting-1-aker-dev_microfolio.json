@@ -1,0 +1,20 @@
+{
+  "doc": "awm-getting-1-aker-dev_microfolio",
+  "rules": [],
+  "skill_candidates": [],
+  "always_on": [
+    "프로젝트 개요 — SvelteKit 2 / Svelte 5 / Tailwind CSS 4 기반 정적 포트폴리오 생성기, 파일 기반 CMS(Markdown + YAML frontmatter), AKER 개발",
+    "개발 명령어 카탈로그 — pnpm dev/build/deploy/preview/lint/format/optimize-images/clean-images (의무·금지·순서 없이 사용 가능한 명령만 나열한 문서화 표)",
+    "패키지 매니저/런타임 요구사항 — pnpm 9.12.0 고정, Node.js 20+ 필요, 테스트 프레임워크 미구성",
+    "콘텐츠 시스템 — /content/projects/{slug}/ 구조(index.md, thumbnail, images/videos/documents), 홈페이지·About 콘텐츠 경로",
+    "데이터 로딩 패턴 — 각 라우트의 +page.server.js가 빌드 타임에 파일시스템에서 콘텐츠를 읽는 방식, 콘텐츠 파싱 패턴(--- 분리, yaml, marked)",
+    "핵심 유틸리티 위치 — paths.js/projects.js/imageMetadata.js/config.js/i18n.js의 역할 설명",
+    "스타일링 — Tailwind CSS 4 설정 위치, 다크모드(prefers-color-scheme), 폰트(IBM Plex Sans, bunny.net CDN)",
+    "컴포넌트 컨벤션 설명 — Ak 접두사 커스텀 컴포넌트, @vincjo/datatables 기반 Datatable 컴포넌트군",
+    "빌드·배포 — @sveltejs/adapter-static, svelte.config.js의 prerender 엔트리 자동 생성, vite-plugin-static-copy로 content/ 복사, 베이스 경로/CUSTOM_DOMAIN 설정 방식, layout의 prerender/trailingSlash 값",
+    "국제화 — 로케일 파일 위치(src/lib/locales/{lang}.json), 기본 로케일 설정 위치, RTL 자동 감지 방식",
+    "프로젝트 메타데이터 스키마 예시 — index.md frontmatter 필드(title/date/location/coordinates/description/type/tags/authors/featured) 참고용 YAML, 의무 표현 없이 예시로 제시됨"
+  ],
+  "low_confidence": [],
+  "questions": []
+}

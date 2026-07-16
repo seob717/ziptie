@@ -1,0 +1,83 @@
+{
+  "doc": "awm-project-1-KentBeck_BPlusTree3",
+  "rules": [
+    {
+      "name": "no-mixed-structural-behavioral-commit",
+      "tool": "Bash",
+      "pattern": "git(\\s+-\\S+(\\s+\\S+)?)*\\s+commit",
+      "field": null,
+      "path": null,
+      "strength": "block",
+      "evidence": "Never mix structural and behavioral changes in the same commit"
+    },
+    {
+      "name": "commit-only-when-tests-pass",
+      "tool": "Bash",
+      "pattern": "git(\\s+-\\S+(\\s+\\S+)?)*\\s+commit",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Only commit when: 1. ALL tests are passing 2. ALL compiler/linter warnings have been resolved 3. The change represents a single logical unit of work 4. Commit messages clearly state whether the commit contains structural or behavioral changes"
+    },
+    {
+      "name": "prefer-small-frequent-commits",
+      "tool": "Bash",
+      "pattern": "git(\\s+-\\S+(\\s+\\S+)?)*\\s+commit",
+      "field": null,
+      "path": null,
+      "strength": "inject",
+      "evidence": "Use small, frequent commits rather than large, infrequent ones"
+    }
+  ],
+  "skill_candidates": [
+    {
+      "summary": "plan.md 기반 TDD Red-Green-Refactor 사이클 (다음 미완료 테스트 구현 -> 최소 코드 -> 리팩터링 원칙 적용)",
+      "evidence": "When I say \"go\", find the next unmarked test in plan.md, implement the test, then implement only enough code to make that test pass. ... Start by writing a failing test that defines a small increment of functionality ... Write just enough code to make the test pass - no more ... Repeat the cycle for new functionality ... When fixing a defect, first write an API-level failing test then write the smallest possible test that replicates the problem then get both tests to pass."
+    },
+    {
+      "summary": "Tidy First 방식: 구조적 변경을 행동적 변경보다 먼저 적용하고 전후로 테스트 검증",
+      "evidence": "Always make structural changes first when both are needed ... Validate structural changes do not alter behavior by running tests before and after"
+    },
+    {
+      "summary": "새 기능 개발 시 따르는 7단계 예시 워크플로 (실패 테스트 작성부터 커밋까지)",
+      "evidence": "When approaching a new feature: 1. Write a simple failing test for a small part of the feature 2. Implement the bare minimum to make it pass ... 7. Repeat until the feature is complete, committing behavioral changes separately from structural ones"
+    }
+  ],
+  "always_on": [
+    "역할 설정: Kent Beck의 TDD와 Tidy First 원칙을 따르는 시니어 소프트웨어 엔지니어",
+    "핵심 개발 원칙 총론: Red→Green→Refactor 준수, 최소 코드로 테스트 통과, 리팩터링은 테스트 통과 후에만, 높은 코드 품질 유지",
+    "코드 품질 기준: 중복 제거, 의도가 드러나는 이름/구조, 의존성 명시, 작고 단일 책임을 갖는 메서드, 상태·부수효과 최소화, 가장 단순한 해법 사용"
+  ],
+  "low_confidence": [
+    {
+      "rule": "commit-only-when-tests-pass",
+      "category": "strength",
+      "reason": "'Only commit when [조건들]'은 금지(Never/Do NOT)도 아니고 순수 권고(avoid/prefer)도 아닌 경계 표현이라 block과 require-read 중 판단이 갈림"
+    },
+    {
+      "rule": "no-mixed-structural-behavioral-commit",
+      "category": "trigger",
+      "reason": "문서 전체에 'git'이라는 도구/명령이 한 번도 언급되지 않아 git commit 트리거는 관습적 추론임"
+    },
+    {
+      "rule": "commit-only-when-tests-pass",
+      "category": "trigger",
+      "reason": "위와 동일하게 'commit'이 git commit을 가리킨다는 것은 문서 텍스트가 아닌 관습에서 온 추론임"
+    },
+    {
+      "rule": "prefer-small-frequent-commits",
+      "category": "trigger",
+      "reason": "위와 동일하게 'commit'이 git commit을 가리킨다는 것은 문서 텍스트가 아닌 관습에서 온 추론임"
+    },
+    {
+      "rule": "tidy-first-structural-before-behavioral",
+      "category": "routing",
+      "reason": "'Always make structural changes first' 순서 규칙을 단일 트리거 없는 절차(스킬 후보)로 분류했지만, 커밋 전 체크리스트처럼 특정 액션에 묶인 규칙으로도 볼 수 있어 경계가 애매함"
+    }
+  ],
+  "questions": [
+    "'Only commit when: 모든 테스트 통과, 모든 컴파일러/린터 경고 해결, 단일 논리 단위, 구조/행동 구분 명시' 규칙의 강도를 require-read(1회 안내 후 통과)로 잠정 판단했습니다. block(위반 시 차단)이 맞습니까, 아니면 require-read가 맞습니까?",
+    "커밋 관련 규칙 3건(구조/행동 변경 혼합 금지, 테스트 통과 후 커밋, 작고 잦은 커밋)의 트리거를 git commit 명령으로 추론했는데, 문서에는 'git'이라는 도구명이 전혀 등장하지 않습니다. 이 추론이 맞습니까?",
+    "'Always make structural changes first when both are needed'(Tidy First 순서 규칙)를 단일 트리거가 없는 절차로 보고 스킬 후보로 분류했습니다. 커밋 전 체크리스트처럼 특정 액션(커밋)에 묶인 규칙으로 봐야 합니까?"
+  ]
+}

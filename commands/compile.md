@@ -38,6 +38,20 @@ A Bash rule's pattern matches against the command string; an Edit/Write rule's p
   - Recommendation (stays `require-read` or `inject`): "avoid …", "prefer …" (en) · "…은 피하세요", "…지양" (ko) · "〜は避けてください" (ja) · "Evita …", "prefiere …" (es)
 - Use `inject` for advisory rules where even one blocked attempt is overkill (style reminders, soft conventions): the rule is delivered alongside the tool call with zero friction, but compliance is left to the model's judgment rather than forced by a retry.
 
+## 4.5 Confirm low-confidence judgments (interactive only)
+
+Some §2–§4 judgments are measured to be wrong often enough that silently finalizing them is worse than one short question. Before generating files (§5), collect the judgments matching a low-confidence pattern below and ask the user about **at most 3 of them per compile** — pick the ones where a wrong call does the most damage (a wrong `block` halts legitimate work; a wrong trigger never fires; a wrong skill-candidate routing drops an enforceable rule). Each question quotes the source passage, states the tentative judgment, and offers the alternative — answerable in one word. Flagged items beyond the cap are finalized as usual and marked in the §6 review table so review starts with them.
+
+Low-confidence patterns (each observed as a misjudgment in the benchmarks — extend this list only with measured evidence):
+
+- **Strength on the recommendation/prohibition boundary** — after applying §4's speech-act calibration the reading is still arguable (hedged prohibitions, translated nuance, advice and ban mixed in one sentence). Measured: 12–18% of strength assignments differ from gold (`pilot/RESULTS-strength-guidance.md`, `pilot/RESULTS-compile-wild-ko.md`).
+- **Trigger inferred beyond the document** — the document names no command or tool for the action, so `tool`/`pattern` come from convention rather than the text (e.g. the doc says "before creating a PR" but never mentions `gh`; a team on different tooling gets a rule that never fires).
+- **Procedure/rule boundary** — multi-step content where §2's single-triggering-action test is arguable either way. Measured misroute: 1/24 (`pilot/RESULTS-compile-bench-skillroute.md`).
+
+Never question high-confidence judgments: explicit prohibition wording matching §4's calibration examples, triggers whose command the document itself names, or a checklist clearly bound to one action. No flagged items → skip this step silently.
+
+**Non-interactive runs ask nothing**: in headless or non-interactive execution (`claude -p`, CI), skip the questions entirely and finalize every judgment exactly as before — the flags still appear in the §6 review table.
+
 ## 5. Generate rule files
 For each rule, create `.claude/rules/<kebab-case-name>.md`. If there is an original document, put its project-relative path in `source` and write only a **one-line summary** in the body. Two reasons, both hard requirements: the original is read at delivery time (so a pasted copy would drift), and Claude Code's native `.claude/rules/` loader injects the body at session start (so a long body would enter context twice — the body is the always-on declaration, the source is the JIT payload):
 
@@ -79,7 +93,7 @@ New rule document — run /nunchi:compile <its path> to compile it into trigger-
 ```
 
 ## 6. User review
-Show the list of generated rule files as a table (name / trigger / strength / source), and along with the two skip lists from §2 — **skill candidates** (each with its quoted procedural passage) and **always-on guidance** — ask "is there anything to fix?" An overly broad regex becomes a false positive, so scoping it conservatively narrow is the default.
+Show the list of generated rule files as a table (name / trigger / strength / source — with a ⚠ mark on rules that carried a §4.5 low-confidence flag but weren't asked about), and along with the two skip lists from §2 — **skill candidates** (each with its quoted procedural passage) and **always-on guidance** — ask "is there anything to fix?" An overly broad regex becomes a false positive, so scoping it conservatively narrow is the default.
 
 Skill candidates are proposals only — create nothing unless the user approves one. On approval, scaffold `.claude/skills/<kebab-case-name>/SKILL.md` with a one-line `description` (what it does + when to use it) and the quoted procedure as the body, and note that the passage can then be removed from the source document. A document left with only compiled action rules and accepted skill candidates (no always-on guidance) qualifies for the §5.5 `@reference` removal.
 

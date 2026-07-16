@@ -1,0 +1,90 @@
+{
+  "doc": "awm-libraries-1-Alive24_CKBoost",
+  "rules": [
+    {
+      "name": "no-taskmaster-reinit",
+      "tool": "Bash",
+      "pattern": "task-master\\s+init\\b",
+      "field": null,
+      "path": null,
+      "strength": "block",
+      "evidence": "DO NOT RE-INITIALIZE. That will not do anything beyond re-adding the same Taskmaster core files."
+    },
+    {
+      "name": "no-manual-edit-tasks-json",
+      "tool": "Edit",
+      "pattern": "\\.taskmaster/tasks/tasks\\.json$",
+      "field": null,
+      "path": null,
+      "strength": "block",
+      "evidence": "Never manually edit `tasks.json` - use commands instead"
+    },
+    {
+      "name": "no-manual-edit-taskmaster-config",
+      "tool": "Edit",
+      "pattern": "\\.taskmaster/config\\.json$",
+      "field": null,
+      "path": null,
+      "strength": "block",
+      "evidence": "Never manually edit `.taskmaster/config.json` - use `task-master models`"
+    },
+    {
+      "name": "prd-template-structure-write",
+      "tool": "Write",
+      "pattern": "\\.prd\\.(txt|md)$",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Always use the standardized template format shown below ... Maintain strict separation between `<context>` and `<PRD>` sections ... Follow the exact section order and formatting specified"
+    },
+    {
+      "name": "prd-template-structure-edit",
+      "tool": "Edit",
+      "pattern": "\\.prd\\.(txt|md)$",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Always use the standardized template format shown below ... Maintain strict separation between `<context>` and `<PRD>` sections ... Follow the exact section order and formatting specified"
+    }
+  ],
+  "skill_candidates": [
+    {
+      "summary": "표준 개발 워크플로우 — 프로젝트 초기화 → PRD 파싱 → 복잡도 분석/확장 → 데일리 루프(next/show/update-subtask/set-status) → 멀티 Claude worktree 병행",
+      "evidence": "#### 1. Project Initialization ... #### 2. Daily Development Loop ... #### 3. Multi-Claude Workflows"
+    },
+    {
+      "summary": "서브태스크 반복 구현 절차 — show로 요구사항 확인 → 탐색/계획 → 계획 로깅 → in-progress 전환 → 구현 → 진행상황 로깅 → done 전환",
+      "evidence": "1. `task-master show <subtask-id>` - Understand requirements\n2. Explore codebase and plan implementation\n3. `task-master update-subtask --id=<id> --prompt=\"detailed plan\"` - Log plan\n4. `task-master set-status --id=<id> --status=in-progress` - Start work\n5. Implement code following logged plan\n6. `task-master update-subtask --id=<id> --prompt=\"what worked/didn't work\"` - Log progress\n7. `task-master set-status --id=<id> --status=done` - Complete task"
+    },
+    {
+      "summary": "대규모 마이그레이션/다단계 작업용 체크리스트 워크플로우 — PRD 파일 생성 → append 파싱 → 복잡도 분석 후 expand → 항목별 작업 → update-subtask로 진행 기록",
+      "evidence": "1. Create a markdown PRD file describing the new changes: `touch task-migration-checklist.md` ... 2. Use Taskmaster to parse the new prd with `task-master parse-prd --append` ... 3. Use Taskmaster to expand ... 4. Work through items systematically ... 5. Use `task-master update-subtask` to log progress"
+    },
+    {
+      "summary": "PRD 필수 선행 개발 워크플로우 — 제품 설계 논의 → PRD 통합 → PRD 승인 → PRD 기반 개발의 4단계 필수 절차",
+      "evidence": "1. **Product Design Discussion Phase** (REQUIRED FIRST) ... 2. **PRD Consolidation Phase** (REQUIRED SECOND) ... 3. **PRD Approval Phase** (REQUIRED THIRD) ... 4. **PRD-Driven Development Phase** (ONLY AFTER PRD COMPLETE)"
+    }
+  ],
+  "always_on": [
+    "Task Master CLI 명령어·MCP 도구·프로젝트 파일/디렉터리 구조 레퍼런스 — 의무·금지 문구 없는 카탈로그",
+    "MCP 서버 설정(.mcp.json) 예시와 커스텀 슬래시 커맨드 작성 예시 — 사용법 안내",
+    ".claude/settings.json에 tool allowlist 추가 권장 — 강제 아님",
+    "API 키 설정 방법과 모델 구성 커맨드(`task-master models --set-*`) 안내",
+    "Task ID·Status 포맷 및 Task 필드 스키마 설명",
+    "컨텍스트 관리 조언 — 작업 전환 시 `/clear` 사용, `task-master show`로 필요한 컨텍스트만 가져오기",
+    "`gh`/git으로 완료 작업 PR·커밋 생성 예시, git worktree로 병렬 작업 예시 — 의무 문구 없는 사용례",
+    "AI 커맨드 실패·MCP 연결 문제·태스크 파일 동기화 문제에 대한 트러블슈팅 절차",
+    "parse_prd/analyze-complexity/expand 등 AI 호출 커맨드는 최대 1분 소요될 수 있다는 정보성 안내",
+    "세션 관리 조언 — `/clear` 자주 사용, 반복 워크플로우는 커스텀 슬래시 커맨드로, headless 모드(`claude -p`)로 자동화",
+    "update/update-task/update-subtask 사용 구분, `--research` 플래그로 리서치 모드 활성화 안내",
+    "PRD 완성·승인 전에는 어떤 개발도 시작하지 않는다는 정책(PRD-First Mandate, Enforcement, Anti-Patterns) — 특정 tool 호출로 환원되지 않는 프로젝트 방법론 규범",
+    "PRD 품질 요구사항·완료 게이트·품질보증 체크리스트 — 이해관계자 리뷰 절차, 단일 tool 트리거 불가",
+    "제품 설계 논의 단계, Logical Dependency Chain(파운데이션 우선) 및 로드맵 타임라인 미기재 지침 — 방법론 조언",
+    "PRD 파일 크로스툴 호환성·네이밍/저장 위치(docs/*.prd.txt) 조언 — 템플릿 구조 룰에 이미 반영됨",
+    "Quest Submission System 아키텍처와 구현 현황(Implementation Status) 설명 — 규칙이 아닌 프로젝트 현황 문서",
+    "CKB dApp/스마트컨트랙트 개발 원칙(Visual Prototyping First, Test-driven Design 등), SSRI 아키텍처 설명, 서비스 레이어/셀 데이터 구조 패턴 — 설계 가이드 문서, 개별 tool 트리거 불명확",
+    "Molecule 스키마 사용 시 공유 정의 재사용(`import blockchain`)과 build.rs로 코드 생성 통일 — 코드 예시 포함 설계 조언",
+    "에러 처리·테스트 전략 베스트 프랙티스(공유 Error enum 사용, 트랜잭션 실패 처리, Molecule 라운드트립 테스트 등) — 일반 코딩 가이드라인",
+    "서버리스 아키텍처 방향성(Netlify 호스팅, 온체인 우선 저장) 및 폴더 구조(contracts/dapp/docs) 설명 — 프로젝트 아키텍처 문서"
+  ]
+}

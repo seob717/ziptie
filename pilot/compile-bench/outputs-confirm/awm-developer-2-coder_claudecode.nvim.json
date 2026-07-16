@@ -1,0 +1,60 @@
+{
+  "doc": "awm-developer-2-coder_claudecode.nvim",
+  "rules": [
+    {
+      "name": "mise-run-all-before-commit",
+      "tool": "Bash",
+      "pattern": "git(\\s+-\\S+(\\s+\\S+)?)*\\s+commit",
+      "field": null,
+      "path": null,
+      "strength": "block",
+      "evidence": "**ALWAYS run `mise run all` before committing any changes.** This runs code quality checks and formatting that must pass for CI to succeed. Never skip this step - many PRs fail CI because contributors don't run the build commands before committing."
+    }
+  ],
+  "skill_candidates": [
+    {
+      "summary": "새 버전 릴리스 시 버전 번호가 박힌 4곳(init.lua, claude_interactive.sh, lib_claude.sh, CHANGELOG.md)을 모두 갱신하고 릴리스 커맨드를 순서대로 실행하는 절차",
+      "evidence": "When updating the version number for a new release, you must update **ALL** of these files: 1. **`lua/claudecode/init.lua`** - Main version table ... 2. **`scripts/claude_interactive.sh`** - Multiple client version references ... 3. **`scripts/lib_claude.sh`** - ClaudeCodeNvim version ... 4. **`CHANGELOG.md`** - Add new release section"
+    },
+    {
+      "summary": "개발 착수부터 커밋까지 이어지는 권장 개발 흐름(착수 → 변경 → mise run all 검증 → 문서화 → 커밋)",
+      "evidence": "1. **Start Development**: Use existing tests and documentation to understand the system 2. **Make Changes**: Follow existing patterns and conventions in the codebase 3. **Validate Work**: Run `mise run all` to ensure formatting, linting, and tests pass 4. **Document Changes**: Update relevant documentation ... 5. **Commit**: Only commit after successful `mise run all` execution"
+    },
+    {
+      "summary": "파일 탐색기·터미널 등 새 통합을 추가할 때의 5단계 절차(구현 → fixture 구성 필수 → 테스트 → 문서화 → 전체 테스트 실행)",
+      "evidence": "**Adding New Integrations** (file explorers, terminals, etc.): 1. **Implement Integration**: Add support in relevant modules ... 2. **Create Fixture Configuration**: **REQUIRED** - Add a complete Neovim config in `fixtures/[integration-name]/` 3. **Test Integration** ... 4. **Update Documentation** ... 5. **Run Full Test Suite**"
+    },
+    {
+      "summary": "새 MCP 툴을 추가할 때의 5단계 절차(기존 패턴 학습 → 핸들러 구현 → JSON 스키마 추가 → 테스트 작성 → 문서화)",
+      "evidence": "**Adding New Tools**: 1. **Study Existing Patterns**: Review `lua/claudecode/tools/` for consistent structure 2. **Implement Handler**: Return MCP format ... 3. **Add JSON Schema** ... 4. **Create Tests**: Both unit tests and integration tests required 5. **Update Documentation**: Add to this file's MCP tools list"
+    }
+  ],
+  "always_on": [
+    "Common Development Commands(테스트/린트/빌드/fixture 커맨드 목록)는 실행 가능한 명령 카탈로그일 뿐 의무·금지가 붙지 않아 문서로 남김",
+    "Architecture Overview의 컴포넌트 설명(WebSocket 서버, MCP 툴 시스템, Lock File 시스템 등)은 프로젝트 배경 사실 서술",
+    "MCP Protocol Compliance 체크리스트(✅ 항목들)는 현재 구현 상태에 대한 보고이지 지켜야 할 지시가 아님",
+    "Test Organization Principles(Isolation/Mocking/Coverage/Performance/Clarity)는 테스트 작성 시 일반적으로 지향할 원칙",
+    "Logging Best Practices(DEBUG/WARN/ERROR 사용 기준)는 로그 레벨 선택에 대한 일반 지침",
+    "Development Notes의 기술 요구사항·보안 고려사항·성능 최적화·통합 지원 항목은 배경 정보 서술",
+    "Code Quality Standards(테스트 커버리지 320+, 0 warning, MCP/VS Code 호환성 등)는 목표 수치·상태 서술로 단일 액션에 매이지 않음",
+    "Development Quality Gates(lint/test/format/MCP 검증/통합 테스트 5개 게이트)는 이미 규칙화한 mise run all 커밋 전 실행과 상당 부분 중복되는 품질 기준 서술",
+    "Development Troubleshooting(LUA_PATH, JSON 포맷 이슈, 인증 테스트 커맨드)은 문제 해결용 참고 문서",
+    "closeAllDiffTabs 등 개별 도구의 동작 불변식 설명(다른 도구의 diff를 건드리지 않음 등)은 코드 동작에 대한 사실 서술로, 텍스트에서 추출 가능한 금지 패턴이 없음"
+  ],
+  "low_confidence": [
+    {
+      "rule": "mise-run-all-before-commit",
+      "category": "strength",
+      "reason": "'Never skip this step'는 block 계열 문구지만, 실제로 금지되는 행위는 git commit 자체가 아니라 사전 단계 생략이라 기본값인 require-read로도 읽힘"
+    },
+    {
+      "rule": "mise-run-all-before-commit",
+      "category": "trigger",
+      "reason": "문서는 'before committing'이라고만 하고 git 명령을 명시하지 않아 git commit 트리거는 관습적 추론에 의존함"
+    }
+  ],
+  "questions": [
+    "'ALWAYS run mise run all before committing ... Never skip this step' — 문구를 그대로 반영해 block으로 정할까요, 아니면 커밋 자체를 금지하는 문장이 아니므로 기본값인 require-read로 둘까요?",
+    "문서가 'committing'이라고만 하고 git 명령을 명시하지 않았는데, git commit(및 git -C ... commit 변형)에 바인딩해도 될까요?"
+  ]
+}

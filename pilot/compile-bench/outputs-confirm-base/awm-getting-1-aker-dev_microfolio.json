@@ -1,0 +1,18 @@
+{
+  "doc": "awm-getting-1-aker-dev_microfolio",
+  "rules": [],
+  "skill_candidates": [],
+  "always_on": [
+    "Project overview: microfolio is a static portfolio generator (SvelteKit 2, Svelte 5, Tailwind CSS 4) developed by AKER.",
+    "Development commands catalog (pnpm dev/build/deploy/preview/lint/format/optimize-images/clean-images) — lists available commands with no must/never/before/after obligation attached.",
+    "Environment facts: pnpm locked to 9.12.0, Node.js 20+ required, no test framework configured.",
+    "Content system structure: content/projects/{slug}/ layout (index.md frontmatter+body, thumbnail, images/videos/documents subdirs), homepage and about page content paths.",
+    "Data loading architecture: server-side +page.server.js loaders per route, content parsing pattern (split on ---, yaml, marked).",
+    "Key utilities catalog: paths.js, projects.js, imageMetadata.js, config.js, i18n.js and their roles.",
+    "Styling setup: Tailwind CSS 4, custom theme file, dark mode via prefers-color-scheme, IBM Plex Sans font from bunny.net CDN.",
+    "Component conventions: custom components use Ak prefix (e.g. AkHeader); Datatable components power the /list view — stated descriptively, not as an obligation.",
+    "Build & deployment configuration: adapter-static, dynamic prerender entry generation, vite-plugin-static-copy, base path behavior, layout prerender/trailingSlash settings.",
+    "Internationalization setup: locale JSON files, default locale config, RTL auto-detection.",
+    "Project metadata schema example (YAML frontmatter fields: title, date, location, coordinates, type, tags, authors, featured) — presented as an example, no must/required language."
+  ]
+}

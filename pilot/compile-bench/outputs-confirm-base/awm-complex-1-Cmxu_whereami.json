@@ -1,0 +1,50 @@
+{
+  "doc": "awm-complex-1-Cmxu_whereami",
+  "rules": [
+    {
+      "name": "no-legacy-svelte-reactive-statements-edit",
+      "tool": "Edit",
+      "pattern": "\\$:\\s",
+      "field": "new_string",
+      "path": "\\.svelte$",
+      "strength": "block",
+      "evidence": "Follow existing Svelte 5 runes patterns (no legacy reactive statements)"
+    },
+    {
+      "name": "no-legacy-svelte-reactive-statements-write",
+      "tool": "Write",
+      "pattern": "\\$:\\s",
+      "field": "content",
+      "path": "\\.svelte$",
+      "strength": "block",
+      "evidence": "Follow existing Svelte 5 runes patterns (no legacy reactive statements)"
+    },
+    {
+      "name": "playwright-run-headless",
+      "tool": "Bash",
+      "pattern": "playwright\\s+test",
+      "field": null,
+      "path": null,
+      "strength": "inject",
+      "evidence": "**Testing**: Playwright (E2E tests against production) - IMPORTANT: RUN HEADLESS whenever possible"
+    }
+  ],
+  "skill_candidates": [
+    {
+      "summary": "표준 개발 워크플로우: 코드 변경 → npm run dev로 로컬 테스트 → npm run check 타입체크 → npm run lint → npm run deploy → Playwright로 배포 검증 → 해당 시 DEVELOPMENT.md 태스크 상태 갱신",
+      "evidence": "1. Make changes to code\n2. Test locally with `npm run dev`\n3. Run type checking: `npm run check`\n4. Run linting: `npm run lint`\n5. Deploy: `npm run deploy`\n6. Run Playwright tests to verify deployment\n7. Update DEVELOPMENT.md task status if applicable"
+    }
+  ],
+  "always_on": [
+    "Common Development Commands 표(dev/dev:functions/build/preview/check/lint/format) — obligation이 붙지 않은 참고용 명령어 카탈로그",
+    "Tech Stack 및 아키텍처 개요(SvelteKit+TS+Tailwind, Cloudflare Workers, R2+KV, Leaflet, Supabase Auth) — 서술적 사실 정보",
+    "Project Structure 디렉터리 레이아웃(src/routes, src/lib/components 등, functions/api) — 서술적 사실 정보",
+    "Key Systems 설명(게임 플로우, 이미지 관리, 사용자 시스템, KV 네임스페이스 역할) — 서술적 사실 정보",
+    "Component Patterns: TypeScript 사용·타입 임포트, props를 타입 인터페이스로, Tailwind 유틸리티 클래스로 일관된 스타일 — 크리스프한 금지 패턴으로 표현하기 어려운 품질 기대치",
+    "API Patterns: 모든 응답이 APIResponse<T> success/error 구조를 따름, 적절한 HTTP 상태코드·에러 처리, CORS 처리, multipart/form-data 업로드 검증",
+    "State Management: Svelte stores로 반응형 상태 관리(gameStore/authStore/themeStore/toastStore), Supabase와 인증 상태 동기화",
+    "Testing Requirements: 신규 기능은 Playwright E2E 테스트를 가져야 함, 테스트는 프로덕션(geo.cmxu.io) 대상으로 실행됨, 로그인 필요한 테스트는 인증된 사용자 상태 사용, 기능 구현 후 테스트 실행",
+    "Deployment reminder: 변경 완료 시 'npm run build && npx wrangler pages deploy .svelte-kit/cloudflare' 실행 — 특정 툴 콜에 묶이지 않는 모호한 트리거('when you are done making changes')라 컴파일 대상 아님",
+    "Configuration Files 참조 목록(wrangler.toml, svelte.config.js, playwright.config.ts, .cursor/rules/web-development-rules.mdc)"
+  ]
+}

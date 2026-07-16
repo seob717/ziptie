@@ -1,0 +1,103 @@
+{
+  "doc": "awm-infrastructure-1-dymensionxyz_dymension",
+  "rules": [
+    {
+      "name": "no-what-comments-edit",
+      "tool": "Edit",
+      "pattern": "//",
+      "field": "new_string",
+      "path": "\\.go$",
+      "strength": "block",
+      "evidence": "**NEVER** comment the WHAT of code (the code itself shows what it does)"
+    },
+    {
+      "name": "no-what-comments-write",
+      "tool": "Write",
+      "pattern": "//",
+      "field": "content",
+      "path": "\\.go$",
+      "strength": "block",
+      "evidence": "**NEVER** comment the WHAT of code (the code itself shows what it does)"
+    },
+    {
+      "name": "golangci-lint-only-if-go-changed",
+      "tool": "Bash",
+      "pattern": "golangci-lint\\s+run",
+      "field": null,
+      "path": null,
+      "strength": "inject",
+      "evidence": "`golangci-lint run` - Only if you modified Go code"
+    },
+    {
+      "name": "gofumpt-only-if-go-changed",
+      "tool": "Bash",
+      "pattern": "gofumpt\\s+-w",
+      "field": null,
+      "path": null,
+      "strength": "inject",
+      "evidence": "`gofumpt -w .` - Only if you modified Go code"
+    },
+    {
+      "name": "proto-gen-only-if-proto-changed",
+      "tool": "Bash",
+      "pattern": "make\\s+proto-(format|gen)",
+      "field": null,
+      "path": null,
+      "strength": "inject",
+      "evidence": "`make proto-format` and `make proto-gen` - Only if you modified .proto files"
+    },
+    {
+      "name": "go-test-only-modified-packages",
+      "tool": "Bash",
+      "pattern": "go\\s+test",
+      "field": null,
+      "path": null,
+      "strength": "inject",
+      "evidence": "`go test` - Only for packages you modified"
+    },
+    {
+      "name": "full-test-suite-before-push-only",
+      "tool": "Bash",
+      "pattern": "go-acc",
+      "field": null,
+      "path": null,
+      "strength": "inject",
+      "evidence": "Full test suite with `go-acc` - Only before final push or if requested"
+    },
+    {
+      "name": "verify-tx-before-signing",
+      "tool": "Bash",
+      "pattern": "dymd\\s+tx\\s+\\S+",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Always verify transaction details before signing"
+    },
+    {
+      "name": "verify-validator-before-delegate",
+      "tool": "Bash",
+      "pattern": "dymd\\s+tx\\s+staking\\s+delegate",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Verify validator identity before delegating"
+    }
+  ],
+  "skill_candidates": [],
+  "always_on": [
+    "레포 개요: Dymension Hub는 Cosmos SDK 기반 Go 블록체인(Dymension 프로토콜의 정산 레이어)",
+    "FACTS: Cosmos SDK는 단일 스레드로 실행, 트랜잭션은 원자적(에러 시 롤백/패닉 시 무효), BeginBlocker/EndBlocker는 절대 패닉하면 안 됨(체인 정지 유발), 검증인 결과는 결정적이어야 함",
+    "Common Development Commands 레퍼런스: make install/build/proto-gen, golangci-lint run, gofumpt -w . 등 — 의무가 부착되지 않은 사용 카탈로그",
+    "Local Development Setup 레퍼런스: setup_local.sh, dymd start, 유동성 풀/인센티브 부트스트랩 스크립트 — 명시적 순서 의무 없는 카탈로그",
+    "Testing 커맨드 레퍼런스: go test ./..., race+coverage 실행, 모듈별 테스트, ibctesting 통합 테스트",
+    "Architecture Overview: core/economic/utility 모듈 설명 및 아키텍처 패턴(모듈 구조, IBC 미들웨어, 훅 시스템, 테스트 구성)",
+    "Module Dependencies: 모듈 간 의존관계 목록(rollapp→sequencer, delayedack→rollapp, eibc→delayedack, incentives→lockup/sponsorship, lightclient→rollapp/sequencer)",
+    "GitHub Actions/CI 워크플로 설명: test.yml, golangci_lint.yml, proto.yaml, e2e_test 워크플로 — 정보성 설명, 규칙 의무 없음",
+    "Verifying CI Checks Locally 레퍼런스: go-acc 커버리지 실행, golangci-lint/gofumpt, proto 커맨드, git status --porcelain — 'push 전' 같은 명시적 의무 문구 없는 커맨드 카탈로그",
+    "Environment Configuration: 기본 RPC/P2P/gRPC/REST/JSON-RPC/WebSocket 포트 및 환경변수",
+    "Important Notes: Go 1.23.0(toolchain 1.24.2), cosmos-sdk/cometbft/ibc-go/osmosis 커스텀 포크, proto 생성에 Docker 필요, 기본 chain-id·denom",
+    "dymd CLI User Guide: 코어 개념, config, 노드/키 관리, 쿼리, 트랜잭션 생성 커맨드 레퍼런스 — 의무 없는 사용 카탈로그",
+    "Security Best Practices 중 대부분 항목: 개인키/니모닉 공유 금지, 메인넷은 하드웨어 지갑 사용, 노드 소프트웨어 최신 유지, HTTPS RPC 엔드포인트 사용, 키 암호화 백업, 고액 계정은 멀티시그 사용, 적정 가스 한도 설정 — 단일 Claude 툴콜에 묶이지 않는 일반 운영자 조언",
+    "Troubleshooting 가이드: account sequence mismatch/insufficient fees/key not found/connection refused/unauthorized 에러에 대한 사후 대응 — 사전 행동 규칙이 아닌 증상→해결 룩업"
+  ]
+}

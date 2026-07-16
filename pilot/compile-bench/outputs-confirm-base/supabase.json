@@ -1,0 +1,78 @@
+{
+  "doc": "supabase",
+  "rules": [
+    {
+      "name": "check-ui-index-before-new-primitive",
+      "tool": "Write",
+      "pattern": "^packages/ui/.*\\.(tsx|ts)$",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Check `packages/ui/index.tsx` before creating new primitives."
+    },
+    {
+      "name": "no-hardcoded-colors-edit",
+      "tool": "Edit",
+      "pattern": "#[0-9a-fA-F]{3,8}\\b|rgba?\\(",
+      "field": "new_string",
+      "path": "\\.(tsx|jsx|css)$",
+      "strength": "block",
+      "evidence": "Tailwind only, semantic tokens (`bg-muted`, `text-foreground-light`), no hardcoded colors."
+    },
+    {
+      "name": "no-hardcoded-colors-write",
+      "tool": "Write",
+      "pattern": "#[0-9a-fA-F]{3,8}\\b|rgba?\\(",
+      "field": "content",
+      "path": "\\.(tsx|jsx|css)$",
+      "strength": "block",
+      "evidence": "Tailwind only, semantic tokens (`bg-muted`, `text-foreground-light`), no hardcoded colors."
+    },
+    {
+      "name": "studio-shortcut-registry-preferred-edit",
+      "tool": "Edit",
+      "pattern": "addEventListener\\(\\s*['\"]keydown|onKeyDown\\s*=|useHotkeys\\(",
+      "field": "new_string",
+      "path": "apps/studio/.*\\.(tsx|ts)$",
+      "strength": "inject",
+      "evidence": "Prefer registered, discoverable shortcuts over one-off keyboard listeners; keep `G then ...` chords for navigation."
+    },
+    {
+      "name": "studio-shortcut-registry-preferred-write",
+      "tool": "Write",
+      "pattern": "addEventListener\\(\\s*['\"]keydown|onKeyDown\\s*=|useHotkeys\\(",
+      "field": "content",
+      "path": "apps/studio/.*\\.(tsx|ts)$",
+      "strength": "inject",
+      "evidence": "Prefer registered, discoverable shortcuts over one-off keyboard listeners; keep `G then ...` chords for navigation."
+    },
+    {
+      "name": "avoid-studio-barrel-files-edit",
+      "tool": "Edit",
+      "pattern": "apps/studio/.*/index\\.(ts|tsx)$",
+      "field": null,
+      "path": null,
+      "strength": "inject",
+      "evidence": "Avoid barrel re-export files."
+    },
+    {
+      "name": "avoid-studio-barrel-files-write",
+      "tool": "Write",
+      "pattern": "apps/studio/.*/index\\.(ts|tsx)$",
+      "field": null,
+      "path": null,
+      "strength": "inject",
+      "evidence": "Avoid barrel re-export files."
+    }
+  ],
+  "skill_candidates": [],
+  "always_on": [
+    "pnpm 10 + Turborepo monorepo; requires Node >= 22.",
+    "Directory structure table (apps/studio, apps/docs, apps/www, packages/ui, packages/common, e2e/studio) — descriptive, no attached obligation.",
+    "Common Commands code block — usage catalog of install/dev/test/build/lint/typecheck commands, no ordering or obligation attached.",
+    "UI — import from 'ui', use `_Shadcn_` suffixed variants for form primitives — general style guidance without a crisply regex-bindable trigger.",
+    "Language — Use U.S. English everywhere — blanket tone/style guidance, not tied to a specific detectable pattern.",
+    "Studio — Pages router; co-locate sub-components with parent — architectural fact, not checkable via a single-file content/path pattern.",
+    "See studio-* skills for detailed studio conventions — redirect to existing skills, not procedural content in this document."
+  ]
+}

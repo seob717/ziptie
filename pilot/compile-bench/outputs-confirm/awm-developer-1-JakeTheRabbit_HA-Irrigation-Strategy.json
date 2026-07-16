@@ -1,0 +1,165 @@
+{
+  "doc": "awm-developer-1-JakeTheRabbit_HA-Irrigation-Strategy",
+  "rules": [
+    {
+      "name": "commit-message-conventional-with-trailer",
+      "tool": "Bash",
+      "pattern": "git(\\s+-\\S+(\\s+\\S+)?)*\\s+commit",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Commit style: conventional commits (feat:/fix:/docs:/chore:) with a Co-Authored-By: Claude trailer when written via Claude Code."
+    },
+    {
+      "name": "changelog-dual-view-structure-edit",
+      "tool": "Edit",
+      "pattern": "CHANGELOG\\.md$",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Changelog = dual view. Every release in CHANGELOG.md leads with 🌱 In plain English (anyone can follow it) then 🔧 Technical notes (entity/code detail). Keep both when adding a release."
+    },
+    {
+      "name": "changelog-dual-view-structure-write",
+      "tool": "Write",
+      "pattern": "CHANGELOG\\.md$",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Changelog = dual view. Every release in CHANGELOG.md leads with 🌱 In plain English (anyone can follow it) then 🔧 Technical notes (entity/code detail). Keep both when adding a release."
+    },
+    {
+      "name": "state-field-safe-defaults-edit",
+      "tool": "Edit",
+      "pattern": "addons/f2_control/f2_control/controller\\.py$",
+      "field": null,
+      "path": null,
+      "strength": "block",
+      "evidence": "Adding a state field → add it to _fresh_zone with a safe default and read it with .get(k) / is not None; never assume it exists in an old file."
+    },
+    {
+      "name": "state-field-safe-defaults-write",
+      "tool": "Write",
+      "pattern": "addons/f2_control/f2_control/controller\\.py$",
+      "field": null,
+      "path": null,
+      "strength": "block",
+      "evidence": "Adding a state field → add it to _fresh_zone with a safe default and read it with .get(k) / is not None; never assume it exists in an old file."
+    },
+    {
+      "name": "addon-option-safe-defaults-edit",
+      "tool": "Edit",
+      "pattern": "addons/f2_control/config\\.yaml$|addons/f2_control/f2_control/controller\\.py$",
+      "field": null,
+      "path": null,
+      "strength": "block",
+      "evidence": "Adding an add-on option → give it a neutral default and read it o.get(\"key\", default) so an old options.json without the key still works. Never require the operator to wipe state, re-run setup, reconfigure, or hand-migrate a schema."
+    },
+    {
+      "name": "addon-option-safe-defaults-write",
+      "tool": "Write",
+      "pattern": "addons/f2_control/config\\.yaml$|addons/f2_control/f2_control/controller\\.py$",
+      "field": null,
+      "path": null,
+      "strength": "block",
+      "evidence": "Adding an add-on option → give it a neutral default and read it o.get(\"key\", default) so an old options.json without the key still works. Never require the operator to wipe state, re-run setup, reconfigure, or hand-migrate a schema."
+    },
+    {
+      "name": "entity-rename-remove-breaking-edit",
+      "tool": "Edit",
+      "pattern": "custom_components/crop_steering/(sensor|number|switch|select|const|config_flow)\\.py$",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Integration entity changes → additive. Renaming/removing an entity an old install relies on is breaking; avoid or migrate."
+    },
+    {
+      "name": "entity-rename-remove-breaking-write",
+      "tool": "Write",
+      "pattern": "custom_components/crop_steering/(sensor|number|switch|select|const|config_flow)\\.py$",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "Integration entity changes → additive. Renaming/removing an entity an old install relies on is breaking; avoid or migrate."
+    },
+    {
+      "name": "compat-change-requires-migration-test",
+      "tool": "Edit",
+      "pattern": "addons/f2_control/f2_control/controller\\.py$|addons/f2_control/config\\.yaml$|custom_components/crop_steering/(sensor|number|switch|select|const|config_flow)\\.py$",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "A change to state/options/entities isn't done until a test shows an old install still loads."
+    },
+    {
+      "name": "addon-rebuild-api-fails",
+      "tool": "Bash",
+      "pattern": "hassio\\.addon_rebuild|addon_rebuild",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "There is no API rebuild with the HA long-lived token — hassio.addon_rebuild 400s and the Supervisor proxy 401s (needs the in-container SUPERVISOR_TOKEN)."
+    },
+    {
+      "name": "addon-restart-not-deploy",
+      "tool": "Bash",
+      "pattern": "ha\\s+addons\\s+restart|hassio\\.addon_restart|docker\\s+restart\\s+addon_",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "A plain restart re-runs the baked image (stale code); only a Rebuild re-COPYs addons/f2_control/. ... Never claim an engine change is live off a restart."
+    }
+  ],
+  "skill_candidates": [
+    {
+      "summary": "engine/integration 변경 배포 절차 — 모듈 복사 → Supervisor에서 Rebuild(또는 임시로 옵션 값 수정) → 통합 변경은 Reload Custom Components",
+      "evidence": "Deploying engine changes: copy changed modules to addons/f2_control/ on the live box, then Rebuild the add-on from Supervisor (⋮ → Rebuild) — the Dockerfile COPY f2_control /app bakes the code into the image at build time, so a plain restart reuses the old image and does NOT pick up code changes (it only re-reads the config.yaml options). Rebuild = re-COPY + restart. (Interim without a rebuild: the running build's shot sizing reads the add-on Configuration options substrate_l/flow_lps, so editing those + Save corrects shot length on the old image.) Integration changes: Developer Tools → YAML → Reload Custom Components. For crop-steering-engine package changes, update the package source and Rebuild the add-on."
+    }
+  ],
+  "always_on": [
+    "2계층 아키텍처 개요 — HA 통합(custom_components/crop_steering/)은 하드웨어를 직접 건드리지 않고, f2-control add-on이 킬스위치 input_boolean.f2_control_enabled로 게이트된 실시간 자동화 엔진을 구동한다.",
+    "문서 진입점 안내 — docs/SYSTEM_OVERVIEW.md → README.md → ENTITIES.md 순으로 읽을 것을 권장.",
+    "Dev commands 참고 목록 — ruff/black/yamllint 린트, 통합/엔진 pytest 명령, add-on 로그 조회 명령. 특정 액션(커밋/PR) 전 실행 의무가 명시되지 않은 사용법 카탈로그.",
+    "PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 환경변수는 일부 로컬 Python 설치의 hydra/omegaconf 플러그인 충돌을 피하기 위한 것이며 CI에는 영향 없음.",
+    "HA 통합 아키텍처 상세 — ~100개 엔티티(config-flow UI, YAML 없음), 서비스 목록(transition_phase 등), calculations.py의 순수 헬퍼.",
+    "f2-control add-on 아키텍처 상세 — 60초 폴링 단일 동기 프로세스, 위상 전환/하드웨어 시퀀싱/드라이백 감지/소스워터 게이트/페일클로즈드 쓰기/EC 보정 최소 간격/선택적 PID EC 루프/일일 상한/센서 퓨전 재발행/운영자 vitals, 샷 길이 산출 공식.",
+    "핵심 파일 목록 — config_flow.py, 엔티티 플랫폼 파일들, calculations.py, const.py, controller.py, core.py의 역할 설명.",
+    "P0~P3 위상 로직 정의와 grow-day(라이트온 기준 리셋)·라이트오프 강제 P3 전환 의미론.",
+    "하드웨어 제어 시퀀스(Safety checks → Pump prime → Mainline → Zone valve → Irrigate → Shutdown)와 밸브 닫힘 read-back 검증 동작 설명.",
+    "엔티티 ID 명명 패턴 참고(글로벌/존별/센서/서비스) — 엔진은 entity_id로 읽으므로 friendly-name 변경엔 영향받지 않는다는 설명.",
+    "의존성 경계 설명 — 통합은 HA+voluptuous만, 엔진은 순수 Python(scipy/numpy 없음), add-on은 자체 requirements.txt.",
+    "테스트 스위트 구성 개요 — TESTING.md, bash tests/run_ci.sh, 각 스위트가 커버하는 범위.",
+    "'Stay generic' 프레이밍 문장과 F2 실기 전용 설정 요구사항(feed_ec_sensor/feed_ph_sensor를 F2 add-on Configuration에 설정) — 오퍼레이터의 Supervisor UI 조작이라 Claude 툴 호출로 바인딩되지 않음.",
+    "배포 확인은 펌프 가동 이력(switch.veg_main_pump, /api/history/period)으로 검증하라는 방법론 — 특정 툴 트리거에 매이지 않는 검증 절차 설명.",
+    "샷 사이징 단위 환산 설명(존 단위 vs 식물당 블록) — 도메인 계산 지식.",
+    "F2 실기 고유 수치(존 3개×식물 36주, 6L 블록, 4L/hr, 라이트 10-22시, 피드 EC/pH 밴드) — 설치별 참고 사실.",
+    "폐기된 'intelligence' 레이어(RootSense/ClimateSense) 히스토리 노트 — archive 태그로 보존, 잔존 비활성 엔티티는 엔진이 무시."
+  ],
+  "low_confidence": [
+    {
+      "rule": "entity-rename-remove-breaking",
+      "category": "strength",
+      "reason": "'구버전 설치가 의존하는 엔티티 rename/remove는 breaking'이라 단언하지만 실제 지시 문구는 'avoid or migrate'(권고형)라 §4 기준으로는 require-read, 결과의 심각성(breaking)을 보면 block도 주장 가능한 경계 사례."
+    },
+    {
+      "rule": "compat-change-requires-migration-test",
+      "category": "trigger",
+      "reason": "'state/options/entities 변경 시 구버전 호환 테스트 필요'라는 단일 문장을 controller.py+config.yaml+엔티티 플랫폼 파일 전체를 아우르는 결합 정규식으로 확장 — 문서가 하나로 명명한 커맨드가 아니라 세 섹션을 조합해 추론한 트리거."
+    },
+    {
+      "rule": "addon-restart-not-deploy",
+      "category": "trigger",
+      "reason": "재시작이 새 코드를 반영하지 않는다는 경고는 명확하지만, 문서는 재시작의 정확한 셸 명령 형태를 restart 맥락에서 직접 보여주지 않는다(로그 명령의 `ha addons logs`/`docker logs addon_<slug>` 컨벤션에서 유추)."
+    },
+    {
+      "rule": "addon-rebuild-api-fails",
+      "category": "trigger",
+      "reason": "hassio.addon_rebuild는 HA 서비스명으로 언급될 뿐, Claude가 Bash로 호출할 구체적 셸 명령 형태는 문서에 없어 트리거 정규식이 추론에 의존."
+    }
+  ],
+  "questions": [
+    "엔티티 rename/remove 규칙 — 'breaking'이라는 결과 설명과 'avoid or migrate'라는 권고형 표현이 함께 쓰였습니다. require-read로 둘까요, block으로 올릴까요?",
+    "'상태/옵션/엔티티 변경 시 구버전 호환 테스트 필요' 규칙의 트리거를 controller.py + config.yaml + 엔티티 플랫폼 파일 전체를 묶은 광범위 정규식으로 잡았습니다. 이 범위 그대로 괜찮을까요, 좁혀야 할까요?",
+    "'재시작은 새 코드를 반영하지 않는다' 규칙의 Bash 트리거(`ha addons restart` 등)를 문서의 로그 명령 컨벤션에서 유추했습니다. 이 추론된 패턴을 그대로 채택할까요?"
+  ]
+}

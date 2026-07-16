@@ -1,0 +1,67 @@
+{
+  "doc": "awm-developer-2-coder_claudecode.nvim",
+  "rules": [
+    {
+      "name": "run-mise-all-before-commit",
+      "tool": "Bash",
+      "pattern": "git(\\s+-\\S+(\\s+\\S+)?)*\\s+commit",
+      "field": null,
+      "path": null,
+      "strength": "block",
+      "evidence": "**ALWAYS run `mise run all` before committing any changes.** This runs code quality checks and formatting that must pass for CI to succeed. Never skip this step - many PRs fail CI because contributors don't run the build commands before committing."
+    }
+  ],
+  "skill_candidates": [
+    {
+      "summary": "새 릴리스 버전을 올릴 때 init.lua/claude_interactive.sh/lib_claude.sh/CHANGELOG.md 4개 파일을 순서대로 갱신하는 릴리스 절차",
+      "evidence": "When updating the version number for a new release, you must update **ALL** of these files: 1. **`lua/claudecode/init.lua`** - Main version table ... 2. **`scripts/claude_interactive.sh`** ... 3. **`scripts/lib_claude.sh`** ... 4. **`CHANGELOG.md`** - Add new release section with: Release date, Features with PR references, Bug fixes with PR references, Development improvements"
+    },
+    {
+      "summary": "새 통합(파일 탐색기·터미널 등) 추가 시 구현→fixture 생성→테스트→문서화→전체 테스트 순으로 진행하는 절차",
+      "evidence": "**Adding New Integrations** (file explorers, terminals, etc.): 1. **Implement Integration**: Add support in relevant modules ... 2. **Create Fixture Configuration**: **REQUIRED** - Add a complete Neovim config in `fixtures/[integration-name]/` 3. **Test Integration**: Use fixture to verify functionality with `vv [integration-name]` 4. **Update Documentation** ... 5. **Run Full Test Suite**: Ensure `mise run all` passes with new integration"
+    },
+    {
+      "summary": "새 MCP 도구 추가 시 기존 패턴 검토→핸들러 구현→JSON 스키마 추가→테스트 작성→문서화 순으로 진행하는 절차",
+      "evidence": "**Adding New Tools**: 1. **Study Existing Patterns**: Review `lua/claudecode/tools/` for consistent structure 2. **Implement Handler**: Return MCP format ... 3. **Add JSON Schema** ... 4. **Create Tests**: Both unit tests and integration tests required 5. **Update Documentation**: Add to this file's MCP tools list"
+    },
+    {
+      "summary": "개발 착수부터 커밋까지 이해→구현→검증→문서화→커밋 순으로 따르는 권장 개발 흐름",
+      "evidence": "1. **Start Development**: Use existing tests and documentation to understand the system 2. **Make Changes**: Follow existing patterns and conventions in the codebase 3. **Validate Work**: Run `mise run all` to ensure formatting, linting, and tests pass 4. **Document Changes** ... 5. **Commit**: Only commit after successful `mise run all` execution."
+    },
+    {
+      "summary": "인증 흐름을 수동으로 검증하는 절차: 플러그인 시작→lock 파일 확인→WebSocket 연결 테스트→로그 확인",
+      "evidence": "**Authentication Flow Testing**: 1. Start the plugin: `:ClaudeCodeStart` 2. Check lock file contains `authToken`: `cat ~/.claude/ide/*.lock | jq .authToken` 3. Test WebSocket connection with auth: Use test scripts in `scripts/` directory 4. Verify authentication in logs: Set `log_level = \"debug\"` in config"
+    }
+  ],
+  "always_on": [
+    "프로젝트 개요: claudecode.nvim은 Anthropic 공식 IDE 확장과 동일한 WebSocket 기반 MCP 프로토콜을 순수 Lua·무의존성으로 구현한 Neovim 플러그인이라는 설명",
+    "테스트 명령 레퍼런스: mise run test / busted 특정 파일 / busted --coverage 등 실행 가능한 명령 카탈로그(의무 없음)",
+    "코드 품질 명령 레퍼런스: mise run check / mise run format / luacheck 직접 실행 명령 카탈로그",
+    "빌드 명령 레퍼런스: mise run all/test/check/format/clean/tasks 명령 카탈로그",
+    "mise 개발 툴체인 설치·활성화 안내(mise install, mise run setup, shell rc에 mise activate 추가)",
+    "통합 테스트용 fixture 사용법: vv/vve/list-configs 명령과 사용 가능한 fixture 목록",
+    "아키텍처 개요: WebSocket 서버·MCP 도구 시스템·lock 파일·선택 추적·diff 통합·터미널 통합 등 핵심 컴포넌트 구성 설명",
+    "WebSocket 서버 구현 세부: TCP 서버·핸드셰이크·프레임 처리·클라이언트 관리·유틸리티 모듈 구성 설명",
+    "인증 시스템 설명: 128비트 토큰, 헤더 기반 인증, lock 파일 디스커버리, MCP 준수 사실 정보",
+    "MCP 도구 아키텍처: VS Code 확장과 동일한 동작·포맷을 구현한다는 완전 호환성 설명 및 노출/내부 도구 목록",
+    "터미널 통합 옵션: 내부(snacks/native)·외부 터미널 제공자 설명과 설정 예시",
+    "주요 파일 위치 안내(init.lua, config.lua, plugin/claudecode.lua, tests/)",
+    "Autocmd 이벤트 설명: ClaudeCodeSendComplete 발생 시점·데이터 구조·용도",
+    "MCP 프로토콜 준수 현황 및 VS Code 확장과의 100% 기능 동등성 설명",
+    "테스트 아키텍처: unit/component/integration 3계층 구성과 테스트 파일 명명 규칙 설명",
+    "테스트 인프라: 커스텀 JSON 인코더/디코더 지원 범위 설명",
+    "테스트 조직 원칙: 독립성·모킹·커버리지·성능·명확성 등 일반적 테스트 스타일 가이드",
+    "인증 관련 사실 정보: 128비트 토큰 생성 방식과 lock 파일 저장 위치",
+    "인증 로깅 레벨(DEBUG/WARN/ERROR)별 기록 대상 설명",
+    "로깅 모범 사례: 연결 이벤트·인증 흐름·사용자 대상 이벤트·시스템 오류별 로그 레벨 사용 가이드",
+    "diff_opts 설정 옵션 레퍼런스 및 예시 코드",
+    "개발 노트: Neovim 0.8+ 요구사항, 외부 의존성 없음 등 기술 요구사항 설명",
+    "보안 고려사항: WebSocket 서버는 로컬 연결만 허용, 인증 이벤트는 모두 로깅된다는 사실",
+    "성능 최적화 사항: 선택 추적 디바운스, 프레임 처리 최적화, 커넥션 풀링 설명",
+    "통합 지원 현황: 지원하는 터미널·파일 탐색기 목록",
+    "코드 품질 기준: 테스트 커버리지 320+, 무경고 luacheck, MCP 준수, VS Code 호환, treefmt 포맷 등 일반 기준",
+    "개발 품질 게이트 목록(check/test/format/MCP 검증/통합 테스트) — 특정 트리거 없이 나열된 체크리스트",
+    "개발 트러블슈팅: LUA_PATH, JSON 포맷, MCP 도구 등록, 인증 테스트 관련 일반 안내",
+    "Best Practice로 언급된 'mise run all을 편집 세션 끝에 항상 사용하라'는 일반 권고(구체적 커밋 전 규칙과 별개의 느슨한 안내)"
+  ]
+}

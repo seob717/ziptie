@@ -1,0 +1,38 @@
+{
+  "doc": "langgraph",
+  "rules": [
+    {
+      "name": "run-checks-before-pr",
+      "tool": "Bash",
+      "pattern": "gh\\s+pr\\s+create",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "run the following commands in that library's directory before creating a pull request: `make format` ... `make lint` ... `make test`"
+    },
+    {
+      "name": "no-sphinx-backticks-edit",
+      "tool": "Edit",
+      "pattern": "``[^`]+``",
+      "field": "new_string",
+      "path": "\\.(py|js|jsx|ts|tsx)$",
+      "strength": "block",
+      "evidence": "Do NOT use Sphinx-style double backtick formatting (` ``code`` `). Use single backticks (`` `code` ``) for inline code references in docstrings and comments."
+    },
+    {
+      "name": "no-sphinx-backticks-write",
+      "tool": "Write",
+      "pattern": "``[^`]+``",
+      "field": "content",
+      "path": "\\.(py|js|jsx|ts|tsx)$",
+      "strength": "block",
+      "evidence": "Do NOT use Sphinx-style double backtick formatting (` ``code`` `). Use single backticks (`` `code` ``) for inline code references in docstrings and comments."
+    }
+  ],
+  "skill_candidates": [],
+  "always_on": [
+    "모노레포 구조 및 각 라이브러리 위치(libs/ 하위)와 전체 라이브러리 목록/설명",
+    "라이브러리 의존성 맵 — 특정 라이브러리 변경이 그 하위 의존 라이브러리들에 영향을 줄 수 있다는 안내",
+    "TEST 변수로 특정 테스트 파일을 지정하거나 추가 pytest 옵션을 전달하는 방법 안내"
+  ]
+}

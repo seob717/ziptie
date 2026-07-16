@@ -1,0 +1,83 @@
+{
+  "doc": "awm-complex-1-Cmxu_whereami",
+  "rules": [
+    {
+      "name": "playwright-headless-run",
+      "tool": "Bash",
+      "pattern": "playwright\\s+test",
+      "field": null,
+      "path": null,
+      "strength": "inject",
+      "evidence": "Playwright (E2E tests against production) - IMPORTANT: RUN HEADLESS whenever possible"
+    },
+    {
+      "name": "svelte-runes-no-legacy-reactive",
+      "tool": "Edit",
+      "pattern": "\\$:\\s",
+      "field": "new_string",
+      "path": "\\.svelte$",
+      "strength": "block",
+      "evidence": "Follow existing Svelte 5 runes patterns (no legacy reactive statements)"
+    },
+    {
+      "name": "svelte-runes-no-legacy-reactive",
+      "tool": "Write",
+      "pattern": "\\$:\\s",
+      "field": "content",
+      "path": "\\.svelte$",
+      "strength": "block",
+      "evidence": "Follow existing Svelte 5 runes patterns (no legacy reactive statements)"
+    },
+    {
+      "name": "api-response-structure",
+      "tool": "Edit",
+      "pattern": "functions/api/",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "All API responses follow `APIResponse<T>` interface with success/error structure"
+    },
+    {
+      "name": "api-response-structure",
+      "tool": "Write",
+      "pattern": "functions/api/",
+      "field": null,
+      "path": null,
+      "strength": "require-read",
+      "evidence": "All API responses follow `APIResponse<T>` interface with success/error structure"
+    }
+  ],
+  "skill_candidates": [
+    {
+      "summary": "Feature development lifecycle: make changes, test locally, type-check, lint, deploy, verify with Playwright, update DEVELOPMENT.md",
+      "evidence": "1. Make changes to code\n2. Test locally with `npm run dev`\n3. Run type checking: `npm run check`\n4. Run linting: `npm run lint`\n5. Deploy: `npm run deploy`\n6. Run Playwright tests to verify deployment\n7. Update DEVELOPMENT.md task status if applicable"
+    }
+  ],
+  "always_on": [
+    "Common Development Commands: npm run dev/dev:functions/build/preview usage catalog (no obligation attached)",
+    "Code Quality commands catalog: npm run check / lint / format",
+    "Testing commands catalog: npx playwright test invocation variants",
+    "Deployment commands catalog plus single-line reminder to run build+deploy 'when you are done making changes' (no specific tool call ties to being 'done')",
+    "Tech stack description: SvelteKit/TypeScript/Tailwind, Cloudflare Workers, R2/KV, Leaflet, Supabase auth",
+    "Project structure layout for frontend (src/routes, src/lib/*) and backend (functions/api/)",
+    "Key Systems - Game Flow: creation, round-based play, Haversine distance, exponential scoring, results/sharing",
+    "Key Systems - Image Management: R2 upload with EXIF GPS extraction, IMAGE_DATA KV metadata, thumbnails, visibility controls",
+    "Key Systems - User System: Supabase auth integration, USER_DATA KV profiles, stats/upload tracking, profile pictures in R2",
+    "Data Storage: IMAGE_DATA/USER_DATA/GAME_DATA KV namespace purposes",
+    "Component Patterns: use TypeScript with typed imports, consistent Tailwind styling, properly typed prop interfaces (too vague for a specific pattern)",
+    "API Patterns: proper HTTP status codes/error handling, CORS handling, multipart/form-data uploads with validation",
+    "State Management: Svelte stores for gameStore/authStore/themeStore/toastStore; auth state synced with Supabase",
+    "Testing Requirements: new features should have Playwright E2E tests; use authenticated user state for login-requiring tests; run tests after feature implementation (no single tool call to bind to)",
+    "Configuration Files list: wrangler.toml, svelte.config.js, playwright.config.ts, .cursor/rules/web-development-rules.mdc"
+  ],
+  "low_confidence": [
+    {
+      "rule": "svelte-runes-no-legacy-reactive",
+      "category": "strength",
+      "reason": "'no legacy reactive statements' is a parenthetical clarifying an affirmative convention ('follow runes patterns'), not an explicit 'never/do NOT' -- could be require-read/inject instead of block"
+    }
+  ],
+  "questions": [
+    "Svelte 컴포넌트에서 legacy reactive statement(`$:`) 사용을 완전히 금지해서 Edit/Write를 block해야 할까요, 아니면 runes 패턴 권장 수준(require-read/inject)으로 다뤄야 할까요?"
+  ]
+}

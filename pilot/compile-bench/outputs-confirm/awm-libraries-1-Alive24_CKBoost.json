@@ -1,0 +1,178 @@
+{
+  "doc": "awm-libraries-1-Alive24_CKBoost",
+  "rules": [
+    {
+      "name": "no-reinitialize-taskmaster",
+      "tool": "Bash",
+      "pattern": "task-master\\s+init",
+      "field": null,
+      "path": null,
+      "strength": "block",
+      "evidence": "DO NOT RE-INITIALIZE. That will not do anything beyond re-adding the same Taskmaster core files."
+    },
+    {
+      "name": "no-manual-edit-tasks-json",
+      "tool": "Edit",
+      "pattern": "tasks\\.json",
+      "field": null,
+      "path": null,
+      "strength": "block",
+      "evidence": "Never manually edit `tasks.json` - use commands instead"
+    },
+    {
+      "name": "no-manual-edit-taskmaster-config",
+      "tool": "Edit",
+      "pattern": "\\.taskmaster/config\\.json",
+      "field": null,
+      "path": null,
+      "strength": "block",
+      "evidence": "Never manually edit `.taskmaster/config.json` - use `task-master models`"
+    },
+    {
+      "name": "prd-file-location-convention",
+      "tool": "Write",
+      "pattern": "\\.prd\\.(txt|md)$",
+      "field": null,
+      "path": null,
+      "strength": "inject",
+      "evidence": "PRD files should be store at docs/project-name.prd.txt"
+    },
+    {
+      "name": "no-duplicate-generated-types-edit",
+      "tool": "Edit",
+      "pattern": "\\b(struct|type|interface)\\s+(UserData|CampaignData|ConnectedTypeID)\\b",
+      "field": "new_string",
+      "path": "\\.(rs|ts|tsx)$",
+      "strength": "block",
+      "evidence": "USE GENERATED TYPES: Always use types generated from Molecule schema - NEVER create duplicate type definitions"
+    },
+    {
+      "name": "no-duplicate-generated-types-write",
+      "tool": "Write",
+      "pattern": "\\b(struct|type|interface)\\s+(UserData|CampaignData|ConnectedTypeID)\\b",
+      "field": "content",
+      "path": "\\.(rs|ts|tsx)$",
+      "strength": "block",
+      "evidence": "USE GENERATED TYPES: Always use types generated from Molecule schema - NEVER create duplicate type definitions"
+    },
+    {
+      "name": "no-validation-in-ssri-methods-edit",
+      "tool": "Edit",
+      "pattern": "modules\\.rs$",
+      "field": null,
+      "path": null,
+      "strength": "block",
+      "evidence": "Do NOT perform validation - only construct transactions"
+    },
+    {
+      "name": "no-validation-in-ssri-methods-write",
+      "tool": "Write",
+      "pattern": "modules\\.rs$",
+      "field": null,
+      "path": null,
+      "strength": "block",
+      "evidence": "Do NOT perform validation - only construct transactions"
+    },
+    {
+      "name": "no-duplicate-molecule-schema-edit",
+      "tool": "Edit",
+      "pattern": "\\.mol$",
+      "field": null,
+      "path": null,
+      "strength": "block",
+      "evidence": "# Import shared definitions - DO NOT DUPLICATE"
+    },
+    {
+      "name": "no-duplicate-molecule-schema-write",
+      "tool": "Write",
+      "pattern": "\\.mol$",
+      "field": null,
+      "path": null,
+      "strength": "block",
+      "evidence": "# Import shared definitions - DO NOT DUPLICATE"
+    },
+    {
+      "name": "no-edit-generated-code",
+      "tool": "Edit",
+      "pattern": "generated/.*\\.rs$",
+      "field": null,
+      "path": null,
+      "strength": "block",
+      "evidence": "Molecule generates code for Molecule Schema. Don't edit the generated code, but use it as a reference."
+    }
+  ],
+  "skill_candidates": [
+    {
+      "summary": "PRD-first development workflow: product design discussion -> PRD consolidation -> PRD approval -> PRD-driven development",
+      "evidence": "1. **Product Design Discussion Phase** (REQUIRED FIRST) ... 2. **PRD Consolidation Phase** (REQUIRED SECOND) ... 3. **PRD Approval Phase** (REQUIRED THIRD) ... 4. **PRD-Driven Development Phase** (ONLY AFTER PRD COMPLETE)"
+    },
+    {
+      "summary": "Iterative subtask implementation loop: show task, explore, log plan, mark in-progress, implement, log progress, mark done",
+      "evidence": "1. `task-master show <subtask-id>` - Understand requirements ... 6. `task-master update-subtask --id=<id> --prompt=\"what worked/didn't work\"` - Log progress 7. `task-master set-status --id=<id> --status=done` - Complete task"
+    },
+    {
+      "summary": "Large-migration checklist workflow: create PRD file, parse with --append, expand into subtasks, work through systematically",
+      "evidence": "1. Create a markdown PRD file describing the new changes ... 2. Use Taskmaster to parse the new prd with `task-master parse-prd --append` ... 4. Work through items systematically, checking them off as completed"
+    },
+    {
+      "summary": "CKB dApp build order: visual prototyping (v0.dev) first, smart contract/cell design second, test-driven design third",
+      "evidence": "- **Visual Prototyping First**: Use v0.dev for visual prototyping ... - **Smart Contract Design Second** ... - **Test-driven Design Third**: With transaction skeletons, we should start to build integration tests"
+    }
+  ],
+  "always_on": [
+    "Essential Commands / MCP tools 참조표 — 실행 가능한 커맨드 목록이지 의무·금지가 아닌 사용법 카탈로그",
+    "Key Files & Project Structure, Directory Structure 문서 — 구조 설명일 뿐 액션 제약 없음",
+    ".claude/settings.json allowedTools 예시 — 권장 설정값 안내, 특정 툴 호출 트리거 없음",
+    "API Keys 구성 안내 (.env, ANTHROPIC_API_KEY 등) — 설정 정보",
+    "Task Structure & IDs, Task Fields, Task Status Values 문서",
+    "'/clear 자주 사용', '헤드리스 모드로 자동화' 등 세션 관리 조언 — 특정 툴 호출에 못 묶임",
+    "Multi-Task Updates, Research Mode 사용법 안내 — 커맨드 선택 가이드일 뿐 의무 아님",
+    "AI-Powered Operations 목록 — 지연시간(최대 1분)이 걸릴 수 있다는 정보성 안내",
+    "'Task markdown 파일은 auto-generated' — 명시적 금지 동사 없어 always-on으로 유지",
+    "'수동 변경 후 task-master generate 실행' — 바로 위 tasks.json 수동편집 금지 규칙과 상충하는 잔여 안내라 always-on 처리",
+    "PRD-First Development Mandate의 품질 기준·안티패턴·게이트 대부분(420~647행) — '코딩 시작 전' 같은 광범위한 조건이라 특정 tool 호출에 못 묶임, 절차 부분만 스킬 후보로 분리",
+    "PRD 로드맵에 타임라인 금지 등 PRD 콘텐츠 품질 기준 — 콘텐츠 정규식으로 표현 불가",
+    "dApp Service Layer 아키텍처 컨벤션(*-cells.ts / *-service.ts / Provider 패턴) — 권장 구조일 뿐 특정 파일에 못 묶임",
+    "Error Handling Best Practices — 일반 코딩 스타일 조언",
+    "Testing Strategy 일반 지침 — 특정 커맨드·트리거 없음",
+    "Architecture 섹션(Netlify/Neon 서버리스 원칙, 폴더 구조) — 아키텍처 철학",
+    "'make build 사용' 안내 — 대안 커맨드를 명시하지 않아 금지 트리거 추론 불가"
+  ],
+  "low_confidence": [
+    {
+      "rule": "no-manual-edit-tasks-json / no-manual-edit-taskmaster-config",
+      "category": "trigger",
+      "reason": "문서가 '수동 편집'만 언급해 Edit 전용으로 판단했으나 Write(전체 재작성)로도 위반 가능해 페어링 여부가 불확실함"
+    },
+    {
+      "rule": "prd-file-location-convention",
+      "category": "trigger",
+      "reason": "문서가 특정 tool을 명시하지 않아 Write 트리거와 .prd.(txt|md) 확장자 패턴을 관례로 추론함"
+    },
+    {
+      "rule": "no-duplicate-generated-types-edit / no-duplicate-generated-types-write",
+      "category": "trigger",
+      "reason": "'중복 타입 정의 금지'가 특정 커맨드를 명시하지 않아 매칭할 타입명·구문(struct/type/interface)을 자체 추론함"
+    },
+    {
+      "rule": "no-validation-in-ssri-methods-edit / no-validation-in-ssri-methods-write",
+      "category": "trigger",
+      "reason": "'검증 로직 금지'를 파일 경로(modules.rs)만으로 스코프했고 '검증 로직'이라는 콘텐츠는 정규식으로 표현 불가능해 과다 트리거 위험이 있음"
+    },
+    {
+      "rule": "PRD-First Development Mandate 라우팅",
+      "category": "routing",
+      "reason": "420~647행의 대규모 PRD 게이트 섹션을 스킬 후보(워크플로)+always-on(품질 기준)으로 분리했으나, '코딩 시작 전 PRD 필수'라는 광범위한 금지를 block 규칙으로 컴파일해야 할지 애매함"
+    },
+    {
+      "rule": "no-duplicate-molecule-schema-edit / no-duplicate-molecule-schema-write",
+      "category": "strength",
+      "reason": "'DO NOT DUPLICATE'가 예시 .mol 코드블록 내 주석이라 실제 지시문인지 예시 설명의 일부인지 경계가 모호함"
+    }
+  ],
+  "questions": [
+    "PRD-First Development Mandate(420~647행)의 '코딩 시작 전 PRD 필수' 게이트를 광범위한 block 규칙(모든 Edit/Write에 적용)으로 컴파일할까요, 아니면 스킬 후보+always-on으로만 남길까요? (현재: 스킬 후보+always-on)",
+    "'Do NOT perform validation' 규칙을 modules.rs 전체에 경로만으로 block 걸까요, 아니면 콘텐츠 패턴이 없어 신뢰도가 낮으니 always-on으로 내릴까요? (현재: path 스코프 block 유지)",
+    "'Never manually edit tasks.json/config.json'을 Edit 전용으로 바인딩했는데 Write(전체 덮어쓰기)에도 페어링할까요? (현재: Edit 전용)"
+  ]
+}
