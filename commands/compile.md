@@ -102,7 +102,7 @@ If the user requests a change, edit only the affected rule file(s) and show the 
 ## 7. Closing lines
 If at least one generated rule has a `source` document, show a one-line before/after right after the review is settled — byte-based, with tokens only as a rough estimate (tokenizers differ):
 
-> always-on 컨텍스트: <sum of source doc bytes> → <sum of one-line rule bodies> (−N%), 상세 문서는 트리거 시에만 배달 — §5.5에서 @참조를 제거한 경우 기준.
+> always-on 컨텍스트: <sum of source doc bytes> → <sum of one-line rule bodies> (−N%), 상세 문서는 트리거 시에만 전달 — §5.5에서 @참조를 제거한 경우 기준.
 
 Only if at least one rule file was generated, end the final message with this single line (once — never repeat it later in the session):
 
