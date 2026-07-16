@@ -559,6 +559,86 @@ def test_recompile_notice_logged_and_marker_sanitized():
     )
 
 
+def test_block_repeat_attempt_abbreviated_but_still_denies():
+    # #23: 재매칭도 deny는 유지(강제력 무회귀), 사유만 본문+기배달 참조로 축약
+    d = make_project(RULE.replace("strength: require-read", "strength: block"))
+    first = decide(hook_input(session="d1"), d)
+    assert "[LAB-123]" in first["hookSpecificOutput"]["permissionDecisionReason"]
+    second = decide(hook_input(session="d1"), d)
+    hso = second["hookSpecificOutput"]
+    assert hso["permissionDecision"] == "deny"
+    reason = hso["permissionDecisionReason"]
+    assert "[LAB-123]" not in reason  # 전문 중복 없음
+    assert "earlier in this session" in reason
+    assert "pr-rules" in reason and "PR 규칙을 따르라" in reason  # 본문은 유지
+
+
+def test_block_full_text_restored_after_rearm():
+    d = make_project(RULE.replace("strength: require-read", "strength: block"))
+    decide(hook_input(session="d2"), d)
+    decide(hook_input(session="d2"), d)  # 축약 배달
+    engine.rearm({"session_id": "d2", "source": "compact"}, d)
+    third = decide(hook_input(session="d2"), d)
+    assert "[LAB-123]" in third["hookSpecificOutput"]["permissionDecisionReason"]
+
+
+def test_shared_source_second_trigger_abbreviated():
+    # #23: 다른 트리거의 룰이 같은 source를 쓰면 두 번째 발화는 축약 배달
+    d = make_project()
+    rule2 = RULE.replace("name: pr-rules", "name: commit-rules").replace(
+        "gh\\s+pr\\s+create", "git\\s+commit"
+    )
+    with open(os.path.join(d, ".claude", "rules", "commit.md"), "w") as f:
+        f.write(rule2)
+    first = decide(hook_input(session="d3"), d)  # gh pr create → 전문
+    assert "[LAB-123]" in first["hookSpecificOutput"]["permissionDecisionReason"]
+    second = decide(hook_input(command="git commit -m x", session="d3"), d)
+    reason = second["hookSpecificOutput"]["permissionDecisionReason"]
+    assert "[LAB-123]" not in reason
+    assert "earlier in this session" in reason
+    assert "commit-rules" in reason
+
+
+def test_shared_source_same_batch_delivers_full_once():
+    d = make_project()
+    rule2 = RULE.replace("name: pr-rules", "name: pr-rules-2")  # 같은 트리거·source
+    with open(os.path.join(d, ".claude", "rules", "pr2.md"), "w") as f:
+        f.write(rule2)
+    reason = decide(hook_input(session="d4"), d)["hookSpecificOutput"][
+        "permissionDecisionReason"
+    ]
+    assert reason.count("[LAB-123]") == 1  # 전문은 배치 내 1회
+    assert "pr-rules" in reason and "pr-rules-2" in reason
+
+
+def test_fallback_delivery_does_not_fake_doc_marker():
+    # source 파일이 없어 본문 폴백이면 문서 마커를 남기지 않는다 —
+    # 다음 배달이 거짓 "기배달" 참조로 축약되면 안 된다.
+    d = make_project(with_source=False)
+    rule2 = RULE.replace("name: pr-rules", "name: commit-rules").replace(
+        "gh\\s+pr\\s+create", "git\\s+commit"
+    )
+    with open(os.path.join(d, ".claude", "rules", "commit.md"), "w") as f:
+        f.write(rule2)
+    decide(hook_input(session="d5"), d)
+    second = decide(hook_input(command="git commit -m x", session="d5"), d)
+    reason = second["hookSpecificOutput"]["permissionDecisionReason"]
+    assert "earlier in this session" not in reason
+    assert "PR 규칙을 따르라" in reason  # 폴백 본문 정상 배달
+    state = os.path.join(d, ".claude", "nunchi", "state")
+    assert not any("--src--" in fn for fn in os.listdir(state))
+
+
+def test_abbreviated_delivery_logged_with_flag():
+    d = make_project(RULE.replace("strength: require-read", "strength: block"))
+    decide(hook_input(session="d6"), d)
+    decide(hook_input(session="d6"), d)
+    logs = glob.glob(os.path.join(d, ".claude", "nunchi", "logs", "*.jsonl"))
+    entries = [json.loads(ln) for ln in open(logs[0]) if ln.strip()]
+    flags = [e.get("abbreviated") for e in entries if e["decision"] == "deny"]
+    assert flags == [None, True]  # 첫 배달은 전문, 재매칭은 축약
+
+
 class TestRearm(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.mkdtemp()

@@ -52,6 +52,19 @@ RECOMPILE_TEMPLATE = (
     "strength, the compiled triggers go stale: after the edit, run "
     "`/nunchi:compile {source}` or suggest it to the user."
 )
+# 중복 배달 축약 (#23): 전문이 이미 이 세션 transcript에 있으면(블록 재매칭,
+# 같은 source를 공유하는 앞선 배달) 본문 1줄 + 기배달 참조로 줄인다 —
+# deny 자체는 유지하므로 강제력은 그대로, 페이로드만 준다.
+ALREADY_DELIVERED_NOTE = (
+    "(Delivered in full earlier in this session — the full text remains in the "
+    "transcript above and still applies unchanged.)"
+)
+
+
+def _doc_marker(state_dir: str, session: str, source: str) -> str:
+    return os.path.join(
+        state_dir, f"{session}--src--{_SESSION_SAFE_RE.sub('-', source)}"
+    )
 
 
 def _match_field(rule: Rule, tool_name: str, tool_input: dict):
@@ -66,14 +79,19 @@ def _match_field(rule: Rule, tool_name: str, tool_input: dict):
     return tool_input.get("file_path", "")  # Edit/Write/기타: 경로 매칭 (기본)
 
 
-def _content(rule: Rule, project_dir: str) -> str:
+def _content(rule: Rule, project_dir: str):
+    """(배달 본문, 원본에서 읽었는지) 반환.
+
+    폴백 배달(파일 없음 등)은 문서 마커를 남기면 안 되므로 — 나중 배달이
+    거짓 "기배달" 참조로 축약되는 것 방지 — 출처를 함께 알린다 (#23).
+    """
     if rule.source:
         try:
             with open(os.path.join(project_dir, rule.source), encoding="utf-8") as f:
-                return f.read()  # 배달 시점에 원본을 읽는다 — 복붙 아님
+                return f.read(), True  # 배달 시점에 원본을 읽는다 — 복붙 아님
         except Exception:
             pass  # 파일 없음·권한·인코딩 깨짐 등 — 룰 본문으로 폴백 (배치 전체를 죽이지 않음)
-    return rule.body
+    return rule.body, False
 
 
 def _log(
@@ -243,7 +261,33 @@ def decide(input_data: dict, project_dir: str) -> dict:
 
         # 콘텐츠 조립을 마커 기록보다 먼저 수행한다 — 한 룰의 배달 실패가
         # 이미 조립된 다른 룰의 마커 기록(=배달 확정)을 소급 무효화하지 않도록.
-        reasons = [_reason(rule, _content(rule, project_dir)) for rule in to_deliver]
+        # 축약 (#23): 블록 재매칭이거나 같은 source의 전문이 이 세션에 이미
+        # 나갔으면(같은 배치 내 포함) 본문 + 기배달 참조로 줄인다 — deny는
+        # 그대로라 강제력 무회귀, 페이로드만 준다. 폴백 배달(from_source
+        # False)은 문서 마커를 남기지 않아 거짓 기배달 참조를 만들지 않는다.
+        reasons, marks = [], []
+        docs_full_in_batch = set()
+        for rule in to_deliver:
+            repeat_block = rule.strength == "block" and os.path.exists(
+                os.path.join(state_dir, f"{session}--{rule.name}")
+            )
+            doc_seen = bool(rule.source) and (
+                rule.source in docs_full_in_batch
+                or os.path.exists(_doc_marker(state_dir, session, rule.source))
+            )
+            if repeat_block or doc_seen:
+                content, from_source, abbreviated = (
+                    f"{rule.body}\n\n{ALREADY_DELIVERED_NOTE}",
+                    False,
+                    True,
+                )
+            else:
+                content, from_source = _content(rule, project_dir)
+                abbreviated = False
+                if from_source:
+                    docs_full_in_batch.add(rule.source)
+            reasons.append(_reason(rule, content))
+            marks.append((rule, from_source, abbreviated))
         if recompile:
             reasons.append(recompile[0])
 
@@ -253,13 +297,22 @@ def decide(input_data: dict, project_dir: str) -> dict:
         inject_only = all(rule.strength == "inject" for rule in to_deliver)
         decision = "inject" if inject_only else "deny"
 
-        for rule in to_deliver:
-            if rule.strength in ("require-read", "inject"):
-                os.makedirs(state_dir, exist_ok=True)
-                marker = os.path.join(state_dir, f"{session}--{rule.name}")
-                with open(marker, "w") as f:
+        for rule, from_source, abbreviated in marks:
+            os.makedirs(state_dir, exist_ok=True)
+            marker = os.path.join(state_dir, f"{session}--{rule.name}")
+            with open(marker, "w") as f:
+                f.write("delivered")
+            if from_source:
+                with open(_doc_marker(state_dir, session, rule.source), "w") as f:
                     f.write("delivered")
-            _log(project_dir, session, rule.name, tool_name, decision)
+            _log(
+                project_dir,
+                session,
+                rule.name,
+                tool_name,
+                decision,
+                extra={"abbreviated": True} if abbreviated else None,
+            )
 
         if recompile:
             # 마커 기록 실패는 룰 배달(이미 확정)을 소급 무효화하면 안 된다

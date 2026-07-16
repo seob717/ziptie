@@ -278,6 +278,36 @@ def test_main_output_recompile_meta_not_a_rule_row(capsys, monkeypatch):
     assert not any(ln.startswith("(recompile)") for ln in out.splitlines())
 
 
+def test_context_economics_excludes_abbreviated_deliveries():
+    # #23: 축약 배달은 배달 건수에는 들어가되 문서 전문 바이트로 계상하지 않는다
+    import json as _json
+
+    from core.report import context_economics
+
+    d = tempfile.mkdtemp()
+    os.makedirs(os.path.join(d, ".claude", "rules"))
+    os.makedirs(os.path.join(d, "docs"))
+    with open(os.path.join(d, "docs", "pr.md"), "w") as f:
+        f.write("x" * 1000)
+    with open(os.path.join(d, ".claude", "rules", "pr.md"), "w") as f:
+        f.write(
+            "---\nname: pr-a\ntrigger:\n  tool: Bash\n  pattern: x\n"
+            "source: docs/pr.md\n---\nb"
+        )
+    log_dir = os.path.join(d, ".claude", "nunchi", "logs")
+    os.makedirs(log_dir)
+    rows = [
+        {"session": "s", "rule": "pr-a", "decision": "deny"},
+        {"session": "s", "rule": "pr-a", "decision": "deny", "abbreviated": True},
+    ]
+    with open(os.path.join(log_dir, "2026-07-16.jsonl"), "w") as f:
+        for r in rows:
+            f.write(_json.dumps({"ts": "t", "tool": "Bash", **r}) + "\n")
+    eco = context_economics(d)
+    assert eco["deliveries"] == 2
+    assert eco["delivered_bytes"] == 1000  # 전문 1회분만
+
+
 def test_summarize_empty_project():
     d = tempfile.mkdtemp()
     assert summarize(d) == {"rules": {}, "never_triggered": []}

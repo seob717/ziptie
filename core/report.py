@@ -97,6 +97,8 @@ def context_economics(project_dir: str) -> dict:
                 if str(entry.get("rule", "")).startswith("("):
                     continue  # (recompile) 등 메타 항목 — 룰 배달 지출이 아니다
                 deliveries += 1
+                if entry.get("abbreviated"):
+                    continue  # 축약 배달 (#23) — 문서 전문이 나가지 않았다
                 source = rule_doc.get(entry.get("rule", ""))
                 delivered_bytes += doc_sizes.get(source, 0)
     return {
