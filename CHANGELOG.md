@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.7.3](https://github.com/seob717/nunchi/compare/v0.7.2...v0.7.3) (2026-07-16)
+
+
+### Features
+
+* compile 스펙에 저신뢰 판단 확인 단계(§4.5) 추가 — A/B 벤치 무회귀 ([#35](https://github.com/seob717/nunchi/issues/35)) ([#37](https://github.com/seob717/nunchi/issues/37)) ([49e9cfc](https://github.com/seob717/nunchi/commit/49e9cfc4e1f0b7a4fa73a6fa4359f296b60c22c8))
+
+
+### Bug Fixes
+
+* 한국어 출력·문서 표기를 [#29](https://github.com/seob717/nunchi/issues/29) 용어로 통일 — 배달→전달·재무장→재활성화·강도→강제 수준 ([#38](https://github.com/seob717/nunchi/issues/38)) ([#39](https://github.com/seob717/nunchi/issues/39)) ([98fb6e5](https://github.com/seob717/nunchi/commit/98fb6e5889e6650f22d1376f253546215ac635a6))
+
+
+### Docs
+
+* README.ko.md 전면 문체 교정 — readme-translate 스킬 적용 ([#29](https://github.com/seob717/nunchi/issues/29)) ([#32](https://github.com/seob717/nunchi/issues/32)) ([e2b5a47](https://github.com/seob717/nunchi/commit/e2b5a476efb319039d8045a8dd576348f0aba7a5))
+* README.ko.md 추가 — 영어 정본의 릴리스 스냅숏 번역 ([#25](https://github.com/seob717/nunchi/issues/25)) ([#27](https://github.com/seob717/nunchi/issues/27)) ([827d033](https://github.com/seob717/nunchi/commit/827d0335d47ad90e14f67e9792a19e42901a889a))
+* README에 실측 요약 표·before/after 예시·커맨드 레퍼런스·도그푸딩 명시 추가 ([#30](https://github.com/seob717/nunchi/issues/30)) ([#36](https://github.com/seob717/nunchi/issues/36)) ([a446196](https://github.com/seob717/nunchi/commit/a44619655c0212bfcfaed2088317c26876faefaf))
+* 빠른 시작을 2경로 설치로 재구성 — CLI·자동 업데이트·팀 셋업 안내 ([#33](https://github.com/seob717/nunchi/issues/33)) ([#34](https://github.com/seob717/nunchi/issues/34)) ([464a1fc](https://github.com/seob717/nunchi/commit/464a1fcffdeedc08d48f6d5d7b2601f4363129d3))
+
 ## [0.7.2](https://github.com/seob717/nunchi/compare/v0.7.1...v0.7.2) (2026-07-16)
 
 
