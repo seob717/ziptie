@@ -3,6 +3,8 @@
 [![License](https://img.shields.io/github/license/seob717/nunchi)](LICENSE)
 [![Release](https://img.shields.io/github/v/release/seob717/nunchi)](https://github.com/seob717/nunchi/releases)
 
+**English** | [한국어](README.ko.md)
+
 *"Rules with nunchi — delivered before you have to ask."*
 
 nunchi is a Claude Code plugin that turns CLAUDE.md rules into event listeners. Instead of loading every rule at session start and hoping it survives 40 turns and a compaction, each rule is delivered at the exact moment its action fires:
@@ -180,6 +182,8 @@ uvx pre-commit run --all-files # lint & format (ruff)
 ## Contributing
 
 Issues and PRs are welcome. Commit messages must follow [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `docs:`, …) — [release-please](https://github.com/googleapis/release-please) derives versions and the changelog from them.
+
+README translations are welcome too — this English README is canonical, and translations (e.g. [README.ko.md](README.ko.md)) are snapshots synced at release time, with the base commit noted at the top.
 
 ## Limitations and roadmap
 
