@@ -7,5 +7,6 @@ pilot/runs/
 /docs/
 /.claude/*
 !/.claude/rules/
+!/.claude/skills/
 pilot/compile-bench/corpus/
 pilot/compile-wild/corpus/
