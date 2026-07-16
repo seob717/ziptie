@@ -134,37 +134,41 @@ What this table shows is *not* an edge of "JIT has a higher compliance rate than
 
 **…Claude Code's path-scoped rules (`paths:` frontmatter)?** Path-scoped rules trigger on *reading files*. nunchi triggers on *actions*: `gh pr create`, `git commit`, the content of the edit being written (`trigger.field: new_string`), with per-session delivery state and three enforcement strengths. The two compose — nunchi's rule files are native `.claude/rules/` files, and the native loader injects their one-line bodies at session start while nunchi delivers the full source document at trigger time.
 
+**…a skill?** Skills and nunchi share the same context shape — a one-line declaration always loaded, the full body just-in-time — but the trigger owner differs. A skill is *pulled*: the model must recognize from the description that it's needed and open it, and no mechanism forces a skill to fire before a given action (the [official docs](https://code.claude.com/docs/en/skills) point to hooks when a guarantee is needed). Rule compliance fails exactly when the model has forgotten a rule exists — and a model that forgot the rule won't open its skill either. nunchi is *pushed*: the action itself is the trigger, so delivery doesn't depend on the model remembering anything; it can enforce (`require-read`/`block` — skills are advisory only), and every delivery is logged. In short: **skills work when the model remembers; nunchi works when it forgets.** The two compose — put procedures (release steps, migration workflows) in skills, and let nunchi guard the actions those procedures take: a skill that runs `gh pr create` mid-procedure gets the PR rules delivered right there.
+
 **…an MCP/output-compression tool like Context Mode or RTK?** Those compress what flows *into* context (MCP output, Bash output). nunchi doesn't compress anything — it schedules rule delivery. Token saving is a side effect of not front-loading documents; the product is that the rule is provably in context at the moment of the action, and every delivery is logged so you can audit compliance instead of assuming it.
 
 **…hoping the regex matches?** Triggers are deterministic regexes by design — auditable, testable, no retrieval variance. The cost is honest: a mis-scoped pattern misses or over-fires. That's why compiled rule files are plain text you review (step 2 of Quick start), why content rules are required to carry a `path:` scope, and why the compile spec itself is benchmarked for format validity (100%) and fabrication (0) on wild corpora.
 
 ## How nunchi compares
 
-Different tools solve different layers of "make the agent follow the rules". Static distributors ([Ruler](https://github.com/intellectronica/ruler), [rulesync](https://github.com/dyoshikawa/rulesync)) answer *"how do I ship the same rules to every agent?"*. Guardrail hooks ([hookify](https://github.com/anthropics/claude-code/tree/main/plugins/hookify)) answer *"how do I stop a bad action?"*. nunchi answers *"how do I get the right rule into the model's context at the moment it matters — and keep it there across compactions?"*. These compose: you can distribute rule documents with Ruler and deliver them with nunchi.
+Different tools solve different layers of "make the agent follow the rules". Static distributors ([Ruler](https://github.com/intellectronica/ruler), [rulesync](https://github.com/dyoshikawa/rulesync)) answer *"how do I ship the same rules to every agent?"*. Guardrail hooks ([hookify](https://github.com/anthropics/claude-code/tree/main/plugins/hookify)) answer *"how do I stop a bad action?"*. [Skills](https://code.claude.com/docs/en/skills) answer *"how do I give the agent a procedure without paying for it up front?"*. nunchi answers *"how do I get the right rule into the model's context at the moment it matters — and keep it there across compactions?"*. These compose: you can distribute rule documents with Ruler, put procedures in skills, and deliver the rules with nunchi.
 
 The table below is a **scope map, not a scoreboard** — an empty cell or a "by design" note usually marks a deliberate design choice, and several rows go the other way (hookify covers more hook events, Writ retrieves semantically, Ruler distributes to 30+ agents — none of which nunchi does).
 
-| Capability | nunchi | hookify | Claude Code native rules | Ruler / rulesync | Writ |
-|---|---|---|---|---|---|
-| Action (command) triggers — `gh pr create`, `git commit` | ✅ | ✅ | file-read path globs | out of scope¹ | partial (built-in gates) |
-| Content triggers — what's being *written* | ✅ `trigger.field` | ✅ | — | out of scope¹ | partial (static-analysis pre-write) |
-| Delivers rule text **to the model** on block | ✅ reason | Stop ✅ / PreToolUse: user-facing message | — | out of scope¹ | ✅ rule ID + reason |
-| Non-blocking JIT injection | ✅ `inject` | — | at file-read | out of scope¹ | ✅ every turn (retrieval) |
-| Delivery state — once per session, no block loops | ✅ | stateless by design | — | out of scope¹ | ✅ per-phase IDs + token budget |
-| Re-armed after compaction | ✅ measured 5/5 | stateless by design | root CLAUDE.md documented; rules files unspecified | out of scope¹ | ✅ PostCompact re-inject |
-| Source document read at delivery time (no drift) | ✅ | message lives in the rule file | ✅ | copied at generation | ✅ |
-| Delivery log + report | ✅ JSONL, `/nunchi:report` | — | — | out of scope¹ | ✅ friction log + dashboard |
-| Hook events beyond PreToolUse (PostToolUse, Stop, UserPromptSubmit) | not yet — Stop rules on the roadmap | ✅ 4 events | — | — | ✅ broad coverage |
-| Semantic rule matching (meaning, not regex) | regex by design (deterministic) | regex | path globs | — | ✅ hybrid-RAG |
-| Multi-agent rule distribution (Cursor, Cline, …) | not planned | — | — | ✅ 30+ agents | — |
-| Runtime dependencies | Python stdlib | Python stdlib | built-in | Node | Docker + Neo4j + FastAPI |
-| Published compliance measurements | pre-registered runs above | — | — | — | qualitative pressure-run transcripts |
+| Capability | nunchi | hookify | Claude Code native rules | Claude Code Skills | Ruler / rulesync | Writ |
+|---|---|---|---|---|---|---|
+| Action (command) triggers — `gh pr create`, `git commit` | ✅ | ✅ | file-read path globs | model-pulled² | out of scope¹ | partial (built-in gates) |
+| Content triggers — what's being *written* | ✅ `trigger.field` | ✅ | — | — | out of scope¹ | partial (static-analysis pre-write) |
+| Delivers rule text **to the model** on block | ✅ reason | Stop ✅ / PreToolUse: user-facing message | — | advisory only — cannot block | out of scope¹ | ✅ rule ID + reason |
+| Non-blocking JIT injection | ✅ `inject` | — | at file-read | ✅ at invocation² | out of scope¹ | ✅ every turn (retrieval) |
+| Delivery state — once per session, no block loops | ✅ | stateless by design | — | identical re-invocation deduped | out of scope¹ | ✅ per-phase IDs + token budget |
+| Re-armed after compaction | ✅ measured 5/5 | stateless by design | root CLAUDE.md documented; rules files unspecified | budgeted re-attach (oldest dropped) | out of scope¹ | ✅ PostCompact re-inject |
+| Source document read at delivery time (no drift) | ✅ | message lives in the rule file | ✅ | ✅ body read at invocation | copied at generation | ✅ |
+| Delivery log + report | ✅ JSONL, `/nunchi:report` | — | — | — | out of scope¹ | ✅ friction log + dashboard |
+| Hook events beyond PreToolUse (PostToolUse, Stop, UserPromptSubmit) | not yet — Stop rules on the roadmap | ✅ 4 events | — | skill-scoped hooks in frontmatter | — | ✅ broad coverage |
+| Semantic rule matching (meaning, not regex) | regex by design (deterministic) | regex | path globs | ✅ description matching | — | ✅ hybrid-RAG |
+| Multi-agent rule distribution (Cursor, Cline, …) | not planned | — | — | ✅ portable SKILL.md (open standard) | ✅ 30+ agents | — |
+| Runtime dependencies | Python stdlib | Python stdlib | built-in | built-in | Node | Docker + Neo4j + FastAPI |
+| Published compliance measurements | pre-registered runs above | — | — | — | — | qualitative pressure-run transcripts |
 
 ¹ Ruler and rulesync are static distributors by design — they generate config files and hand off to each agent's own runtime, so runtime-delivery rows simply don't apply to them.
 
+² Skills are model-invoked: the model matches the request against each skill's description. Nothing binds a skill to a tool call, and nothing forces it to fire before an action — invocation rides on the model's judgment, and the [official docs](https://code.claude.com/docs/en/skills) point to hooks when a guarantee is needed. See the FAQ entry above.
+
 Hook overhead, measured: ~24ms median per tool call (26ms when a rule is delivered). Rows verified against each tool's source or official docs as of July 2026 — corrections welcome via issue.
 
-Credit where due: hookify pioneered markdown-frontmatter rules on Claude Code hooks and covers more hook events (PostToolUse, Stop, UserPromptSubmit); Ruler and rulesync solve cross-agent distribution properly; Writ explores semantic retrieval-based delivery. nunchi's niche is deliberately narrow: deterministic, action-triggered delivery with delivery-state tracking — and only measured claims.
+Credit where due: hookify pioneered markdown-frontmatter rules on Claude Code hooks and covers more hook events (PostToolUse, Stop, UserPromptSubmit); Skills are the right home for procedures — progressive disclosure at ~100 tokens per skill plus execution controls (`allowed-tools`, model/effort overrides, forked context) that nunchi doesn't have; Ruler and rulesync solve cross-agent distribution properly; Writ explores semantic retrieval-based delivery. nunchi's niche is deliberately narrow: deterministic, action-triggered delivery with delivery-state tracking — and only measured claims.
 
 ## Development
 
